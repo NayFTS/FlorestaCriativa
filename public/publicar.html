@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floresta Criativa - Publicar Post</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+  </head>
+  <body>
+    <header>
+      <a href="index.html">
+        <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header">
+      </a>
+      <h1>Publicar Post</h1>
+    </header>
+    <div id="top-image"></div>
+    <!-- Isso substitui a tag img -->
+    <form id="postForm" enctype="multipart/form-data">
+      <label for="title">Título:</label>
+      <input type="text" id="title" name="title" required><br><br>
+    
+      <!-- Editor de conteúdo -->
+      <label for="editor">Conteúdo:</label>
+      <textarea id="editor" aria-label="Editor de texto do post"></textarea>
+    
+      <!-- Campo escondido para armazenar o conteúdo final -->
+      <textarea id="content" name="content" style="display:none;"></textarea>
+      <br><br>
+    
+      <label for="image">Imagem de Capa:</label>
+      <input type="file" id="image" name="image" accept="image/*"><br><br>
+    
+      <label for="url">Página de destino:</label>
+      <select id="url" name="url" required>
+        <option label="escolha uma das opções"></option>
+        <option value="about.html">Sobre Mim</option>
+        <option value="verde-inspiracao.html">Hobbies, animes, jogos e leituras</option>
+        <option value="sapo-imaginario.html">portfolio e projetos</option>
+        <option value="rascunhos-da-floresta.html">eu que escrevi</option>
+      </select>
+      <br><br>
+    
+      <fieldset>
+          <legend>Categorias:</legend>
+          <div class="category">
+              <input type="checkbox" id="cat1" value="1" name="category[]">
+              <label for="cat1">Escrita</label>
+          </div>
+          <div class="category">
+              <input type="checkbox" id="cat2" value="2" name="category[]">
+              <label for="cat2">Projetos</label>
+          </div>
+          <div class="category">
+              <input type="checkbox" id="cat3" value="3" name="category[]">
+              <label for="cat3">Animes</label>
+          </div>
+          <div class="category">
+              <input type="checkbox" id="cat4" value="4" name="category[]">
+              <label for="cat4">Jogos</label>
+          </div>
+          <div class="category">
+              <input type="checkbox" id="cat5" value="5" name="category[]">
+              <label for="cat5">Slice of Life</label>
+          </div>
+      </fieldset><br><br>
+    
+      <button type="submit">Publicar</button>
+    </form>
+    
+    <script>
+      ClassicEditor
+        .create(document.querySelector('#editor'))
+        .then(editor => {
+            // Captura o conteúdo do CKEditor ao enviar o formulário
+            document.getElementById('postForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Impede o comportamento padrão de recarregar a página
+                var content = editor.getData(); // Obtém o conteúdo do CKEditor
+                document.getElementById('content').value = content; // Insere o conteúdo no textarea escondido
+                
+                // Envia os dados via fetch
+                const formData = new FormData(this); // Pega todos os dados do formulário
+                
+                fetch('/addPost', {  // Supondo que essa seja sua rota de adicionar posts
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Post publicado com sucesso!');
+                    } else {
+                        alert('Erro ao publicar o post.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar o formulário:', error);
+                });
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao inicializar o CKEditor:', error);
+        });
+    </script>
+    
+
+    <div id="bottom-image"></div>
+    <!-- Isso substitui a tag img -->
+    <footer>
+      <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Postagens - Floresta Criativa</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
+  </head>
+  <body>
+    <header>
+      <a href="index.html">
+        <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
+      </a>
+      <h1>Floresta Criativa</h1>
+      <p>Gerencie suas postagens aqui.</p>
+    </header>
+
+    <div class="manage-posts-container">
+      <h2>Suas Postagens</h2>
+      <table id="postsTable">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Data de Publicação</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- As postagens serão carregadas dinamicamente aqui -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      // Função para buscar e exibir as postagens
+      function loadPosts() {
+        fetch('/posts')
+          .then(response => response.json())
+          .then(posts => {
+            const postsTableBody = document.querySelector('#postsTable tbody');
+            postsTableBody.innerHTML = ''; // Limpa o conteúdo atual
+
+            posts.forEach(post => {
+              const row = document.createElement('tr');
+
+              // Cria colunas de título, data e ações
+              const titleCell = document.createElement('td');
+              titleCell.textContent = post.title;
+              row.appendChild(titleCell);
+
+              const dateCell = document.createElement('td');
+              dateCell.textContent = new Date(post.publish_date).toLocaleDateString('pt-BR');
+              row.appendChild(dateCell);
+
+              const actionsCell = document.createElement('td');
+              const editButton = document.createElement('button');
+              editButton.textContent = 'Editar';
+              editButton.onclick = () => editPost(post.id);
+              actionsCell.appendChild(editButton);
+
+              const deleteButton = document.createElement('button');
+              deleteButton.textContent = 'Excluir';
+              deleteButton.onclick = () => deletePost(post.id);
+              actionsCell.appendChild(deleteButton);
+
+              row.appendChild(actionsCell);
+
+              postsTableBody.appendChild(row);
+            });
+          })
+          .catch(error => {
+            console.error('Erro ao carregar postagens:', error);
+          });
+      }
+
+      // Função para editar uma postagem
+      function editPost(postId) {
+        window.location.href = `editPost.html?id=${postId}`;
+      }
+
+      // Função para excluir uma postagem
+      function deletePost(postId) {
+        if (confirm('Tem certeza que deseja excluir esta postagem?')) {
+          fetch(`/posts/${postId}`, { method: 'DELETE' })
+            .then(response => {
+              if (response.ok) {
+                loadPosts(); // Recarrega as postagens após a exclusão
+              } else {
+                console.error('Erro ao excluir a postagem');
+              }
+            })
+            .catch(error => {
+              console.error('Erro ao excluir a postagem:', error);
+            });
+        }
+      }
+
+      // Carregar as postagens ao abrir a página
+      window.onload = loadPosts;
+    </script>
+
+    <footer>
+      <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

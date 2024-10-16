@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Completo - Floresta Criativa</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
+  </head>
+  <body>
+    <header>
+      <a href="index.html">
+      <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
+      </a>
+      <h1>Floresta Criativa</h1>
+      <p>Bem-vindo ao meu espaço de escrita, projetos e inspiração!</p>
+    </header>
+    <div id="top-image"></div>
+    <!-- Isso substitui a tag img -->
+    <nav>
+      <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
+      <!-- Ícone de hambúrguer -->
+      <div class="menu" id="menu">
+        <a href="index.html">Home</a>
+        <a href="about.html">Sobre Mim</a>
+        <a href="verde-inspiracao.html">Verde Inspiração</a>
+        <a href="sapo-imaginario.html">Sapo Imaginário</a>
+        <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
+        <!-- Formulário de pesquisa agora está dentro do nav -->
+        <form class="search-container" onsubmit="search(); return false;">
+          <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos...">
+          <button type="submit">Pesquisar</button>
+          <button type="button" onclick="toggleFilters()">Mostrar Filtros</button>
+        </form>
+      </div>
+    </nav>
+    <!-- Filtros avançados -->
+    <div id="advancedFilters" style="display: none;">
+      <p>Categorias:</p>
+      <label><input type="checkbox" class="category" value="Escrita" name="category[]"> Escrita</label>
+      <label><input type="checkbox" class="category" value="Projetos" name="category[]"> Projetos</label>
+      <label><input type="checkbox" class="category" value="Animes" name="category[]"> Animes</label>
+      <label><input type="checkbox" class="category" value="Jogos" name="category[]"> Jogos</label>
+      <!-- Outros filtros opcionais (como autor e data) -->
+      <input type="date" id="startDate" name="startDate" placeholder="Data de início">
+      <input type="date" id="endDate" name="endDate" placeholder="Data de fim">
+    </div>
+    <div id="searchResults"></div>
+    <div class="container" id="post-content">
+      <img src="/imagens/uploads/${data.image_path}" alt="${data.title}" loading="lazy">
+      <!-- Conteúdo do post será carregado aqui -->
+    </div>
+    <!-- Botão de Voltar -->
+    <div class="back-button-container">
+      <button onclick="goBack()">Voltar</button>
+    </div>
+    <script>
+      function toggleMenu() {
+          const menu = document.getElementById('menu');
+          if (menu.style.display === 'block') {
+              menu.style.display = 'none';
+          } else {
+              menu.style.display = 'block';
+          }
+      }
+      
+      function toggleFilters() {
+          const filters = document.getElementById('advancedFilters');
+          if (filters.style.display === "none") {
+              filters.style.display = "block";
+          } else {
+              filters.style.display = "none";
+          }
+      }
+      
+      function search() {
+    const query = document.getElementById('searchBar').value.trim();
+    const selectedCategories = Array.from(document.querySelectorAll('.category:checked')).map(checkbox => checkbox.value);
+    const startDate = document.getElementById('startDate').value || '';
+    const endDate = document.getElementById('endDate').value || '';
+
+    // Verificação se pelo menos um campo foi preenchido
+    if (!query && selectedCategories.length === 0 && !startDate && !endDate) {
+        alert("Por favor, preencha ao menos um campo para realizar a pesquisa.");
+        return; // Não faz nada se nenhum parâmetro for preenchido
+    }
+
+    // Monta a URL da pesquisa com os filtros
+    const categoriesString = selectedCategories.join(',');
+    const searchURL = `/search?q=${query}&category=${categoriesString}&startDate=${startDate}&endDate=${endDate}`;
+
+    fetch(searchURL)
+        .then(response => response.json())
+        .then(data => {
+            const resultContainer = document.getElementById('searchResults');
+            resultContainer.innerHTML = '';
+
+            if (data.length === 0) {
+                resultContainer.style.display = 'block';
+                resultContainer.innerHTML = '<p>Nenhum resultado encontrado.</p>';
+            } else {
+                resultContainer.style.display = 'block';
+                data.forEach(post => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = "search-result";
+
+                    // Título do post
+                    const titleElement = document.createElement('h3');
+                    titleElement.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
+                    resultItem.appendChild(titleElement);
+
+                    // Exibe as categorias concatenadas
+                    const categoryElement = document.createElement('p');
+                    categoryElement.innerHTML = `<strong>Categoria(s):</strong> ${post.categories}`;
+                    resultItem.appendChild(categoryElement);
+
+                    // Filtrar o trecho do texto e colocar em negrito
+                    const regex = new RegExp(query, 'gi');
+                    const highlightedText = post.content.replace(regex, match => `<strong>${match}</strong>`);
+                    const excerpt = highlightedText.substring(0, 100) + '...';  // Limita o trecho a 100 caracteres
+
+                    const excerptElement = document.createElement('p');
+                    excerptElement.innerHTML = excerpt;
+                    resultItem.appendChild(excerptElement);
+
+                    resultContainer.appendChild(resultItem);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro na busca:', error);
+        });
+}
+
+      function fetchPost() {
+          // Captura o ID do post da URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const postId = urlParams.get('id');
+      
+          // Busca o post pelo ID
+          fetch(`/post/${postId}`)
+.then(response => response.json())
+.then(data => {
+    console.log(data);
+    const postContainer = document.getElementById('post-content');
+
+    // Verifica se a imagem está presente e gera o HTML corretamente
+    const imageHTML = data.image_path ? `<img src="/imagens/uploads/${data.image_path}" alt="${data.title}" style="max-width: 100%; height: auto;">` : '';
+
+    postContainer.innerHTML = `
+        <h2>${data.title}</h2>
+        ${imageHTML}  <!-- Adiciona a imagem se existir -->
+        <p>${data.content}</p>
+        <p><strong>Publicado em:</strong> ${data.publish_date}</p>
+        <p><strong>Categorias:</strong> ${data.category}</p>
+    `;
+})
+.catch(error => {
+    console.error('Erro ao buscar post:', error);
+});
+
+
+      }
+      
+      function goBack() {
+          window.history.back();
+      }
+      
+      // Chama a função ao carregar a página
+      window.onload = fetchPost;
+    </script>
+    <div id="bottom-image"></div>
+    <!-- Isso substitui a tag img -->
+    <footer>
+      <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Floresta Criativa</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
+  </head>
+  <body>
+    <header>
+      <a href="index.html">
+      <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
+      </a>
+      <h1>Floresta Criativa</h1>
+      <p>Bem-vindo ao meu espaço de escrita, projetos e inspiração!</p>
+    </header>
+
+    <div id="top-image"></div>
+
+    <nav>
+      <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
+      <div class="menu" id="menu">
+        <a href="index.html">Home</a>
+        <a href="about.html">Sobre Mim</a>
+        <a href="verde-inspiracao.html">Verde Inspiração</a>
+        <a href="sapo-imaginario.html">Sapo Imaginário</a>
+        <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
+        <a href="login.html" id="loginButton">Login</a>
+        <a href="#" id="logoutButton">Logout</a>
+
+      </div>
+    </nav>
+
+    <div class="dashboard-container">
+      <h2 id="welcomeMessage">Bem-vindo!</h2>
+
+      <!-- Ações de gerenciamento -->
+      <div class="dashboard-actions">
+        <button onclick="window.location.href='publicar.html'">Adicionar Nova Postagem</button>
+        <button onclick="window.location.href='managePosts.html'">Gerenciar Postagens</button>
+      </div>
+
+      <!-- Estatísticas de Postagens -->
+      <div class="dashboard-stats">
+        <h3>Suas Estatísticas:</h3>
+        <p>Total de Postagens: 10</p>
+        <p>Postagem mais Popular: "Meu Melhor Trabalho"</p>
+      </div>
+    </div>
+
+    <script>
+      // Verifica se o usuário está autenticado e carrega as informações
+      function checkAuthentication() {
+        fetch('/user-info')
+          .then(response => {
+            if (!response.ok) {
+              document.getElementById('loginButton').textContent = 'Login';
+              document.getElementById('loginButton').href = 'login.html';
+              throw new Error('Usuário não autenticado');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data && data.username) {
+              // Atualiza o botão de login para mostrar o nome do usuário
+              document.getElementById('loginButton').textContent = `Perfil`;
+              document.getElementById('loginButton').href = 'dashboard.html';
+
+              // Atualiza a mensagem de boas-vindas no dashboard
+              document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
+            }
+          })
+          .catch(error => {
+            console.error('Erro ao verificar autenticação:', error);
+            window.location.href = '/login';
+          });
+      }
+
+      // Função de logout
+      document.getElementById('logoutButton').addEventListener('click', function() {
+        fetch('/logout', { method: 'GET' })
+          .then(response => {
+            if (response.ok) {
+              window.location.href = '/login';
+            } else {
+              console.error('Erro ao fazer logout');
+            }
+          })
+          .catch(error => {
+            console.error('Erro:', error);
+          });
+      });
+
+      // Chama a função para verificar se o usuário está autenticado e carrega os dados
+      checkAuthentication();
+
+      fetch('/dashboard-stats')
+    .then(response => response.json())
+    .then(data => {
+        document.querySelector('.dashboard-stats p').textContent = `Total de Postagens: ${data.totalPosts}`;
+    })
+    .catch(error => {
+        console.error('Erro ao carregar estatísticas:', error);
+    });
+
+
+    </script>
+
+    <footer>
+      <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

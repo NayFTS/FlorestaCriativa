@@ -1,0 +1,849 @@
+/* Estilos globais */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f7f0;
+    color: #2f4f2f;
+    margin: 0;
+    padding: 0;
+}
+
+/* Imagem do cabeçalho */
+#top-image, #bottom-image {
+    width: 100%;
+    height: 30px; /* Define a altura desejada */
+    background-size: auto 30px; /* Mantém a proporção original da imagem e ajusta a altura para 30px */
+    background-repeat: repeat-x; /* Repete horizontalmente */
+    background-position: center; /* Centraliza a imagem na tela */
+    margin: 0 auto;
+    display: block;
+}
+
+#top-image {
+    background-image: url('imagens/nayfts-header-up.png');
+}
+
+#bottom-image {
+    background-image: url('imagens/nayfts-header-bottom.png');
+}
+
+/* Estilo do cabeçalho */
+header {
+    background-color: #4d774e;
+    color: white;
+    padding: 10px 0;  /* Reduz o padding para diminuir a altura */
+    text-align: center;
+}
+
+header h1, header p {
+    max-width: 1000px;
+    margin: 0 auto;  /* Centraliza o texto */
+    padding: 5px 0;  /* Ajusta o espaçamento */
+}
+
+/* Navegação */
+nav {
+    display: flex;
+    justify-content: space-between; /* Faz os elementos dentro do nav se espaçarem corretamente */
+    align-items: center; /* Alinha verticalmente o conteúdo do nav */
+    padding: 10px;
+    background-color: #f3f7f0;
+    flex-wrap: wrap; /* Permite que os elementos do nav se reorganizem em telas menores */
+    border-bottom: 1px solid #4d774e; /* Linha abaixo do nav */
+}
+
+nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #2f4f2f;
+    font-size: 18px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+a {
+    text-decoration: none; /* Remove o sublinhado */
+    color: inherit; /* Faz com que a cor do link seja a mesma do texto ao redor */
+}
+
+a:hover {
+    color: #4d774e; /* Define uma cor diferente para quando o mouse passar por cima (opcional) */
+    text-decoration: none; /* Garante que o sublinhado não apareça no hover */
+}
+
+/* Esconde o menu padrão e mostra o ícone de hambúrguer */
+.hamburger {
+    display: none;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* Estilo para telas grandes */
+@media (min-width: 769px) {
+    .menu {
+        display: flex; /* Mantém o menu visível e lado a lado com a barra de pesquisa */
+        justify-content: space-between;
+        align-items: center; /* Alinha verticalmente o conteúdo */
+    }
+
+    .search-container {
+        display: flex;
+        justify-content: flex-end; /* Mantém a barra de pesquisa à direita */
+        width: auto;
+    }
+
+    .hamburger {
+        display: none; /* Esconde o ícone de hambúrguer em telas grandes */
+    }
+}
+
+/* Telas pequenas */
+@media (max-width: 768px) {
+    .menu {
+        display: none; /* Esconde o menu padrão */
+        flex-direction: column;
+        width: 100%;
+        background-color: #f3f7f0;
+        padding: 10px 0;
+    }
+
+    .hamburger {
+        display: block; /* Exibe o ícone de hambúrguer */
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+    .menu a {
+        padding: 10px;
+        display: block;
+        text-align: center;
+        margin: 5px 0;
+    }
+}
+
+/* Pesquisa */
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px auto;
+}
+
+.search-container input[type="text"] {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #4d774e;
+    width: 150px; /* Define um tamanho menor para a barra de pesquisa */
+    margin-right: 10px;
+}
+
+.search-container button {
+    background-color: #4d774e;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-container button:hover {
+    background-color: #365a3f;
+}
+
+/* Imagem do cabeçalho */
+#header-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 20px;
+}
+
+/* Container principal */
+.container {
+    min-height: calc(100vh - 100px);
+    padding: 20px;
+}
+
+/* Rodapé */
+footer {
+    background-color: #4d774e;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+/* Flexbox geral para seções */
+.section-container {
+    display: flex;
+    justify-content: flex-start; /* Garante que o conteúdo comece da esquerda */
+    align-items: center; /* Centraliza verticalmente */
+    margin-bottom: 30px;
+    padding: 10px;
+    border: 1px solid #4d774e;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.section-container img {
+    width: 30%; /* Ajusta o tamanho da imagem */
+    max-width: 250px;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.section-container div {
+    margin-left: 20px; /* Adiciona espaço entre a imagem e o texto */
+}
+
+.section-container h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+}
+
+.section-container p {
+    width: 60%; /* Define a largura do texto */
+    margin-left: 20px;
+    line-height: 1.5em;
+    text-align: justify;
+}
+
+/* Container principal do carrossel */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;  /* Define uma largura máxima para o carrossel */
+    margin: 0 auto;  /* Centraliza o carrossel */
+    overflow: hidden;  /* Esconde os posts que estão fora da visualização */
+    padding: 20px;
+}
+
+/* Container dos posts */
+.carousel {
+    display: flex;  /* Organiza os posts em linha */
+    transition: transform 0.5s ease;  /* Animação suave ao deslizar os posts */
+}
+
+/* Cada post no carrossel */
+.post-container {
+    flex: 0 0 100%;  /* Faz o post ocupar 100% da largura do carrossel */
+    box-sizing: border-box;  /* Inclui padding e bordas dentro da largura */
+    padding: 20px;
+    text-align: center;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    margin: 10px 0; /* Ajusta as margens para evitar espaçamento lateral */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Botões de navegação */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    color: #4d774e;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 24px; /* Aumenta o tamanho da fonte para melhor visibilidade */
+    transition: background-color 0.3s ease;
+    z-index: 10;
+}
+
+.carousel-btn:hover {
+    background-color: rgba(123, 137, 126, 0.7);
+}
+
+.prev-btn {
+    left: 10px;
+}
+
+.next-btn {
+    right: 10px;
+}
+
+/* Estilo dos posts */
+.post-container h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    text-align: center; /* Centraliza o título */
+    color: #2f4f2f; /* Dá destaque ao título */
+}
+
+.post-container:hover {
+    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra mais forte */
+}
+
+.post-container p {
+    margin: 10px 0;
+    color: #2f4f2f;
+}
+
+.post-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px; /* Dá um espaço entre a imagem e o texto */
+}
+
+/* Botão "Leia mais" */  
+.leia-mais {
+    align-self: flex-start;
+    background-color: #4d774e;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.leia-mais:hover {
+    background-color: #3b5f3a; /* Cor de fundo mais escura ao passar o mouse */
+}
+
+/* Resultados da pesquisa */
+#searchResults {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto; /* Centraliza o container de resultados */
+    width: 100%; /* Garante que ocupe o espaço da tela */
+}
+
+.search-result {
+    width: 90%; /* Faz os resultados ocuparem a maior parte da tela */
+    max-width: 600px; /* Limita o tamanho máximo dos resultados */
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f3f7f0;
+    border: 1px solid #4d774e;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.search-result h3 a {
+    color: #2f4f2f;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.search-result h3 a:hover {
+    text-decoration: underline;
+}
+
+.search-result p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.search-result p strong {
+    color: #4d774e;
+}
+
+/* Estilos para telas menores */
+@media (max-width: 768px) {
+    /* Ajuste o título dos posts recentes */
+    #recent-posts-title {
+        font-size: 1.8em; /* Diminui um pouco o tamanho da fonte para se adequar à tela */
+        margin-bottom: 20px;
+    }
+
+    .post-container {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .post-container h3 {
+        font-size: 1.2em; /* Ajusta o tamanho do título para ficar mais legível */
+        text-align: center; /* Centraliza o título */
+    }
+
+    .post-container p {
+        font-size: 0.9em; /* Reduz o tamanho do texto para ficar proporcional à tela */
+    }
+
+    /* Ajuste geral para imagens nos posts */
+    .post-container img {
+        width: 100%; /* Assegura que a imagem ocupe toda a largura disponível */
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .carousel-btn {
+        font-size: 20px; /* Ajusta o tamanho da fonte */
+        padding: 8px;
+    }
+
+    /* Ajustes na navegação */
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 0;
+    }
+
+    nav a {
+        margin: 10px 0;
+    }
+
+    .search-container {
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .section-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .section-container img {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .post-container, .post-item {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .post-container img, .post-item img {
+        width: 100%;
+    }
+
+    /* Estilos para centralizar o rodapé em telas menores */
+    footer p {
+        text-align: center;
+    }
+}
+
+/* Estilos para as listas de posts e posts recentes */
+#post-list,
+#recent-posts-container {
+    margin-top: 30px;
+    padding: 10px;
+}
+
+#post-list div {
+    background-color: #f3f7f0;
+    border: 1px solid #4d774e;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+}
+
+#post-list h3,
+#recent-posts-container h3 {
+    margin: 0 0 10px 0;
+}
+
+#post-list p,
+#recent-posts-container p {
+    margin: 0;
+}
+
+/* Estilos para o formulário de postagem */
+#postForm {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f3f7f0;
+    border: 2px solid #4d774e;
+    border-radius: 10px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#postForm textarea, 
+#postForm select { /* ALTERAR AQUI PARA A CATEGORIA */
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d774e;
+    background-color: #f3f7f0;
+    font-size: 1em;
+}
+
+#postForm input[type="file"] {
+    width: 100%;
+    padding: 5px;
+    background-color: #f3f7f0;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d774e;
+    font-size: 1em;
+}
+
+#postForm input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    background-color: #f3f7f0;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d774e;
+    font-size: 1em;
+}
+
+/* Botão de Publicar */
+#postForm button[type="submit"] {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: #4d774e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#postForm button[type="submit"]:hover {
+    background-color: #3b593d;
+}
+
+/* Estilo para as categorias */
+#postForm .category {
+    display: inline-block;
+    margin: 5px 10px 5px 0;
+}
+
+/* Responsividade para o formulário */
+@media (max-width: 768px) {
+    #postForm {
+        padding: 10px;
+    }
+
+    #postForm button {
+        padding: 10px;
+        font-size: 1em;
+    }
+}
+
+/* Estilo para as imagens nos posts (index e post) */
+.post-container img, #post-content img {
+    width: 100%; /* Faz a imagem ocupar toda a largura da caixa */
+    max-height: 300px; /* Define uma altura máxima */
+    object-fit: cover; /* Faz a imagem preencher a caixa */
+    border-radius: 15px; /* Bordas arredondadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona uma leve sombra */
+    margin-bottom: 20px; /* Espaçamento inferior */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave */
+}
+
+
+
+/* Estilo para as imagens nos posts  */
+.post-container img {
+    width: 100%;
+    height: 300px; /* Define uma altura fixa */
+    object-fit: cover; /* Faz a imagem preencher a caixa */
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+
+/* Ajustes de responsividade para telas menores */
+@media (max-width: 768px) {
+    .post-container img, #post-content img {
+        max-height: 200px; /* Altura menor em telas pequenas */
+        width: 100%;
+        object-fit: cover;
+    }
+}
+
+
+/* Estilo para o botão de Voltar */
+.back-button-container {
+    text-align: center; /* Centraliza o botão horizontalmente */
+    margin: 20px 0; /* Espaçamento em cima e embaixo do botão */
+}
+
+.back-button-container button {
+    background-color: #4d774e; /* Cor de fundo do botão */
+    color: white; /* Cor do texto */
+    padding: 10px 20px; /* Espaçamento interno do botão */
+    border: none; /* Remove a borda padrão */
+    border-radius: 5px; /* Bordas arredondadas */
+    font-size: 16px; /* Tamanho da fonte */
+    cursor: pointer; /* Define o ponteiro ao passar o mouse */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Transição suave ao interagir */
+}
+
+.back-button-container button:hover {
+    background-color: #365a3f; /* Cor mais escura ao passar o mouse */
+    transform: translateY(-3px); /* Eleva o botão ligeiramente ao passar o mouse */
+}
+
+.back-button-container button:active {
+    transform: translateY(0); /* Retira o efeito de elevação ao clicar */
+}
+
+
+/* Container do dashboard */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Mensagem de boas-vindas */
+.dashboard-container h2 {
+    text-align: center;
+    color: #4d774e;
+    font-size: 2em;
+    margin-bottom: 30px;
+}
+
+/* Ações de gerenciamento */
+.dashboard-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 40px;
+}
+
+.dashboard-actions button {
+    background-color: #4d774e;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.dashboard-actions button:hover {
+    background-color: #365a3f;
+    transform: translateY(-5px);
+}
+
+.dashboard-actions button:active {
+    transform: translateY(0);
+}
+
+/* Estatísticas do dashboard */
+.dashboard-stats {
+    background-color: #f3f7f0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.dashboard-stats h3 {
+    font-size: 1.5em;
+    color: #2f4f2f;
+    margin-bottom: 15px;
+}
+
+.dashboard-stats p {
+    font-size: 1.2em;
+    color: #333;
+}
+
+/* Responsividade para o dashboard */
+@media (max-width: 768px) {
+    .dashboard-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .dashboard-actions button {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-stats h3 {
+        font-size: 1.3em;
+    }
+
+    .dashboard-stats p {
+        font-size: 1em;
+    }
+}
+
+/* Container para gerenciar as postagens */
+.manage-posts-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Título da página de gerenciamento */
+.manage-posts-container h2 {
+    text-align: center;
+    font-size: 2em;
+    color: #4d774e;
+    margin-bottom: 30px;
+}
+
+/* Estilos da tabela */
+#postsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    font-family: 'Arial', sans-serif;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#postsTable th,
+#postsTable td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#postsTable th {
+    background-color: #4d774e;
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.1em;
+}
+
+#postsTable tr {
+    transition: background-color 0.2s ease;
+}
+
+#postsTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+#postsTable td {
+    font-size: 0.9em;
+    color: #333;
+}
+
+/* Estilos dos botões de ação */
+#postsTable button {
+    background-color: #4d774e;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#postsTable button:hover {
+    background-color: #365a3f;
+    transform: translateY(-2px);
+}
+
+#postsTable button:active {
+    transform: translateY(0);
+}
+
+/* Responsividade da tabela */
+@media (max-width: 768px) {
+    #postsTable th,
+    #postsTable td {
+        padding: 10px;
+    }
+
+    #postsTable {
+        font-size: 0.8em;
+    }
+}
+
+/* Estilos para o formulário de edição */
+#editPostForm {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f3f7f0;
+    border: 2px solid #4d774e;
+    border-radius: 10px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#editPostForm textarea, 
+#editPostForm select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d774e;
+    background-color: #f3f7f0;
+    font-size: 1em;
+}
+
+#editPostForm input[type="file"] {
+    width: 100%;
+    padding: 5px;
+    background-color: #f3f7f0;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d774e;
+    font-size: 1em;
+}
+
+#editPostForm input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    background-color: #f3f7f0;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d774e;
+    font-size: 1em;
+}
+
+/* Botão de Salvar Alterações */
+#editPostForm button[type="submit"] {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: #4d774e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#editPostForm button[type="submit"]:hover {
+    background-color: #3b593d;
+}
+
+/* Estilo para as categorias */
+#editPostForm .category {
+    display: inline-block;
+    margin: 5px 10px 5px 0;
+}
+
+/* Responsividade para o formulário de edição */
+@media (max-width: 768px) {
+    #editPostForm {
+        padding: 10px;
+    }
+
+    #editPostForm button {
+        padding: 10px;
+        font-size: 1em;
+    }
+}
