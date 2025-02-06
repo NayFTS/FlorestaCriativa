@@ -61,29 +61,20 @@
       // Verifica se o usuário está autenticado e carrega as informações
       function checkAuthentication() {
         fetch('/user-info')
-          .then(response => {
+        .then(response => {
             if (!response.ok) {
-              document.getElementById('loginButton').textContent = 'Login';
-              document.getElementById('loginButton').href = 'login.html';
-              throw new Error('Usuário não autenticado');
+                throw new Error('Usuário não autenticado');
             }
             return response.json();
-          })
-          .then(data => {
-            if (data && data.username) {
-              // Atualiza o botão de login para mostrar o nome do usuário
-              document.getElementById('loginButton').textContent = `Perfil`;
-              document.getElementById('loginButton').href = 'dashboard.html';
-
-              // Atualiza a mensagem de boas-vindas no dashboard
-              document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
-            }
-          })
-          .catch(error => {
-            console.error('Erro ao verificar autenticação:', error);
-            window.location.href = '/login';
-          });
-      }
+        })
+        .then(data => {
+            document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
+        })
+        .catch(error => {
+            console.error('Erro ao buscar informações do usuário:', error);
+            window.location.href = '/login.html';
+        });
+}
 
       // Função de logout
       document.getElementById('logoutButton').addEventListener('click', function(event) {
@@ -117,27 +108,36 @@
         `;
 
         // Exibir postagens recentes
-        const recentPostsContainer = document.getElementById('recentPosts');
-        recentPostsContainer.innerHTML = '';
+        function fetchRecentPosts() {
+    fetch('/recent-posts')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao buscar posts recentes');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const recentPostsContainer = document.getElementById('recentPosts');
+            recentPostsContainer.innerHTML = '';
 
-        if (data.recentPosts.length === 0) {
-            recentPostsContainer.innerHTML = '<p>Nenhuma postagem recente.</p>';
-        } else {
-            data.recentPosts.forEach(post => {
-                const postElement = document.createElement('div');
-                postElement.classList.add('recent-post-item');
-                postElement.innerHTML = `
-                    <h4>${post.title}</h4>
-                    <p>${post.content.substring(0, 100)}...</p>
-                    <a href="post.html?id=${post._id}">Ler mais</a>
-                `;
-                recentPostsContainer.appendChild(postElement);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao carregar estatísticas:', error);
-    });
+            if (data.length === 0) {
+                recentPostsContainer.innerHTML = '<p>Nenhum post recente encontrado.</p>';
+            } else {
+                data.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('recent-post-item');
+                    postElement.innerHTML = `
+                        <h4><a href="post.html?id=${post._id}">${post.title}</a></h4>
+                        <p>${post.content.substring(0, 100)}...</p>
+                    `;
+                    recentPostsContainer.appendChild(postElement);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar posts recentes:', error);
+        });
+}
 
 
     </script>
