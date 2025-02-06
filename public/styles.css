@@ -593,6 +593,19 @@ footer {
 }
 
 
+#registerLink {
+    display: inline-block;
+    margin-top: 10px;
+    color: #4d774e;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#registerLink:hover {
+    text-decoration: underline;
+}
+
+
 /* Container do dashboard */
 .dashboard-container {
     max-width: 1200px;

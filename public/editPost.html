@@ -30,6 +30,9 @@
 
       <label for="image">Imagem de Capa:</label>
       <input type="file" id="image" name="image" accept="image/*"><br><br>
+      <!-- Preview da Imagem Atual -->
+      <img id="previewImage" src="" alt="Preview da Imagem" style="display: none; max-width: 200px; margin-top: 10px;">
+
 
       <label for="url">Página de destino:</label>
       <select id="url" name="url" required>
@@ -70,83 +73,119 @@
 
     <!-- CKEditor Script -->
     <script>
-      let editorInstance;
+let editorInstance;
+let postId = new URLSearchParams(window.location.search).get('id');
 
-      // Inicializar o CKEditor
-      ClassicEditor
-        .create(document.querySelector('#editor'))
-        .then(editor => {
-            editorInstance = editor;
+// 🔹 Limpa espaços extras e verifica o ID
+postId = postId ? postId.trim() : null;
 
-            // Captura o conteúdo do CKEditor ao enviar o formulário
-            document.getElementById('editPostForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                var content = editorInstance.getData(); // Obtém o conteúdo do CKEditor
-                document.getElementById('content').value = content; // Insere o conteúdo no textarea escondido
-                
-                // Cria o objeto FormData com todos os dados do formulário
-                const formData = new FormData(this);
+console.log("ID Capturado:", `"${postId}"`); // 🔹 Verifique se agora está correto
 
-                  // Se nenhuma categoria for selecionada, cria um array vazio
-                  const categories = Array.from(document.querySelectorAll('input[name="category[]"]:checked')).map(checkbox => checkbox.value);
-                  if (categories.length === 0) {
-                      formData.append('categories', JSON.stringify([])); // Envia um array vazio
-                  } else {
-                      formData.append('categories', JSON.stringify(categories)); // Envia as categorias selecionadas
-                  }
+if (!postId || postId === "null" || postId === "undefined" || postId.length !== 24) {
+    alert('ID de post inválido.');
+    window.location.href = 'managePosts.html';
+    throw new Error('ID do post não encontrado ou inválido');
+}
 
-                // Envia os dados via fetch
-                const postId = new URLSearchParams(window.location.search).get('id'); // Obtém o ID do post
-                fetch(`/editPost/${postId}`, {
-    method: 'POST',
-    body: formData,
-})
-.then(response => {
-    if (!response.ok) {
-        throw new Error('Erro na resposta do servidor');
-    }
-    return response.json();
-})
-.then(data => {
-    if (data.success) {
-        alert('Post atualizado com sucesso!');
-    } else {
-        alert('Erro ao atualizar o post.');
-    }
-})
-.catch(error => {
-    console.error('Erro ao enviar o formulário:', error);
-});
+      function fetchPost() {
+          if (!postId) {
+              alert('ID de post inválido.');
+              window.location.href = 'managePosts.html';
+              return;
+          }
+    
+          fetch(`/post/${postId}`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Post não encontrado');
+              }
+              return response.json();
+          })
+          .then(data => {
+              document.getElementById('title').value = data.title;
+              document.getElementById('url').value = data.url;
+    
+              // Inicializa o editor com o conteúdo do post
+              ClassicEditor
+                  .create(document.querySelector('#editor'))
+                  .then(editor => {
+                      editorInstance = editor;
+                      editorInstance.setData(data.content);
+                  })
+                  .catch(error => console.error('Erro ao inicializar o CKEditor:', error));
+    
+              // Exibir preview da imagem atual (se existir)
+              if (data.image_path) {
+                  const previewImage = document.getElementById('previewImage');
+                  previewImage.src = `/imagens/uploads/${data.image_path}`;
+                  previewImage.style.display = 'block';
+              }
+    
+              // Marcar as categorias já selecionadas
+              if (data.categories) {
+                  data.categories.forEach(category => {
+                      const checkbox = document.querySelector(`input[name="category[]"][value="${category}"]`);
+                      if (checkbox) checkbox.checked = true;
+                  });
+              }
+          })
+          .catch(error => {
+              console.error('Erro ao carregar o post:', error);
+              alert('Erro ao carregar a postagem. Redirecionando para Gerenciar Postagens.');
+              window.location.href = 'managePosts.html';
+          });
+      }
+    
+      window.onload = fetchPost;
 
-            });
+      document.getElementById('image').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              document.getElementById('previewImage').src = e.target.result;
+              document.getElementById('previewImage').style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+      }
+  });
+
+  document.getElementById('editPostForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Adicionar o conteúdo do CKEditor ao campo escondido
+    document.getElementById('content').value = editorInstance.getData();
+
+    const formData = new FormData(this);
+
+    // Captura categorias selecionadas
+    const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
+        .map(checkbox => checkbox.value);
+    formData.append('categories', JSON.stringify(selectedCategories));
+
+    // Envia o postId para o backend
+    formData.append('postId', postId);
+
+    fetch(`/editPost/${postId}`, {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Post atualizado com sucesso!');
+                window.location.href = 'managePosts.html';
+            } else {
+                alert(`Erro ao atualizar o post: ${data.message}`);
+            }
         })
         .catch(error => {
-            console.error('Erro ao inicializar o CKEditor:', error);
+            console.error('Erro ao enviar as alterações:', error);
+            alert('Erro ao salvar as alterações do post. Tente novamente.');
         });
-
-      // Carregar os dados do post para edição
-      const postId = new URLSearchParams(window.location.search).get('id');
-
-fetch(`/post/${postId}`)
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('title').value = data.title;
-        editorInstance.setData(data.content);
-        document.getElementById('url').value = data.url;
-
-        // Atualiza categorias selecionadas
-        const categoryArray = data.categories || [];
-        categoryArray.forEach(category => {
-            const checkbox = document.querySelector(`input[name="category[]"][value="${category}"]`);
-            if (checkbox) checkbox.checked = true;
-        });
-    })
-    .catch(error => console.error('Erro ao carregar o post:', error));
-
-
-
+});
     </script>
-
+    
     <div id="bottom-image"></div>
     <footer>
       <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>

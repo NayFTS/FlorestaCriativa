@@ -81,19 +81,23 @@
       }
 
       // Função de logout
-      document.getElementById('logoutButton').addEventListener('click', function() {
-        fetch('/logout', { method: 'GET' })
-          .then(response => {
-            if (response.ok) {
-              window.location.href = '/login';
-            } else {
-              console.error('Erro ao fazer logout');
-            }
-          })
-          .catch(error => {
-            console.error('Erro:', error);
-          });
+      document.getElementById('logoutButton').addEventListener('click', function(event) {
+    event.preventDefault(); // Evita que o link padrão seja seguido
+
+    fetch('/logout', { method: 'GET' })
+      .then(response => {
+        if (response.ok) {
+          alert('Logout realizado com sucesso!');
+          window.location.href = 'login.html'; // Redireciona para o login
+        } else {
+          console.error('Erro ao fazer logout');
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao tentar logout:', error);
       });
+  });
+
 
       // Chama a função para verificar se o usuário está autenticado e carrega os dados
       checkAuthentication();
