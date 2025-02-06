@@ -44,23 +44,23 @@
       <fieldset>
           <legend>Categorias:</legend>
           <div class="category">
-              <input type="checkbox" id="cat1" value="1" name="category[]">
+              <input type="checkbox" id="cat1" value="Escrita" name="category[]">
               <label for="cat1">Escrita</label>
           </div>
           <div class="category">
-              <input type="checkbox" id="cat2" value="2" name="category[]">
+              <input type="checkbox" id="cat2" value="Projetos" name="category[]">
               <label for="cat2">Projetos</label>
           </div>
           <div class="category">
-              <input type="checkbox" id="cat3" value="3" name="category[]">
+              <input type="checkbox" id="cat3" value="Animes" name="category[]">
               <label for="cat3">Animes</label>
           </div>
           <div class="category">
-              <input type="checkbox" id="cat4" value="4" name="category[]">
+              <input type="checkbox" id="cat4" value="Jogos" name="category[]">
               <label for="cat4">Jogos</label>
           </div>
           <div class="category">
-              <input type="checkbox" id="cat5" value="5" name="category[]">
+              <input type="checkbox" id="cat5" value="Slice of Life" name="category[]">
               <label for="cat5">Slice of Life</label>
           </div>
       </fieldset><br><br>
@@ -72,23 +72,29 @@
       ClassicEditor
         .create(document.querySelector('#editor'))
         .then(editor => {
-            // Captura o conteúdo do CKEditor ao enviar o formulário
             document.getElementById('postForm').addEventListener('submit', function(event) {
-                event.preventDefault(); // Impede o comportamento padrão de recarregar a página
-                var content = editor.getData(); // Obtém o conteúdo do CKEditor
-                document.getElementById('content').value = content; // Insere o conteúdo no textarea escondido
+                event.preventDefault();
                 
-                // Envia os dados via fetch
-                const formData = new FormData(this); // Pega todos os dados do formulário
+                // Obtém o conteúdo do CKEditor e armazena no textarea oculto
+                document.getElementById('content').value = editor.getData();
                 
-                fetch('/addPost', {  // Supondo que essa seja sua rota de adicionar posts
+                // Captura os dados do formulário
+                const formData = new FormData(this);
+    
+                // Captura categorias selecionadas
+                const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
+                                               .map(checkbox => checkbox.value);
+                formData.append('categories', JSON.stringify(selectedCategories));
+    
+                fetch('/addPost', {
                     method: 'POST',
-                    body: formData,
+                    body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         alert('Post publicado com sucesso!');
+                        window.location.reload();
                     } else {
                         alert('Erro ao publicar o post.');
                     }
@@ -102,6 +108,7 @@
             console.error('Erro ao inicializar o CKEditor:', error);
         });
     </script>
+    
     
 
     <div id="bottom-image"></div>
