@@ -29,44 +29,60 @@
         <input type="password" id="password" name="password" required>
 
         <button type="submit">Entrar</button>
+        <p>Não tem uma conta? <a href="register.html" id="registerLink">Cadastre-se aqui</a></p>
+
       </form>
       <p id="errorMessage" style="color: red;"></p>
     </div>
 
     <script>
-      // Função para enviar o formulário de login
       document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
-
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        // Faz a requisição de login via fetch
+    
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorMessageElement = document.getElementById('errorMessage');
+    
+        // Limpa mensagens anteriores
+        errorMessageElement.innerHTML = '';
+    
+        // Validação no lado do cliente
+        if (!email.includes('@') || !email.includes('.')) {
+          errorMessageElement.innerHTML = 'Por favor, insira um email válido.';
+          return;
+        }
+        if (password.length < 6) {
+          errorMessageElement.innerHTML = 'A senha deve ter pelo menos 6 caracteres.';
+          return;
+        }
+    
+        // Enviar requisição ao backend
         fetch('/login', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         })
         .then(response => {
-          if (response.ok) {
-            window.location.href = '/dashboard'; // Redireciona para o dashboard se login for bem-sucedido
-          } else {
-            return response.text(); // Exibe a mensagem de erro
+          if (!response.ok) {
+            return response.json().then(data => { throw data; });
           }
+          return response.text();
         })
-        .then(errorMessage => {
-          if (errorMessage) {
-            document.getElementById('errorMessage').textContent = errorMessage;
-          }
+        .then(() => {
+          alert('Login bem-sucedido! Redirecionando para o dashboard...');
+          window.location.href = '/dashboard.html';
         })
         .catch(error => {
           console.error('Erro no login:', error);
+          if (error.errors) {
+            errorMessageElement.innerHTML = error.errors.map(err => `<p>${err.msg}</p>`).join('');
+          } else {
+            errorMessageElement.innerHTML = 'Usuário ou senha incorretos.';
+          }
         });
       });
     </script>
-
+    
     <footer>
       <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>
     </footer>

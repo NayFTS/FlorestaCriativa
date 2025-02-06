@@ -6,7 +6,8 @@ const PostSchema = new mongoose.Schema({
     url: String,
     image_path: String,
     publish_date: { type: Date, default: Date.now },
-    categories: [String], // Lista de categorias
+    categories: [String],
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // ✅ Adiciona referência ao usuário
 });
 
 module.exports = mongoose.model('Post', PostSchema);

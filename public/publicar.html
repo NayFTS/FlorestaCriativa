@@ -67,47 +67,66 @@
     
       <button type="submit">Publicar</button>
     </form>
-    
+    <p id="errorMessage" style="color: red;"></p>
     <script>
-      ClassicEditor
-        .create(document.querySelector('#editor'))
-        .then(editor => {
-            document.getElementById('postForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                // Obtém o conteúdo do CKEditor e armazena no textarea oculto
-                document.getElementById('content').value = editor.getData();
-                
-                // Captura os dados do formulário
-                const formData = new FormData(this);
-    
-                // Captura categorias selecionadas
-                const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
-                                               .map(checkbox => checkbox.value);
-                formData.append('categories', JSON.stringify(selectedCategories));
-    
-                fetch('/addPost', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Post publicado com sucesso!');
-                        window.location.reload();
-                    } else {
-                        alert('Erro ao publicar o post.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao enviar o formulário:', error);
-                });
+  ClassicEditor
+    .create(document.querySelector('#editor'))
+    .then(editor => {
+        document.getElementById('postForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            document.getElementById('content').value = editor.getData(); // Obtém conteúdo do CKEditor
+            const formData = new FormData(this);
+
+            // Captura categorias selecionadas
+            const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
+                                           .map(checkbox => checkbox.value);
+            formData.append('categories', JSON.stringify(selectedCategories));
+
+            fetch('/addPost', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include' // 🔹 Garante que a sessão do usuário seja enviada com a requisição
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Post publicado com sucesso!');
+                    window.location.href = 'managePosts.html'; // Redireciona para Gerenciar Postagens
+                } else {
+                    alert(`Erro: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao enviar o formulário:', error);
             });
-        })
-        .catch(error => {
-            console.error('Erro ao inicializar o CKEditor:', error);
         });
-    </script>
+    })
+    .catch(error => {
+        console.error('Erro ao inicializar o CKEditor:', error);
+    });
+
+  function checkAuthentication() {
+    fetch('/user-info')
+      .then(response => {
+        if (!response.ok) {
+          alert('Você precisa estar logado para publicar um post.');
+          window.location.href = 'login.html'; // Redireciona para login
+          throw new Error('Usuário não autenticado');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.username) {
+          document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
+        }
+      })
+      .catch(error => console.error('Erro ao verificar autenticação:', error));
+  }
+
+  // Executa a verificação ao carregar a página
+  window.onload = checkAuthentication;
+</script>
     
     
 
