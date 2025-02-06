@@ -14,8 +14,6 @@ const fs = require('fs');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-app.use(express.json());
-
 
 // Conexão ao MongoDB (Escolha entre local e online)
 const mongoLocal = 'mongodb://127.0.0.1:27017/floresta_criativa';
@@ -152,18 +150,15 @@ app.post('/login', [
 
 
 // Rota para buscar informações do usuário
-app.get('/user-info', (req, res) => {
-    if (!req.session || !req.session.userId) {
-        return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
+app.get('/user-info', async (req, res) => {
+    if (!req.session.userId) return res.status(401).send('Usuário não autenticado');
+    try {
+        const user = await User.findById(req.session.userId);
+        res.json({ username: user.username });
+    } catch (err) {
+        res.status(500).send('Erro ao buscar usuário');
     }
-
-    // Exemplo de retorno estático (substitua pela lógica real do seu projeto)
-    res.json({
-        username: 'Nome do Usuário',
-        email: 'email@exemplo.com'
-    });
 });
-
 
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -290,14 +285,12 @@ app.delete('/posts/:id', async (req, res) => {
 // Rota para buscar posts recentes
 app.get('/recent-posts', async (req, res) => {
     try {
-        const recentPosts = await Post.find().sort({ publish_date: -1 }).limit(5); // Pega os 5 posts mais recentes
-        res.json(recentPosts);
+        const posts = await Post.find().sort({ publish_date: -1 }).limit(5);
+        res.json(posts);
     } catch (err) {
-        console.error('Erro ao buscar posts recentes:', err);
-        res.status(500).json({ success: false, message: 'Erro ao buscar posts recentes' });
+        res.status(500).send('Erro ao buscar posts');
     }
 });
-
 
 app.get('/search', async (req, res) => {
     try {
