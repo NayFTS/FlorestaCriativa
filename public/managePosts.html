@@ -86,13 +86,14 @@
       function deletePost(postId) {
         if (confirm('Tem certeza que deseja excluir esta postagem?')) {
           fetch(`/posts/${postId}`, { method: 'DELETE' })
-            .then(response => {
-              if (response.ok) {
-                loadPosts(); // Recarrega as postagens após a exclusão
-              } else {
-                console.error('Erro ao excluir a postagem');
-              }
-            })
+    .then(response => {
+        if (response.ok) {
+            loadPosts(); // Atualiza a lista após exclusão
+        } else {
+            console.error('Erro ao excluir post');
+        }
+    })
+
             .catch(error => {
               console.error('Erro ao excluir a postagem:', error);
             });
