@@ -127,25 +127,22 @@
       // Carregar os dados do post para edição
       const postId = new URLSearchParams(window.location.search).get('id');
 
-      fetch(`/post/${postId}`)
+fetch(`/post/${postId}`)
     .then(response => response.json())
     .then(data => {
         document.getElementById('title').value = data.title;
-        editorInstance.setData(data.content); // Carregar o conteúdo no CKEditor
+        editorInstance.setData(data.content);
         document.getElementById('url').value = data.url;
-console.log('oi');
-        // Converter a string concatenada em um array
-        const categoryArray = data.category_ids ? data.category_ids.split(',') : [];
 
-        // Marcar as categorias associadas ao post
-        categoryArray.forEach(categoryId => {
-            const checkbox = document.querySelector(`input[name="category[]"][value="${categoryId}"]`);
-            if (checkbox) {
-                checkbox.checked = true;  // Marca a checkbox se ela existir
-            }
+        // Atualiza categorias selecionadas
+        const categoryArray = data.categories || [];
+        categoryArray.forEach(category => {
+            const checkbox = document.querySelector(`input[name="category[]"][value="${category}"]`);
+            if (checkbox) checkbox.checked = true;
         });
     })
     .catch(error => console.error('Erro ao carregar o post:', error));
+
 
 
     </script>

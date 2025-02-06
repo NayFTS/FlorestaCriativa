@@ -44,6 +44,7 @@
       <label><input type="checkbox" class="category" value="Projetos" name="category[]"> Projetos</label>
       <label><input type="checkbox" class="category" value="Animes" name="category[]"> Animes</label>
       <label><input type="checkbox" class="category" value="Jogos" name="category[]"> Jogos</label>
+      <label><input type="checkbox" class="category" value="Slice of Life" name="category[]"> Slice of Life</label>
       <!-- Outros filtros opcionais (como autor e data) -->
       <input type="date" id="startDate" name="startDate" placeholder="Data de início">
       <input type="date" id="endDate" name="endDate" placeholder="Data de fim">
@@ -85,7 +86,7 @@
     // Verificação se pelo menos um campo foi preenchido
     if (!query && selectedCategories.length === 0 && !startDate && !endDate) {
         alert("Por favor, preencha ao menos um campo para realizar a pesquisa.");
-        return; // Não faz nada se nenhum parâmetro for preenchido
+        return;
     }
 
     // Monta a URL da pesquisa com os filtros
@@ -109,19 +110,18 @@
 
                     // Título do post
                     const titleElement = document.createElement('h3');
-                    titleElement.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
+                    titleElement.innerHTML = `<a href="post.html?id=${post._id}">${post.title}</a>`;
                     resultItem.appendChild(titleElement);
 
                     // Exibe as categorias concatenadas
-                    const categoryElement = document.createElement('p');
-                    categoryElement.innerHTML = `<strong>Categoria(s):</strong> ${post.categories}`;
-                    resultItem.appendChild(categoryElement);
+                    if (post.categories && post.categories.length > 0) {
+                        const categoryElement = document.createElement('p');
+                        categoryElement.innerHTML = `<strong>Categoria(s):</strong> ${post.categories.join(', ')}`;
+                        resultItem.appendChild(categoryElement);
+                    }
 
-                    // Filtrar o trecho do texto e colocar em negrito
-                    const regex = new RegExp(query, 'gi');
-                    const highlightedText = post.content.replace(regex, match => `<strong>${match}</strong>`);
-                    const excerpt = highlightedText.substring(0, 100) + '...';  // Limita o trecho a 100 caracteres
-
+                    // Trecho do conteúdo
+                    const excerpt = post.content.substring(0, 100) + '...';
                     const excerptElement = document.createElement('p');
                     excerptElement.innerHTML = excerpt;
                     resultItem.appendChild(excerptElement);
