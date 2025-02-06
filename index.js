@@ -77,7 +77,7 @@ const upload = multer({
     storage,
     limits: { fileSize: 2 * 1024 * 1024 }, // Limite de 2MB
     fileFilter: (req, file, cb) => {
-        const fileTypes = /jpeg|jpg|png|gif/;
+        const fileTypes = /jpeg|jpg|png|gif|webp/;
         const mimeType = fileTypes.test(file.mimetype);
         const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
 
@@ -254,10 +254,7 @@ app.get('/post/:id', async (req, res) => {
     try {
         const postId = req.params.id;
 
-        console.log("Recebendo ID:", postId); // 🔹 Teste: Veja se o ID chega corretamente
-
         if (!mongoose.Types.ObjectId.isValid(postId)) {
-            console.error("ID inválido detectado:", postId);
             return res.status(400).json({ success: false, message: 'ID de post inválido' });
         }
 
@@ -266,7 +263,6 @@ app.get('/post/:id', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Post não encontrado' });
         }
 
-        console.log("Post encontrado:", post); // 🔹 Teste: Veja se o post foi achado
         res.json(post);
     } catch (err) {
         console.error('Erro ao buscar post:', err);
@@ -340,6 +336,29 @@ app.get('/user-posts', async (req, res) => {
         res.status(500).send('Erro no servidor');
     }
 });
+
+app.get('/dashboard-stats', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
+        }
+
+        const totalPosts = await Post.countDocuments({ author: req.session.userId });
+        const mostPopularPost = await Post.findOne({ author: req.session.userId }).sort({ publish_date: -1 });
+        const recentPosts = await Post.find({ author: req.session.userId }).sort({ publish_date: -1 }).limit(3);
+
+        res.json({
+            totalPosts,
+            mostPopularPost: mostPopularPost ? mostPopularPost.title : 'Nenhuma postagem encontrada',
+            recentPosts,
+        });
+    } catch (err) {
+        console.error('Erro ao buscar estatísticas do dashboard:', err);
+        res.status(500).json({ success: false, message: 'Erro ao buscar estatísticas' });
+    }
+});
+
+
 
 // Servir arquivos estáticos
 app.use(express.static('public'));

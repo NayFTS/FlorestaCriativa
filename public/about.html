@@ -53,11 +53,6 @@
     </div>
     <div id="searchResults"></div>
     <section id="about" class="section-container">
-      <img src="imagens/quadrado-da-floresta.webp" alt="Sobre mim - Floresta Criativa" loading="lazy">
-      <div>
-        <h2>Olá! Sou a Nay</h2>
-        <p>Tenho 25 anos, moro em Portugal e adoro compartilhar meus projetos criativos. Aqui você pode conhecer mais sobre meus hobbies, inspirações e os projetos que estou desenvolvendo.</p>
-      </div>
       <div id="post-list"></div>
     </section>
     <script>
@@ -154,10 +149,11 @@
                       const postItem = document.createElement('div');
                       postItem.className = "post-container";
                       postItem.innerHTML = `
-                          <h3><a href="post.html?id=${post.id}">${post.title}</a></h3>
+                          <h3><a href="post.html?id=${post._id}">${post.title}</a>
+</h3>
                           <img src="/imagens/uploads/${post.image_path}" alt="${post.title}">
                           <p>${postContent}</p>
-                          <a href="post.html?id=${post.id}" class="leia-mais">Leia mais</a>
+                          <a href="post.html?id=${post._id}" class="leia-mais">Leia mais</a>
                       `;
                       postContainer.appendChild(postItem);
                   });
