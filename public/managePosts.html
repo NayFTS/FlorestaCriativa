@@ -38,44 +38,58 @@
     <script>
       // Função para buscar e exibir as postagens
       function loadPosts() {
-        fetch('/posts')
-          .then(response => response.json())
-          .then(posts => {
-            const postsTableBody = document.querySelector('#postsTable tbody');
-            postsTableBody.innerHTML = ''; // Limpa o conteúdo atual
+    fetch('/user-posts') // ✅ Agora busca só os posts do usuário logado
+    .then(response => response.json())
+    .then(posts => {
+        const postsTableBody = document.querySelector('#postsTable tbody');
+        postsTableBody.innerHTML = ''; // Limpa a tabela
 
-            posts.forEach(post => {
-              const row = document.createElement('tr');
+        if (posts.length === 0) {
+            postsTableBody.innerHTML = '<tr><td colspan="3">Nenhuma postagem encontrada.</td></tr>';
+            return;
+        }
 
-              // Cria colunas de título, data e ações
-              const titleCell = document.createElement('td');
-              titleCell.textContent = post.title;
-              row.appendChild(titleCell);
+        posts.forEach(post => {
+            const row = document.createElement('tr');
 
-              const dateCell = document.createElement('td');
-              dateCell.textContent = new Date(post.publish_date).toLocaleDateString('pt-BR');
-              row.appendChild(dateCell);
+            // Título
+            const titleCell = document.createElement('td');
+            titleCell.textContent = post.title;
+            row.appendChild(titleCell);
 
-              const actionsCell = document.createElement('td');
-              const editButton = document.createElement('button');
-              editButton.textContent = 'Editar';
-              editButton.onclick = () => editPost(post.id);
-              actionsCell.appendChild(editButton);
+            // Data de Publicação
+            const dateCell = document.createElement('td');
+            dateCell.textContent = new Date(post.publish_date).toLocaleDateString('pt-BR');
+            row.appendChild(dateCell);
 
-              const deleteButton = document.createElement('button');
-              deleteButton.textContent = 'Excluir';
-              deleteButton.onclick = () => deletePost(post.id);
-              actionsCell.appendChild(deleteButton);
+            // Ações (Editar/Excluir)
+            const actionsCell = document.createElement('td');
 
-              row.appendChild(actionsCell);
+            // Botão de Editar
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Editar';
+            editButton.onclick = () => window.location.href = `editPost.html?id=${post._id}`;
 
-              postsTableBody.appendChild(row);
-            });
-          })
-          .catch(error => {
-            console.error('Erro ao carregar postagens:', error);
-          });
-      }
+            actionsCell.appendChild(editButton);
+
+            // Botão de Excluir
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Excluir';
+            deleteButton.setAttribute('data-id', post._id);
+            deleteButton.onclick = () => deletePost(post._id);
+            actionsCell.appendChild(deleteButton);
+
+            row.appendChild(actionsCell);
+            postsTableBody.appendChild(row);
+        });
+    })
+    .catch(error => {
+        console.error('Erro ao carregar postagens:', error);
+    });
+}
+
+// Carregar postagens ao abrir a página
+window.onload = loadPosts;
 
       // Função para editar uma postagem
       function editPost(postId) {
@@ -84,21 +98,30 @@
 
       // Função para excluir uma postagem
       function deletePost(postId) {
-        if (confirm('Tem certeza que deseja excluir esta postagem?')) {
-          fetch(`/posts/${postId}`, { method: 'DELETE' })
-    .then(response => {
-        if (response.ok) {
-            loadPosts(); // Atualiza a lista após exclusão
-        } else {
-            console.error('Erro ao excluir post');
+    if (confirm('Tem certeza que deseja excluir esta postagem?')) {
+        const deleteButton = document.querySelector(`button[data-id="${postId}"]`);
+        if (deleteButton) {
+            deleteButton.textContent = 'Excluindo...';
+            deleteButton.disabled = true;
         }
-    })
 
-            .catch(error => {
-              console.error('Erro ao excluir a postagem:', error);
-            });
-        }
-      }
+        fetch(`/posts/${postId}`, { method: 'DELETE' })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao excluir post');
+            }
+            return response.text();
+        })
+        .then(() => {
+            alert('Postagem excluída com sucesso!');
+            loadPosts(); // Atualiza a lista após exclusão
+        })
+        .catch(error => {
+            console.error('Erro ao excluir postagem:', error);
+            alert('Não foi possível excluir a postagem. Tente novamente.');
+        });
+    }
+}
 
       // Carregar as postagens ao abrir a página
       window.onload = loadPosts;
