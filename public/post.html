@@ -135,36 +135,62 @@
         });
 }
 
-      function fetchPost() {
-          // Captura o ID do post da URL
-          const urlParams = new URLSearchParams(window.location.search);
-          const postId = urlParams.get('id');
-      
-          // Busca o post pelo ID
-          fetch(`/post/${postId}`)
-.then(response => response.json())
-.then(data => {
-    console.log(data);
-    const postContainer = document.getElementById('post-content');
+function fetchPost() {
+    // Captura o ID do post da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('id');
 
-    // Verifica se a imagem está presente e gera o HTML corretamente
-    const imageHTML = data.image_path ? `<img src="/imagens/uploads/${data.image_path}" alt="${data.title}" style="max-width: 100%; height: auto;">` : '';
+    if (!postId || postId === "undefined") {
+        document.getElementById('post-content').innerHTML = '<p>Post não encontrado.</p>';
+        console.error('ID do post está ausente ou inválido na URL.');
+        return;
+    }
 
-    postContainer.innerHTML = `
-        <h2>${data.title}</h2>
-        ${imageHTML}  <!-- Adiciona a imagem se existir -->
-        <p>${data.content}</p>
-        <p><strong>Publicado em:</strong> ${data.publish_date}</p>
-        <p><strong>Categorias:</strong> ${data.category}</p>
-    `;
-})
-.catch(error => {
-    console.error('Erro ao buscar post:', error);
-});
+    // Busca o post pelo ID
+    fetch(`/post/${postId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Post não encontrado');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data); // Debug para conferir os dados no console
+
+            const postContainer = document.getElementById('post-content');
+
+            // Formatar a data de publicação
+            const publishDate = new Date(data.publish_date).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Verifica se há uma imagem para exibir
+            const imageHTML = data.image_path
+                ? `<img src="/imagens/uploads/${data.image_path}" alt="${data.title}" style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px;">`
+                : '';
+
+            // Exibir categorias corretamente
+            const categoriesHTML = data.categories && data.categories.length > 0
+                ? data.categories.join(', ')
+                : 'Sem categoria';
+
+            postContainer.innerHTML = `
+                <h2>${data.title}</h2>
+                ${imageHTML}
+                <p>${data.content}</p>
+                <p><strong>Publicado em:</strong> ${publishDate}</p>
+                <p><strong>Categorias:</strong> ${categoriesHTML}</p>
+            `;
+        })
+        .catch(error => {
+            console.error('Erro ao buscar post:', error);
+            document.getElementById('post-content').innerHTML = '<p>Erro ao carregar a postagem.</p>';
+        });
+}
 
 
-      }
-      
       function goBack() {
           window.history.back();
       }

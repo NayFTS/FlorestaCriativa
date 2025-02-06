@@ -51,6 +51,11 @@
         <p>Postagem mais Popular: "Meu Melhor Trabalho"</p>
       </div>
     </div>
+    <div class="dashboard-recent-posts">
+      <h3>Postagens Recentes:</h3>
+      <div id="recentPosts"></div>
+  </div>
+  
 
     <script>
       // Verifica se o usuário está autenticado e carrega as informações
@@ -105,7 +110,30 @@
       fetch('/dashboard-stats')
     .then(response => response.json())
     .then(data => {
-        document.querySelector('.dashboard-stats p').textContent = `Total de Postagens: ${data.totalPosts}`;
+        document.querySelector('.dashboard-stats').innerHTML = `
+            <h3>Suas Estatísticas:</h3>
+            <p>Total de Postagens: ${data.totalPosts}</p>
+            <p>Postagem mais Popular: "${data.mostPopularPost}"</p>
+        `;
+
+        // Exibir postagens recentes
+        const recentPostsContainer = document.getElementById('recentPosts');
+        recentPostsContainer.innerHTML = '';
+
+        if (data.recentPosts.length === 0) {
+            recentPostsContainer.innerHTML = '<p>Nenhuma postagem recente.</p>';
+        } else {
+            data.recentPosts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.classList.add('recent-post-item');
+                postElement.innerHTML = `
+                    <h4>${post.title}</h4>
+                    <p>${post.content.substring(0, 100)}...</p>
+                    <a href="post.html?id=${post._id}">Ler mais</a>
+                `;
+                recentPostsContainer.appendChild(postElement);
+            });
+        }
     })
     .catch(error => {
         console.error('Erro ao carregar estatísticas:', error);
