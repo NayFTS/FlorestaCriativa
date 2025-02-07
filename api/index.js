@@ -55,7 +55,7 @@ const Post = mongoose.model('Post', new mongoose.Schema({
 }));
 
 
-const uploadDir = path.join(__dirname, 'public/imagens/uploads');
+const uploadDir = path.join(__dirname, '../public/imagens/uploads');
 
 // Verifica se o diretório existe, e cria se não existir
 if (!fs.existsSync(uploadDir)) {
@@ -128,24 +128,25 @@ app.post('/login', [
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user || !bcrypt.compareSync(password, user.password)) {
-            return res.status(400).send('Usuário ou senha incorretos');
+            return res.status(400).json({ message: 'Usuário ou senha incorretos' });
         }
 
         req.session.regenerate((err) => {
             if (err) {
                 console.error('Erro ao regenerar sessão:', err);
-                return res.status(500).send('Erro no servidor');
+                return res.status(500).json({ message: 'Erro no servidor' });
             }
             req.session.userId = user._id;
             req.session.username = user.username;
-            res.status(200).send('Login bem-sucedido');
+            res.status(200).json({ message: 'Login bem-sucedido' });
         });
 
     } catch (err) {
         console.error('Erro no login:', err);
-        res.status(500).send('Erro no servidor');
+        res.status(500).json({ message: 'Erro no servidor' });
     }
 });
+
 
 
 
