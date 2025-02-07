@@ -57,29 +57,32 @@
         }
     
         // Enviar requisição ao backend
-        fetch('/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        })
-        .then(response => {
-          if (!response.ok) {
+        fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+})
+    .then(response => {
+        if (!response.ok) {
             return response.json().then(data => { throw data; });
-          }
-          return response.text();
-        })
-        .then(() => {
-          alert('Login bem-sucedido! Redirecionando para o dashboard...');
-          window.location.href = '/dashboard.html';
-        })
-        .catch(error => {
-          console.error('Erro no login:', error);
-          if (error.errors) {
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert(data.message || 'Login bem-sucedido! Redirecionando para o dashboard...');
+        window.location.href = '/dashboard.html';
+    })
+    .catch(error => {
+        console.error('Erro no login:', error);
+        if (error.errors) {
             errorMessageElement.innerHTML = error.errors.map(err => `<p>${err.msg}</p>`).join('');
-          } else {
-            errorMessageElement.innerHTML = 'Usuário ou senha incorretos.';
-          }
-        });
+        } else if (error.message) {
+            errorMessageElement.innerHTML = `<p>${error.message}</p>`;
+        } else {
+            errorMessageElement.innerHTML = '<p>Erro desconhecido. Tente novamente.</p>';
+        }
+    });
+
       });
     </script>
     
