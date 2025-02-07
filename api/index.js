@@ -55,7 +55,7 @@ const Post = mongoose.model('Post', new mongoose.Schema({
 }));
 
 
-const uploadDir = path.join(__dirname, 'public/imagens/uploads');
+const uploadDir = path.join(__dirname, '../public/imagens/uploads');
 
 // Verifica se o diretório existe, e cria se não existir
 if (!fs.existsSync(uploadDir)) {
