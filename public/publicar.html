@@ -69,6 +69,8 @@
     </form>
     <p id="errorMessage" style="color: red;"></p>
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
   ClassicEditor
     .create(document.querySelector('#editor'))
     .then(editor => {

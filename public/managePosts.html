@@ -36,6 +36,8 @@
     </div>
 
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
       // Função para buscar e exibir as postagens
       function loadPosts() {
     fetch('/user-posts') // ✅ Agora busca só os posts do usuário logado

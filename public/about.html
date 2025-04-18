@@ -56,6 +56,10 @@
       <div id="post-list"></div>
     </section>
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
       function toggleMenu() {
           const menu = document.getElementById('menu');
           if (menu.style.display === 'block') {

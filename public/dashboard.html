@@ -58,6 +58,8 @@
   
 
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
       // Verifica se o usuário está autenticado e carrega as informações
       function checkAuthentication() {
         fetch('/user-info')

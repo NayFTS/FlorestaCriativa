@@ -36,6 +36,8 @@
     </div>
 
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
       document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
     
@@ -57,7 +59,7 @@
         }
     
         // Enviar requisição ao backend
-        fetch('/api/login', {
+        fetch('/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })

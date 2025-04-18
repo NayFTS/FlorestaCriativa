@@ -73,6 +73,8 @@
 
     <!-- CKEditor Script -->
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
 let editorInstance;
 let postId = new URLSearchParams(window.location.search).get('id');
 
