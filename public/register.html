@@ -37,6 +37,8 @@
     </div>
 
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
       document.getElementById('registerForm').addEventListener('submit', function(event) {
         event.preventDefault();
     

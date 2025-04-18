@@ -59,6 +59,8 @@
       <button onclick="goBack()">Voltar</button>
     </div>
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
       function toggleMenu() {
           const menu = document.getElementById('menu');
           if (menu.style.display === 'block') {
