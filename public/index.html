@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Floresta Criativa</title>
     <link rel="stylesheet" href="styles.css">
+    <!--<link rel="stylesheet" href="dist/styles.css">!-->
     <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
@@ -54,6 +55,8 @@
     </div>
     <div id="searchResults"></div>
     <script>
+  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+
       function toggleMenu() {
         const menu = document.getElementById('menu');
         if (menu.style.display === 'block') {
@@ -189,7 +192,7 @@
 
       // Função para buscar posts recentes e exibi-los nas seções
       function fetchRecentPosts() {
-    fetch('/recent-posts')
+    fetch(`${API_BASE}/recent-posts`)
     .then(response => response.json())
     .then(data => {
         const postsRecentesContainer = document.getElementById('recent-posts-container');
