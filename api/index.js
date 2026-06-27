@@ -41,6 +41,12 @@ mongoose.connect(mongoURI)
     .then(() => console.log(`Conectado ao MongoDB: ${mongoURI.includes('localhost') ? 'Local' : 'Atlas'}`))
     .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
 
+// Vercel passa o caminho completo (/api/login) ao Express; strip do prefixo antes do roteamento
+app.use((req, res, next) => {
+    if (req.url.startsWith('/api/')) req.url = req.url.slice(4) || '/';
+    next();
+});
+
 // Configuração de sessão
 app.use(session({
     secret: process.env.SESSION_SECRET || 'fallback_secret',
@@ -462,7 +468,9 @@ ${items}
 // Servir arquivos estáticos
 app.use(express.static('public'));
 
-// Iniciar servidor
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
-});
+// Iniciar servidor (ignorado no Vercel serverless)
+if (process.env.VERCEL !== '1') {
+    app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
+}
+
+module.exports = app;
