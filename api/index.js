@@ -9,7 +9,23 @@ const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+function uploadToCloudinary(buffer) {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { folder: 'floresta-criativa' },
+            (error, result) => error ? reject(error) : resolve(result.secure_url)
+        );
+        stream.end(buffer);
+    });
+}
 
 const app = express();
 app.use(bodyParser.json());
@@ -73,35 +89,14 @@ async function uniqueSlug(title) {
 }
 
 
-const uploadDir = path.join(__dirname, '../public/imagens/uploads');
-
-// Verifica se o diretório existe, e cria se não existir
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configura o multer para salvar as imagens no diretório de upload
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueName = `${Date.now()}-${file.originalname}`;
-        cb(null, uniqueName);
-    }
-});
-
 const upload = multer({
-    storage,
-    limits: { fileSize: 2 * 1024 * 1024 }, // Limite de 2MB
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 2 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const fileTypes = /jpeg|jpg|png|gif|webp/;
         const mimeType = fileTypes.test(file.mimetype);
         const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
-
-        if (mimeType && extName) {
-            return cb(null, true);
-        }
+        if (mimeType && extName) return cb(null, true);
         cb(new Error('Apenas arquivos de imagem são permitidos (JPEG, PNG, GIF).'));
     }
 });
@@ -231,7 +226,7 @@ app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
     try {
         const { title, content, url, status } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
-        const image_path = req.file ? req.file.filename : null;
+        const image_path = req.file ? await uploadToCloudinary(req.file.buffer) : null;
         const slug = await uniqueSlug(title);
 
         const newPost = new Post({
@@ -276,9 +271,8 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
         post.url = url;
         post.categories = categories;
 
-        // Substitui a imagem, se uma nova for enviada
         if (req.file) {
-            post.image_path = req.file.filename;
+            post.image_path = await uploadToCloudinary(req.file.buffer);
         }
 
         await post.save();

@@ -66,7 +66,7 @@
                   container.innerHTML = '';
                   data.forEach(post => {
                       const postContent = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
-                      const imageUrl = post.image_path ? `/imagens/uploads/${post.image_path}` : 'imagens/quadrado_da_floresta.webp';
+                      const imageUrl = post.image_path ? (post.image_path.startsWith('http') ? post.image_path : `/imagens/uploads/${post.image_path}`) : 'imagens/quadrado_da_floresta.webp';
                       const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
                       const postItem = document.createElement('div');
                       postItem.classList.add('post-container');

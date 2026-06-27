@@ -68,6 +68,29 @@ Features que expandem o projeto além do que existe hoje.
 
 ---
 
+---
+
+## Fase 6 — Infraestrutura e Segurança
+
+Problemas que afetam o funcionamento real do site em produção.
+
+- [ ] **Migrar uploads para Cloudinary** — o filesystem do Vercel é efêmero; imagens enviadas pelo painel somem a cada redeploy. Integrar o SDK do Cloudinary: upload direto da rota `/addPost` e `/editPost/:id`, salvar URL retornada no campo `image_path`, remover dependência do Multer para disco local.
+- [ ] **Rate limiting nas rotas de auth** — `/login`, `/register` e `/reset-password` sem limite de tentativas. Adicionar `express-rate-limit` com janela de 15 min e máximo de 10 tentativas por IP.
+- [ ] **Remover registro público e adotar usuário único** — `register.html` é público, mas o site é um blog pessoal com um único autor. Remover a rota `POST /register` e a página `register.html`; criar script `create-user.js` para cadastrar o usuário via terminal; remover link de cadastro do `login.html`.
+
+---
+
+## Fase 7 — Melhorias de UX
+
+Pequenas melhorias que tornam o site mais agradável de usar.
+
+- [ ] **Feedback visual de erro no login** — destacar os campos de e-mail/senha com borda vermelha e mensagem de erro mais visível quando o login falha.
+- [ ] **Paginação no managePosts** — carregar posts em lotes no painel de gerenciamento para não travar com muitos posts.
+- [ ] **Confirmação antes de excluir post** — substituir o comportamento atual por um modal de confirmação em vez de deletar imediatamente ao clicar.
+- [ ] **Exibir imagem atual no editPost** — mostrar thumbnail da imagem já salva ao abrir a edição, não apenas após selecionar uma nova.
+
+---
+
 ## Notas
 
 - A ordem das fases é uma sugestão. Fases 1 e 2 são as mais urgentes.

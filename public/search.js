@@ -160,7 +160,7 @@ function loadPosts(pageUrl, containerId, page, limit) {
                 postItem.className = 'post-container';
                 postItem.innerHTML =
                     `<h3><a href="${link}">${post.title}</a></h3>` +
-                    (post.image_path ? `<img src="/imagens/uploads/${post.image_path}" alt="${post.title}" loading="lazy">` : '') +
+                    (post.image_path ? `<img src="${post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path}" alt="${post.title}" loading="lazy">` : '') +
                     `<p>${excerpt}</p>` +
                     `<a href="${link}" class="leia-mais">Leia mais</a>`;
                 container.appendChild(postItem);

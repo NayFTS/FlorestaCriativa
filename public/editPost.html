@@ -108,7 +108,7 @@
 
               if (data.image_path) {
                   const previewImage = document.getElementById('previewImage');
-                  previewImage.src = `/imagens/uploads/${data.image_path}`;
+                  previewImage.src = data.image_path.startsWith('http') ? data.image_path : `/imagens/uploads/${data.image_path}`;
                   previewImage.style.display = 'block';
               }
 

@@ -83,16 +83,17 @@ function fetchPost() {
             document.querySelector('meta[property="og:title"]').setAttribute('content', data.title);
             document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
             if (data.image_path) {
-                document.querySelector('meta[property="og:image"]').setAttribute('content',
-                    `${window.location.origin}/imagens/uploads/${data.image_path}`);
+                const ogImg = data.image_path.startsWith('http') ? data.image_path : `${window.location.origin}/imagens/uploads/${data.image_path}`;
+                document.querySelector('meta[property="og:image"]').setAttribute('content', ogImg);
             }
 
             const postContainer = document.getElementById('post-content');
             const publishDate = new Date(data.publish_date).toLocaleDateString('pt-BR', {
                 day: '2-digit', month: 'long', year: 'numeric'
             });
+            const resolveImg = (p) => p.startsWith('http') ? p : `/imagens/uploads/${p}`;
             const imageHTML = data.image_path
-                ? `<img src="/imagens/uploads/${data.image_path}" alt="${data.title}" style="max-width:100%;height:auto;border-radius:10px;margin-bottom:20px;">`
+                ? `<img src="${resolveImg(data.image_path)}" alt="${data.title}" style="max-width:100%;height:auto;border-radius:10px;margin-bottom:20px;">`
                 : '';
             const categoriesHTML = data.categories && data.categories.length > 0
                 ? data.categories.join(', ') : 'Sem categoria';
