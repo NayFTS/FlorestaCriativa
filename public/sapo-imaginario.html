@@ -55,148 +55,35 @@
     <section id="sapo-imaginario" class="section-container">
       <div id="post-list"></div>
     </section>
+    <script src="search.js"></script>
     <script>
-  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
-
-      function toggleMenu() {
-          const menu = document.getElementById('menu');
-          if (menu.style.display === 'block') {
-              menu.style.display = 'none';
-          } else {
-              menu.style.display = 'block';
-          }
-      }
-      
-      function toggleFilters() {
-          const filters = document.getElementById('advancedFilters');
-          if (filters.style.display === "none") {
-              filters.style.display = "block";
-          } else {
-              filters.style.display = "none";
-          }
-      }
-      
-      function clearSearch() {
-          document.getElementById('searchBar').value = '';
-          document.querySelectorAll('.category').forEach(cb => cb.checked = false);
-          document.getElementById('startDate').value = '';
-          document.getElementById('endDate').value = '';
-          document.getElementById('searchResults').innerHTML = '';
-          document.getElementById('advancedFilters').style.display = 'none';
-      }
-
-      function search() {
-    const query = document.getElementById('searchBar').value.trim();
-    const selectedCategories = Array.from(document.querySelectorAll('.category:checked')).map(checkbox => checkbox.value);
-    const startDate = document.getElementById('startDate').value || '';
-    const endDate = document.getElementById('endDate').value || '';
-
-    // Verificação se pelo menos um campo foi preenchido
-    if (!query && selectedCategories.length === 0 && !startDate && !endDate) {
-        alert("Por favor, preencha ao menos um campo para realizar a pesquisa.");
-        return;
-    }
-
-    // Monta a URL da pesquisa com os filtros
-    const categoriesString = selectedCategories.join(',');
-    const searchURL = `/search?q=${query}&category=${categoriesString}&startDate=${startDate}&endDate=${endDate}`;
-
-    fetch(searchURL)
-        .then(response => response.json())
-        .then(data => {
-            const resultContainer = document.getElementById('searchResults');
-            resultContainer.innerHTML = '';
-
-            if (data.length === 0) {
-                resultContainer.style.display = 'block';
-                resultContainer.innerHTML = '<p>Nenhum resultado encontrado.</p>';
-            } else {
-                resultContainer.style.display = 'block';
-                data.forEach(post => {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = "search-result";
-
-                    // Título do post
-                    const titleElement = document.createElement('h3');
-                    titleElement.innerHTML = `<a href="post.html?id=${post._id}">${post.title}</a>`;
-                    resultItem.appendChild(titleElement);
-
-                    // Exibe as categorias concatenadas
-                    if (post.categories && post.categories.length > 0) {
-                        const categoryElement = document.createElement('p');
-                        categoryElement.innerHTML = `<strong>Categoria(s):</strong> ${post.categories.join(', ')}`;
-                        resultItem.appendChild(categoryElement);
-                    }
-
-                    // Trecho do conteúdo
-                    const excerpt = post.content.substring(0, 100) + '...';
-                    const excerptElement = document.createElement('p');
-                    excerptElement.innerHTML = excerpt;
-                    resultItem.appendChild(excerptElement);
-
-                    resultContainer.appendChild(resultItem);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Erro na busca:', error);
-        });
-}
-
-      // Função para buscar e exibir os posts
       function fetchPosts() {
-          fetch('/posts?url=sapo-imaginario.html') // Aqui você pode ajustar a categoria correspondente para "Sapo Imaginário"
-          .then(response => response.json())
-          .then(data => {
-              const postContainer = document.getElementById('post-list');
-              postContainer.innerHTML = ''; // Limpa o conteúdo anterior
-      
-              if (data.length === 0) {
-                  postContainer.innerHTML = '<p>Nenhum post encontrado.</p>';
-              } else {
-                  data.forEach(post => {
-                      const postContent = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
-                      
-                      const postItem = document.createElement('div');
-                      postItem.className = "post-container";
-                      postItem.innerHTML = `
-                          <h3><a href="post.html?id=${post._id}">${post.title}</a></h3>
-                          <img src="/imagens/uploads/${post.image_path}" alt="${post.title}">
-                          <p>${postContent}</p>
-                          <a href="post.html?id=${post._id}" class="leia-mais">Leia mais</a>
-                      `;
-      
-                      postContainer.appendChild(postItem);
-                  });
-              }
-          })
-          .catch(error => {
-              console.error('Erro ao buscar posts:', error);
-          });
+          fetch(`${API_BASE}/posts?url=sapo-imaginario.html`)
+              .then(response => response.json())
+              .then(data => {
+                  const postContainer = document.getElementById('post-list');
+                  postContainer.innerHTML = '';
+                  if (data.length === 0) {
+                      postContainer.innerHTML = '<p>Nenhum post encontrado.</p>';
+                  } else {
+                      data.forEach(post => {
+                          const postContent = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
+                          const postItem = document.createElement('div');
+                          postItem.className = 'post-container';
+                          postItem.innerHTML = `
+                              <h3><a href="post.html?id=${post._id}">${post.title}</a></h3>
+                              <img src="/imagens/uploads/${post.image_path}" alt="${post.title}">
+                              <p>${postContent}</p>
+                              <a href="post.html?id=${post._id}" class="leia-mais">Leia mais</a>
+                          `;
+                          postContainer.appendChild(postItem);
+                      });
+                  }
+              })
+              .catch(error => console.error('Erro ao buscar posts:', error));
       }
-      
-      // Chama a função ao carregar a página
-      window.onload = fetchPosts;
-       // Faz a requisição para verificar se o usuário está autenticado
-  fetch('/user-info')
-    .then(response => {
-      if (!response.ok) {
-        document.getElementById('loginButton').textContent = 'Login';
-        document.getElementById('loginButton').href = 'login.html';
-      } else {
-        return response.json();
-      }
-    })
-    .then(data => {
-      if (data && data.username) {
-        document.getElementById('loginButton').textContent = `Bem-vindo, ${data.username}`;
-        document.getElementById('loginButton').href = 'dashboard.html'; // Agora o link leva ao dashboard
-      }
-    })
-    .catch(error => {
-      console.error('Erro ao verificar autenticação:', error);
-    });
 
+      window.onload = fetchPosts;
     </script>
     <div id="bottom-image"></div>
     <!-- Isso substitui a tag img -->

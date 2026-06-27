@@ -59,94 +59,8 @@
     <div class="back-button-container">
       <button onclick="goBack()">Voltar</button>
     </div>
+    <script src="search.js"></script>
     <script>
-  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
-
-      function toggleMenu() {
-          const menu = document.getElementById('menu');
-          if (menu.style.display === 'block') {
-              menu.style.display = 'none';
-          } else {
-              menu.style.display = 'block';
-          }
-      }
-      
-      function toggleFilters() {
-          const filters = document.getElementById('advancedFilters');
-          if (filters.style.display === "none") {
-              filters.style.display = "block";
-          } else {
-              filters.style.display = "none";
-          }
-      }
-      
-      function search() {
-    const query = document.getElementById('searchBar').value.trim();
-    const selectedCategories = Array.from(document.querySelectorAll('.category:checked')).map(checkbox => checkbox.value);
-    const startDate = document.getElementById('startDate').value || '';
-    const endDate = document.getElementById('endDate').value || '';
-
-    // Verificação se pelo menos um campo foi preenchido
-    if (!query && selectedCategories.length === 0 && !startDate && !endDate) {
-        alert("Por favor, preencha ao menos um campo para realizar a pesquisa.");
-        return;
-    }
-
-    // Monta a URL da pesquisa com os filtros
-    const categoriesString = selectedCategories.join(',');
-    const searchURL = `/search?q=${query}&category=${categoriesString}&startDate=${startDate}&endDate=${endDate}`;
-
-    fetch(searchURL)
-        .then(response => response.json())
-        .then(data => {
-            const resultContainer = document.getElementById('searchResults');
-            resultContainer.innerHTML = '';
-
-            if (data.length === 0) {
-                resultContainer.style.display = 'block';
-                resultContainer.innerHTML = '<p>Nenhum resultado encontrado.</p>';
-            } else {
-                resultContainer.style.display = 'block';
-                data.forEach(post => {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = "search-result";
-
-                    // Título do post
-                    const titleElement = document.createElement('h3');
-                    titleElement.innerHTML = `<a href="post.html?id=${post._id}">${post.title}</a>`;
-                    resultItem.appendChild(titleElement);
-
-                    // Exibe as categorias concatenadas
-                    if (post.categories && post.categories.length > 0) {
-                        const categoryElement = document.createElement('p');
-                        categoryElement.innerHTML = `<strong>Categoria(s):</strong> ${post.categories.join(', ')}`;
-                        resultItem.appendChild(categoryElement);
-                    }
-
-                    // Trecho do conteúdo
-                    const excerpt = post.content.substring(0, 100) + '...';
-                    const excerptElement = document.createElement('p');
-                    excerptElement.innerHTML = excerpt;
-                    resultItem.appendChild(excerptElement);
-
-                    resultContainer.appendChild(resultItem);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Erro na busca:', error);
-        });
-}
-
-      function clearSearch() {
-          document.getElementById('searchBar').value = '';
-          document.querySelectorAll('.category').forEach(cb => cb.checked = false);
-          document.getElementById('startDate').value = '';
-          document.getElementById('endDate').value = '';
-          document.getElementById('searchResults').innerHTML = '';
-          document.getElementById('advancedFilters').style.display = 'none';
-      }
-
 function fetchPost() {
     // Captura o ID do post da URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -159,7 +73,7 @@ function fetchPost() {
     }
 
     // Busca o post pelo ID
-    fetch(`/post/${postId}`)
+    fetch(`${API_BASE}/post/${postId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Post não encontrado');
