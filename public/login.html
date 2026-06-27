@@ -39,52 +39,64 @@
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+
       document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
-    
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
         const errorMessageElement = document.getElementById('errorMessage');
-    
-        // Limpa mensagens anteriores
+
+        // Limpa estado de erro anterior
         errorMessageElement.innerHTML = '';
-    
+        emailInput.classList.remove('input-error');
+        passwordInput.classList.remove('input-error');
+
         // Validação no lado do cliente
         if (!email.includes('@') || !email.includes('.')) {
+          emailInput.classList.add('input-error');
           errorMessageElement.innerHTML = 'Por favor, insira um email válido.';
           return;
         }
         if (password.length < 6) {
+          passwordInput.classList.add('input-error');
           errorMessageElement.innerHTML = 'A senha deve ter pelo menos 6 caracteres.';
           return;
         }
-    
-        // Enviar requisição ao backend
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Entrando...';
+
         fetch(`${API_BASE}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-})
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => { throw data; });
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message || 'Login bem-sucedido! Redirecionando para o dashboard...');
-        window.location.href = '/dashboard.html';
-    })
-    .catch(error => {
-        console.error('Erro no login:', error);
-        if (error.errors) {
-            errorMessageElement.innerHTML = error.errors.map(err => `<p>${err.msg}</p>`).join('');
-        } else if (error.message) {
-            errorMessageElement.innerHTML = `<p>${error.message}</p>`;
-        } else {
-            errorMessageElement.innerHTML = '<p>Erro desconhecido. Tente novamente.</p>';
-        }
-    });
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => { throw data; });
+            }
+            return response.json();
+        })
+        .then(() => {
+            window.location.href = '/dashboard.html';
+        })
+        .catch(error => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Entrar';
+            emailInput.classList.add('input-error');
+            passwordInput.classList.add('input-error');
+            if (error.errors) {
+                errorMessageElement.innerHTML = error.errors.map(err => `<p>${err.msg}</p>`).join('');
+            } else if (error.message) {
+                errorMessageElement.innerHTML = `<p>${error.message}</p>`;
+            } else {
+                errorMessageElement.innerHTML = '<p>Erro desconhecido. Tente novamente.</p>';
+            }
+        });
 
       });
     </script>

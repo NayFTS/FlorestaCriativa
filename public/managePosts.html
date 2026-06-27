@@ -20,8 +20,20 @@
       <p>Gerencie suas postagens aqui.</p>
     </header>
 
+    <!-- Modal de confirmação de exclusão -->
+    <div id="deleteModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <p>Tem certeza que deseja excluir esta postagem?</p>
+        <div class="modal-actions">
+          <button id="modalCancel" class="btn-secondary">Cancelar</button>
+          <button id="modalConfirm" class="btn-danger">Excluir</button>
+        </div>
+      </div>
+    </div>
+
     <div class="manage-posts-container">
       <h2>Suas Postagens</h2>
+      <div id="paginationControls" class="pagination-controls"></div>
       <table id="postsTable">
         <thead>
           <tr>
@@ -39,6 +51,10 @@
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
+  let allPosts = [];
+  let currentPage = 1;
+  const PAGE_SIZE = 10;
+
   function loadPosts() {
       fetch(`${API_BASE}/user-posts`)
           .then(response => {
@@ -49,51 +65,85 @@
               return response.json();
           })
           .then(posts => {
-              const tbody = document.querySelector('#postsTable tbody');
-              tbody.innerHTML = '';
-
-              if (posts.length === 0) {
-                  tbody.innerHTML = '<tr><td colspan="5">Nenhuma postagem encontrada.</td></tr>';
-                  return;
-              }
-
-              posts.forEach(post => {
-                  const isDraft = post.status === 'draft';
-                  const row = document.createElement('tr');
-                  row.innerHTML = `
-                      <td>${post.title}</td>
-                      <td><span class="badge ${isDraft ? 'badge-draft' : 'badge-published'}">${isDraft ? 'Rascunho' : 'Publicado'}</span></td>
-                      <td>${new Date(post.publish_date).toLocaleDateString('pt-BR')}</td>
-                      <td>${post.views || 0}</td>
-                      <td></td>
-                  `;
-
-                  const actionsCell = row.querySelector('td:last-child');
-
-                  const editBtn = document.createElement('button');
-                  editBtn.textContent = 'Editar';
-                  editBtn.onclick = () => window.location.href = `editPost.html?id=${post._id}`;
-                  actionsCell.appendChild(editBtn);
-
-                  if (isDraft) {
-                      const publishBtn = document.createElement('button');
-                      publishBtn.textContent = 'Publicar';
-                      publishBtn.style.backgroundColor = '#4a8a4a';
-                      publishBtn.onclick = () => publishPost(post._id, publishBtn);
-                      actionsCell.appendChild(publishBtn);
-                  }
-
-                  const deleteBtn = document.createElement('button');
-                  deleteBtn.textContent = 'Excluir';
-                  deleteBtn.style.backgroundColor = '#c0392b';
-                  deleteBtn.setAttribute('data-id', post._id);
-                  deleteBtn.onclick = () => deletePost(post._id);
-                  actionsCell.appendChild(deleteBtn);
-
-                  tbody.appendChild(row);
-              });
+              allPosts = posts;
+              renderPage(1);
           })
           .catch(error => console.error('Erro ao carregar postagens:', error));
+  }
+
+  function renderPage(page) {
+      currentPage = page;
+      const start = (page - 1) * PAGE_SIZE;
+      const pagePosts = allPosts.slice(start, start + PAGE_SIZE);
+      const totalPages = Math.ceil(allPosts.length / PAGE_SIZE);
+      const tbody = document.querySelector('#postsTable tbody');
+      tbody.innerHTML = '';
+
+      if (allPosts.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5">Nenhuma postagem encontrada.</td></tr>';
+          updatePaginationUI(0, 0);
+          return;
+      }
+
+      pagePosts.forEach(post => {
+          const isDraft = post.status === 'draft';
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td>${post.title}</td>
+              <td><span class="badge ${isDraft ? 'badge-draft' : 'badge-published'}">${isDraft ? 'Rascunho' : 'Publicado'}</span></td>
+              <td>${new Date(post.publish_date).toLocaleDateString('pt-BR')}</td>
+              <td>${post.views || 0}</td>
+              <td></td>
+          `;
+
+          const actionsCell = row.querySelector('td:last-child');
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Editar';
+          editBtn.onclick = () => window.location.href = `editPost.html?id=${post._id}`;
+          actionsCell.appendChild(editBtn);
+
+          if (isDraft) {
+              const publishBtn = document.createElement('button');
+              publishBtn.textContent = 'Publicar';
+              publishBtn.style.backgroundColor = '#4a8a4a';
+              publishBtn.onclick = () => publishPost(post._id, publishBtn);
+              actionsCell.appendChild(publishBtn);
+          }
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Excluir';
+          deleteBtn.style.backgroundColor = '#c0392b';
+          deleteBtn.setAttribute('data-id', post._id);
+          deleteBtn.onclick = () => deletePost(post._id);
+          actionsCell.appendChild(deleteBtn);
+
+          tbody.appendChild(row);
+      });
+
+      updatePaginationUI(page, totalPages);
+  }
+
+  function updatePaginationUI(page, totalPages) {
+      const container = document.getElementById('paginationControls');
+      container.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '← Anterior';
+      prevBtn.disabled = page === 1;
+      prevBtn.onclick = () => renderPage(page - 1);
+      container.appendChild(prevBtn);
+
+      const info = document.createElement('span');
+      info.textContent = `Página ${page} de ${totalPages}`;
+      container.appendChild(info);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = 'Próxima →';
+      nextBtn.disabled = page === totalPages;
+      nextBtn.onclick = () => renderPage(page + 1);
+      container.appendChild(nextBtn);
   }
 
   function publishPost(postId, btn) {
@@ -108,8 +158,25 @@
           .catch(() => { btn.disabled = false; btn.textContent = 'Publicar'; });
   }
 
-  function deletePost(postId) {
-      if (!confirm('Tem certeza que deseja excluir esta postagem?')) return;
+  function confirmDelete() {
+      return new Promise(resolve => {
+          const modal = document.getElementById('deleteModal');
+          modal.style.display = 'flex';
+          document.getElementById('modalConfirm').onclick = () => {
+              modal.style.display = 'none';
+              resolve(true);
+          };
+          document.getElementById('modalCancel').onclick = () => {
+              modal.style.display = 'none';
+              resolve(false);
+          };
+      });
+  }
+
+  async function deletePost(postId) {
+      const confirmed = await confirmDelete();
+      if (!confirmed) return;
+
       const btn = document.querySelector(`button[data-id="${postId}"]`);
       if (btn) { btn.textContent = 'Excluindo...'; btn.disabled = true; }
 

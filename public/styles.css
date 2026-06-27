@@ -208,6 +208,84 @@ a:hover {
     padding: 20px;
 }
 
+/* Campo de formulário com erro */
+input.input-error, input.input-error:focus {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+    outline: none;
+}
+
+/* Modal de confirmação */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-box {
+    background: var(--color-surface);
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.modal-box p {
+    font-size: 1.05em;
+    margin-bottom: 24px;
+    color: var(--color-text);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-danger {
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover { background-color: #a93226; }
+
+.btn-secondary {
+    background-color: var(--color-surface-alt);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    padding: 10px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover { background-color: var(--color-border); }
+
+/* Controles de paginação do managePosts */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 0 8px;
+    font-size: 0.9em;
+}
+
+.pagination-controls span { color: var(--color-text-secondary); }
+
 /* Rodapé */
 footer {
     background-color: var(--color-accent);
@@ -1318,4 +1396,19 @@ select {
         text-align: center;
         box-sizing: border-box;
     }
+}
+
+/* Telas muito pequenas — carrossel */
+@media (max-width: 360px) {
+    .carousel-container {
+        padding: 10px 4px;
+    }
+
+    .carousel-btn {
+        font-size: 16px;
+        padding: 4px 6px;
+    }
+
+    .prev-btn { left: 0; }
+    .next-btn { right: 0; }
 }
