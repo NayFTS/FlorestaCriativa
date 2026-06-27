@@ -1,3 +1,33 @@
+// Aplica o tema salvo antes do primeiro paint
+(function () {
+    const t = localStorage.getItem('theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+
+    function injectThemeToggle() {
+        const menu = document.getElementById('menu');
+        if (!menu || document.getElementById('themeToggle')) return;
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const btn = document.createElement('button');
+        btn.id = 'themeToggle';
+        btn.className = 'theme-toggle';
+        btn.textContent = isDark ? 'Modo Claro' : 'Modo Escuro';
+        btn.onclick = function () {
+            const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const next = dark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            btn.textContent = next === 'dark' ? 'Modo Claro' : 'Modo Escuro';
+        };
+        menu.appendChild(btn);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectThemeToggle);
+    } else {
+        injectThemeToggle();
+    }
+})();
+
 const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
 function toggleMenu() {
@@ -122,14 +152,17 @@ function loadPosts(pageUrl, containerId, page, limit) {
                 temp.innerHTML = post.content;
                 const text = (temp.textContent || temp.innerText || '').trim();
                 const excerpt = text.length > 150 ? text.substring(0, 150) + '...' : text;
+                const link = post.slug
+                    ? `post.html?slug=${post.slug}`
+                    : `post.html?id=${post._id}`;
 
                 const postItem = document.createElement('div');
                 postItem.className = 'post-container';
                 postItem.innerHTML =
-                    `<h3><a href="post.html?id=${post._id}">${post.title}</a></h3>` +
+                    `<h3><a href="${link}">${post.title}</a></h3>` +
                     (post.image_path ? `<img src="/imagens/uploads/${post.image_path}" alt="${post.title}" loading="lazy">` : '') +
                     `<p>${excerpt}</p>` +
-                    `<a href="post.html?id=${post._id}" class="leia-mais">Leia mais</a>`;
+                    `<a href="${link}" class="leia-mais">Leia mais</a>`;
                 container.appendChild(postItem);
             });
 

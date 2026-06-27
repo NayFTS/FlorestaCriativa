@@ -51,8 +51,26 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     image_path: String,
     publish_date: { type: Date, default: Date.now },
     categories: [String],
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // 🔹 Agora os posts têm um autor vinculado
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    slug: { type: String, sparse: true },
+    views: { type: Number, default: 0 },
+    status: { type: String, enum: ['published', 'draft'], default: 'published' }
 }));
+
+function slugify(text) {
+    return text.toString().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '').trim()
+        .replace(/\s+/g, '-').replace(/-+/g, '-')
+        .substring(0, 100) || 'post';
+}
+
+async function uniqueSlug(title) {
+    const base = slugify(title);
+    let slug = base, i = 1;
+    while (await Post.findOne({ slug })) slug = `${base}-${i++}`;
+    return slug;
+}
 
 
 const uploadDir = path.join(__dirname, '../public/imagens/uploads');
@@ -181,21 +199,20 @@ app.get('/logout', (req, res) => {
 
 app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        const { title, content, url } = req.body;
+        const { title, content, url, status } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         const image_path = req.file ? req.file.filename : null;
+        const slug = await uniqueSlug(title);
 
         const newPost = new Post({
-            title,
-            content,
-            url,
-            image_path,
-            categories,
-            author: req.session.userId
+            title, content, url, image_path, categories,
+            author: req.session.userId,
+            slug,
+            status: status === 'draft' ? 'draft' : 'published'
         });
 
         await newPost.save();
-        res.json({ success: true, message: 'Post publicado com sucesso!' });
+        res.json({ success: true, message: 'Post publicado com sucesso!', slug: newPost.slug });
     } catch (err) {
         console.error('Erro ao salvar o post:', err);
         res.status(400).json({ success: false, message: err.message || 'Erro ao salvar o post' });
@@ -249,7 +266,8 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
 app.get('/posts', async (req, res) => {
     const { url, page, limit } = req.query;
     try {
-        const query = url ? { url } : {};
+        const query = { status: { $ne: 'draft' } };
+        if (url) query.url = url;
         if (page && limit) {
             const pageNum = Math.max(1, parseInt(page) || 1);
             const limitNum = Math.min(50, parseInt(limit) || 5);
@@ -270,17 +288,14 @@ app.get('/posts', async (req, res) => {
 
 app.get('/post/:id', async (req, res) => {
     try {
-        const postId = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(postId)) {
-            return res.status(400).json({ success: false, message: 'ID de post inválido' });
+        const id = req.params.id;
+        let post;
+        if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+            post = await Post.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true });
+        } else {
+            post = await Post.findOneAndUpdate({ slug: id }, { $inc: { views: 1 } }, { new: true });
         }
-
-        const post = await Post.findById(postId);
-        if (!post) {
-            return res.status(404).json({ success: false, message: 'Post não encontrado' });
-        }
-
+        if (!post) return res.status(404).json({ success: false, message: 'Post não encontrado' });
         res.json(post);
     } catch (err) {
         console.error('Erro ao buscar post:', err);
@@ -308,7 +323,7 @@ app.delete('/posts/:id', requireAuth, async (req, res) => {
 // Rota para buscar posts recentes
 app.get('/recent-posts', async (req, res) => {
     try {
-        const posts = await Post.find().sort({ publish_date: -1 }).limit(5);
+        const posts = await Post.find({ status: { $ne: 'draft' } }).sort({ publish_date: -1 }).limit(5);
         res.json(posts);
     } catch (err) {
         res.status(500).send('Erro ao buscar posts');
@@ -358,13 +373,22 @@ app.get('/user-posts', requireAuth, async (req, res) => {
 
 app.get('/dashboard-stats', requireAuth, async (req, res) => {
     try {
-        const totalPosts = await Post.countDocuments({ author: req.session.userId });
-        const mostPopularPost = await Post.findOne({ author: req.session.userId }).sort({ publish_date: -1 });
-        const recentPosts = await Post.find({ author: req.session.userId }).sort({ publish_date: -1 }).limit(3);
+        const authorId = req.session.userId;
+        const [allPosts, recentPosts] = await Promise.all([
+            Post.find({ author: authorId }),
+            Post.find({ author: authorId }).sort({ publish_date: -1 }).limit(3)
+        ]);
+        const totalPosts = allPosts.length;
+        const draftCount = allPosts.filter(p => p.status === 'draft').length;
+        const totalViews = allPosts.reduce((sum, p) => sum + (p.views || 0), 0);
+        const mostViewedPost = allPosts.sort((a, b) => (b.views || 0) - (a.views || 0))[0];
 
         res.json({
             totalPosts,
-            mostPopularPost: mostPopularPost ? mostPopularPost.title : 'Nenhuma postagem encontrada',
+            draftCount,
+            publishedCount: totalPosts - draftCount,
+            totalViews,
+            mostPopularPost: mostViewedPost ? mostViewedPost.title : 'Nenhuma postagem encontrada',
             recentPosts,
         });
     } catch (err) {
@@ -374,6 +398,60 @@ app.get('/dashboard-stats', requireAuth, async (req, res) => {
 });
 
 
+
+// Publicar rascunho
+app.patch('/posts/:id/publish', requireAuth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+        if (post.author.toString() !== req.session.userId.toString()) {
+            return res.status(403).json({ message: 'Sem permissão' });
+        }
+        post.status = 'published';
+        await post.save();
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+// Feed RSS
+app.get('/feed.xml', async (req, res) => {
+    try {
+        const posts = await Post.find({ status: { $ne: 'draft' } }).sort({ publish_date: -1 }).limit(20);
+        const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+        const stripHtml = s => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+
+        const items = posts.map(post => {
+            const desc = stripHtml(post.content).substring(0, 200);
+            const link = `${siteUrl}/post.html?id=${post._id}`;
+            return `
+    <item>
+      <title><![CDATA[${post.title}]]></title>
+      <link>${link}</link>
+      <description><![CDATA[${desc}...]]></description>
+      <pubDate>${new Date(post.publish_date).toUTCString()}</pubDate>
+      <guid isPermaLink="true">${link}</guid>
+    </item>`;
+        }).join('');
+
+        res.set('Content-Type', 'application/rss+xml; charset=utf-8');
+        res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Floresta Criativa</title>
+    <link>${siteUrl}</link>
+    <description>Blog pessoal — escrita, projetos e inspiração</description>
+    <language>pt-br</language>
+    <atom:link href="${siteUrl}/api/feed.xml" rel="self" type="application/rss+xml"/>
+${items}
+  </channel>
+</rss>`);
+    } catch (err) {
+        console.error('Erro ao gerar feed RSS:', err);
+        res.status(500).send('Erro ao gerar feed');
+    }
+});
 
 // Servir arquivos estáticos
 app.use(express.static('public'));

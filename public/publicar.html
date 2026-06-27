@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Floresta Criativa - Publicar Post</title>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
   </head>
@@ -64,12 +65,16 @@
         </div>
       </fieldset><br><br>
 
-      <button type="submit">Publicar</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="submit" id="publishBtn">Publicar</button>
+        <button type="button" id="draftBtn" style="background-color:#888;">Salvar como rascunho</button>
+      </div>
     </form>
     <p id="errorMessage"></p>
 
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+  let submitStatus = 'published';
 
   ClassicEditor
     .create(document.querySelector('#editor'), {
@@ -84,6 +89,11 @@
         }
     })
     .then(editor => {
+        document.getElementById('draftBtn').addEventListener('click', function() {
+            submitStatus = 'draft';
+            document.getElementById('postForm').requestSubmit();
+        });
+
         document.getElementById('image').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -105,6 +115,7 @@
             const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
                 .map(checkbox => checkbox.value);
             formData.append('categories', JSON.stringify(selectedCategories));
+            formData.append('status', submitStatus);
 
             const btn = document.querySelector('#postForm button[type="submit"]');
             const errorMsg = document.getElementById('errorMessage');
@@ -120,6 +131,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    submitStatus = 'published';
                     window.location.href = 'managePosts.html';
                 } else {
                     errorMsg.textContent = `Erro: ${data.message}`;

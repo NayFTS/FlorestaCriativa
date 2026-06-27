@@ -1,10 +1,33 @@
 /* ===================== */
+/* CSS VARIABLES */
+/* ===================== */
+:root {
+    --color-bg: #f3f7f0;
+    --color-text: #2f4f2f;
+    --color-accent: #4d774e;
+    --color-accent-dark: #365a3f;
+    --color-surface: #ffffff;
+    --color-surface-alt: #f8f8f8;
+    --color-border: #ddd;
+    --color-text-secondary: #333;
+}
+
+[data-theme="dark"] {
+    --color-bg: #1a2b1a;
+    --color-text: #c8e0c8;
+    --color-surface: #1e301e;
+    --color-surface-alt: #243324;
+    --color-border: #3d5a3d;
+    --color-text-secondary: #9ab89a;
+}
+
+/* ===================== */
 /* GLOBAL STYLES */
 /* ===================== */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f3f7f0;
-    color: #2f4f2f;
+    background-color: var(--color-bg);
+    color: var(--color-text);
     margin: 0;
     padding: 0;
 }
@@ -31,7 +54,7 @@ body {
 /* HEADER AND NAVIGATION */
 /* ===================== */
 header {
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     padding: 10px 0;  /* Reduz o padding para diminuir a altura */
     text-align: center;
@@ -48,14 +71,14 @@ nav {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color: #f3f7f0;
+    background-color: var(--color-bg);
     flex-wrap: wrap;
 }
 
 nav a {
     margin: 0 15px;
     text-decoration: none;
-    color: #2f4f2f;
+    color: var(--color-text);
     font-size: 18px;
 }
 
@@ -69,7 +92,7 @@ a {
 }
 
 a:hover {
-    color: #4d774e; /* Define uma cor diferente para quando o mouse passar por cima (opcional) */
+    color: var(--color-accent); /* Define uma cor diferente para quando o mouse passar por cima (opcional) */
     text-decoration: none; /* Garante que o sublinhado não apareça no hover */
 }
 
@@ -105,7 +128,7 @@ a:hover {
         display: none; /* Esconde o menu padrão */
         flex-direction: column;
         width: 100%;
-        background-color: #f3f7f0;
+        background-color: var(--color-bg);
         padding: 10px 0;
     }
 
@@ -135,13 +158,13 @@ a:hover {
 .search-container input[type="text"] {
     padding: 5px;
     border-radius: 5px;
-    border: 1px solid #4d774e;
+    border: 1px solid var(--color-accent);
     width: 150px; /* Define um tamanho menor para a barra de pesquisa */
     margin-right: 10px;
 }
 
 .search-container button {
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     padding: 8px 15px;
     border: none;
@@ -150,7 +173,7 @@ a:hover {
 }
 
 .search-container button:hover {
-    background-color: #365a3f;
+    background-color: var(--color-accent-dark);
 }
 
 /* Imagem do cabeçalho */
@@ -170,7 +193,7 @@ a:hover {
 
 /* Rodapé */
 footer {
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     text-align: center;
     padding: 10px 0;
@@ -184,7 +207,7 @@ footer {
     align-items: center; /* Centraliza verticalmente */
     margin-bottom: 30px;
     padding: 10px;
-    border: 1px solid #4d774e;
+    border: 1px solid var(--color-accent);
     border-radius: 10px;
     text-align: left;
 }
@@ -235,8 +258,8 @@ footer {
     box-sizing: border-box;  /* Inclui padding e bordas dentro da largura */
     padding: 20px;
     text-align: center;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
+    background-color: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
     margin: 10px 0; /* Ajusta as margens para evitar espaçamento lateral */
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -248,7 +271,7 @@ footer {
     top: 50%;
     transform: translateY(-50%);
     background-color: transparent;
-    color: #4d774e;
+    color: var(--color-accent);
     border: none;
     padding: 10px;
     cursor: pointer;
@@ -275,7 +298,7 @@ footer {
     font-size: 1.5em;
     margin-bottom: 10px;
     text-align: center; /* Centraliza o título */
-    color: #2f4f2f; /* Dá destaque ao título */
+    color: var(--color-text); /* Dá destaque ao título */
 }
 
 .post-container:hover {
@@ -285,7 +308,7 @@ footer {
 
 .post-container p {
     margin: 10px 0;
-    color: #2f4f2f;
+    color: var(--color-text);
 }
 
 .post-container img {
@@ -298,7 +321,7 @@ footer {
 /* Botão "Leia mais" */  
 .leia-mais {
     align-self: flex-start;
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     padding: 10px 15px;
     border-radius: 5px;
@@ -309,7 +332,7 @@ footer {
 }
 
 .leia-mais:hover {
-    background-color: #3b5f3a; /* Cor de fundo mais escura ao passar o mouse */
+    background-color: var(--color-accent-dark); /* Cor de fundo mais escura ao passar o mouse */
 }
 
 /* Resultados da pesquisa */
@@ -327,14 +350,14 @@ footer {
     max-width: 600px; /* Limita o tamanho máximo dos resultados */
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #f3f7f0;
-    border: 1px solid #4d774e;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-accent);
     border-radius: 5px;
     text-align: left;
 }
 
 .search-result h3 a {
-    color: #2f4f2f;
+    color: var(--color-text);
     text-decoration: none;
     font-size: 18px;
 }
@@ -346,11 +369,11 @@ footer {
 .search-result p {
     margin: 5px 0;
     font-size: 14px;
-    color: #333;
+    color: var(--color-text-secondary);
 }
 
 .search-result p strong {
-    color: #4d774e;
+    color: var(--color-accent);
 }
 
 /* Estilos para telas menores */
@@ -446,8 +469,8 @@ footer {
 }
 
 #post-list div {
-    background-color: #f3f7f0;
-    border: 1px solid #4d774e;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-accent);
     padding: 10px;
     margin: 10px 0;
     border-radius: 10px;
@@ -467,8 +490,8 @@ footer {
 #postForm {
     margin: 20px 0;
     padding: 20px;
-    background-color: #f3f7f0;
-    border: 2px solid #4d774e;
+    background-color: var(--color-bg);
+    border: 2px solid var(--color-accent);
     border-radius: 10px;
     max-width: 600px;
     margin-left: auto;
@@ -481,28 +504,28 @@ footer {
     padding: 10px;
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #4d774e;
-    background-color: #f3f7f0;
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-bg);
     font-size: 1em;
 }
 
 #postForm input[type="file"] {
     width: 100%;
     padding: 5px;
-    background-color: #f3f7f0;
+    background-color: var(--color-bg);
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #4d774e;
+    border: 1px solid var(--color-accent);
     font-size: 1em;
 }
 
 #postForm input[type="text"] {
     width: 100%;
     padding: 5px;
-    background-color: #f3f7f0;
+    background-color: var(--color-bg);
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #4d774e;
+    border: 1px solid var(--color-accent);
     font-size: 1em;
 }
 
@@ -510,7 +533,7 @@ footer {
 #postForm button[type="submit"] {
     margin-top: 20px;
     padding: 12px 20px;
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     border: none;
     border-radius: 5px;
@@ -520,7 +543,7 @@ footer {
 }
 
 #postForm button[type="submit"]:hover {
-    background-color: #3b593d;
+    background-color: var(--color-accent-dark);
 }
 
 /* Estilo para as categorias */
@@ -582,7 +605,7 @@ footer {
 }
 
 .back-button-container button {
-    background-color: #4d774e; /* Cor de fundo do botão */
+    background-color: var(--color-accent); /* Cor de fundo do botão */
     color: white; /* Cor do texto */
     padding: 10px 20px; /* Espaçamento interno do botão */
     border: none; /* Remove a borda padrão */
@@ -593,7 +616,7 @@ footer {
 }
 
 .back-button-container button:hover {
-    background-color: #365a3f; /* Cor mais escura ao passar o mouse */
+    background-color: var(--color-accent-dark); /* Cor mais escura ao passar o mouse */
     transform: translateY(-3px); /* Eleva o botão ligeiramente ao passar o mouse */
 }
 
@@ -605,7 +628,7 @@ footer {
 #registerLink {
     display: inline-block;
     margin-top: 10px;
-    color: #4d774e;
+    color: var(--color-accent);
     font-weight: bold;
     text-decoration: none;
 }
@@ -620,7 +643,7 @@ footer {
     max-width: 800px;
     margin: 40px auto;
     padding: 20px;
-    background-color: white;
+    background-color: var(--color-surface);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -633,7 +656,7 @@ footer {
 }
 
 .dashboard-actions button {
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     padding: 15px 20px;
     font-size: 16px;
@@ -645,11 +668,11 @@ footer {
 
 .dashboard-actions button:hover {
     transform: translateY(-3px);
-    background-color: #365a3f;
+    background-color: var(--color-accent-dark);
 }
 
 .dashboard-stats {
-    background-color: #f3f7f0;
+    background-color: var(--color-bg);
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -657,7 +680,7 @@ footer {
 
 .dashboard-stats h3 {
     font-size: 20px;
-    color: #2f4f2f;
+    color: var(--color-text);
     margin-bottom: 10px;
 }
 
@@ -667,7 +690,7 @@ footer {
 }
 .dashboard-recent-posts {
     margin-top: 20px;
-    background-color: #fff;
+    background-color: var(--color-surface);
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -675,7 +698,7 @@ footer {
 
 .recent-post-item {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .recent-post-item:last-child {
@@ -684,16 +707,16 @@ footer {
 
 .recent-post-item h4 {
     font-size: 18px;
-    color: #4d774e;
+    color: var(--color-accent);
 }
 
 .recent-post-item p {
     font-size: 14px;
-    color: #333;
+    color: var(--color-text-secondary);
 }
 
 .recent-post-item a {
-    color: #4d774e;
+    color: var(--color-accent);
     text-decoration: none;
     font-weight: bold;
 }
@@ -728,7 +751,7 @@ footer {
     max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: var(--color-surface-alt);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -737,7 +760,7 @@ footer {
 .manage-posts-container h2 {
     text-align: center;
     font-size: 2em;
-    color: #4d774e;
+    color: var(--color-accent);
     margin-bottom: 30px;
 }
 
@@ -748,7 +771,7 @@ footer {
     margin: 20px 0;
     font-size: 1em;
     font-family: 'Arial', sans-serif;
-    background-color: #fff;
+    background-color: var(--color-surface);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -756,11 +779,11 @@ footer {
 #postsTable td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--color-border);
 }
 
 #postsTable th {
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     text-transform: uppercase;
     font-size: 0.9em;
@@ -777,12 +800,12 @@ footer {
 
 #postsTable td {
     font-size: 0.9em;
-    color: #333;
+    color: var(--color-text-secondary);
 }
 
 /* Estilos dos botões de ação */
 #postsTable button {
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     border: none;
     padding: 8px 12px;
@@ -793,7 +816,7 @@ footer {
 }
 
 #postsTable button:hover {
-    background-color: #365a3f;
+    background-color: var(--color-accent-dark);
     transform: translateY(-2px);
 }
 
@@ -822,8 +845,8 @@ footer {
 #editPostForm {
     margin: 20px 0;
     padding: 20px;
-    background-color: #f3f7f0;
-    border: 2px solid #4d774e;
+    background-color: var(--color-bg);
+    border: 2px solid var(--color-accent);
     border-radius: 10px;
     max-width: 600px;
     margin-left: auto;
@@ -836,28 +859,28 @@ footer {
     padding: 10px;
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #4d774e;
-    background-color: #f3f7f0;
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-bg);
     font-size: 1em;
 }
 
 #editPostForm input[type="file"] {
     width: 100%;
     padding: 5px;
-    background-color: #f3f7f0;
+    background-color: var(--color-bg);
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #4d774e;
+    border: 1px solid var(--color-accent);
     font-size: 1em;
 }
 
 #editPostForm input[type="text"] {
     width: 100%;
     padding: 5px;
-    background-color: #f3f7f0;
+    background-color: var(--color-bg);
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #4d774e;
+    border: 1px solid var(--color-accent);
     font-size: 1em;
 }
 
@@ -865,7 +888,7 @@ footer {
 #editPostForm button[type="submit"] {
     margin-top: 20px;
     padding: 12px 20px;
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     border: none;
     border-radius: 5px;
@@ -875,7 +898,7 @@ footer {
 }
 
 #editPostForm button[type="submit"]:hover {
-    background-color: #3b593d;
+    background-color: var(--color-accent-dark);
 }
 
 /* Estilo para as categorias */
@@ -958,11 +981,56 @@ section#rascunhos-da-floresta {
     margin-bottom: 1em;
 }
 
+/* Botão de modo escuro */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--color-accent);
+    color: var(--color-text);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-left: 8px;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.theme-toggle:hover {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+/* Meta info do post */
+.post-meta, .post-categories {
+    font-size: 0.9em;
+    color: var(--color-text-secondary);
+    margin: 6px 0;
+}
+
+/* Badges de status */
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.badge-draft {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.badge-published {
+    background-color: var(--color-accent);
+    color: white;
+}
+
 /* Carregando posts */
 .post-loading {
     text-align: center;
     padding: 30px;
-    color: #4d774e;
+    color: var(--color-accent);
     font-style: italic;
     animation: pulse 1.2s ease-in-out infinite;
 }
@@ -986,7 +1054,7 @@ section#rascunhos-da-floresta {
     display: block;
     margin: 20px auto;
     padding: 12px 30px;
-    background-color: #4d774e;
+    background-color: var(--color-accent);
     color: white;
     border: none;
     border-radius: 5px;
@@ -996,7 +1064,7 @@ section#rascunhos-da-floresta {
 }
 
 .load-more-btn:hover {
-    background-color: #365a3f;
+    background-color: var(--color-accent-dark);
 }
 
 /* Preview de imagem no formulário */
@@ -1005,7 +1073,7 @@ section#rascunhos-da-floresta {
     max-width: 200px;
     margin: 10px 0;
     border-radius: 8px;
-    border: 1px solid #4d774e;
+    border: 1px solid var(--color-accent);
 }
 
 /* Mobile pequeno (até 480px) */

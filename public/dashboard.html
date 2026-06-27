@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Floresta Criativa</title>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
     <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
@@ -13,10 +14,9 @@
   <body>
     <header>
       <a href="index.html">
-      <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
+        <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
       </a>
       <h1>Floresta Criativa</h1>
-      <p>Bem-vindo ao meu espaço de escrita, projetos e inspiração!</p>
     </header>
 
     <div id="top-image"></div>
@@ -30,118 +30,96 @@
         <a href="sapo-imaginario.html">Sapo Imaginário</a>
         <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
         <a href="login.html" id="loginButton">Login</a>
-        <a href="#" id="logoutButton">Logout</a>
-
+        <a href="#" id="logoutButton">Sair</a>
       </div>
     </nav>
 
     <div class="dashboard-container">
       <h2 id="welcomeMessage">Bem-vindo!</h2>
 
-      <!-- Ações de gerenciamento -->
       <div class="dashboard-actions">
-        <button onclick="window.location.href='publicar.html'">Adicionar Nova Postagem</button>
+        <button onclick="window.location.href='publicar.html'">Nova Postagem</button>
         <button onclick="window.location.href='managePosts.html'">Gerenciar Postagens</button>
       </div>
 
-      <!-- Estatísticas de Postagens -->
-      <div class="dashboard-stats">
+      <div class="dashboard-stats" id="statsContainer">
         <h3>Suas Estatísticas:</h3>
-        <p>Total de Postagens: 10</p>
-        <p>Postagem mais Popular: "Meu Melhor Trabalho"</p>
+        <p>Carregando...</p>
       </div>
     </div>
+
     <div class="dashboard-recent-posts">
       <h3>Postagens Recentes:</h3>
       <div id="recentPosts"></div>
-  </div>
-  
+    </div>
 
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
-      // Verifica se o usuário está autenticado e carrega as informações
-      function checkAuthentication() {
-        fetch('/user-info')
-          .then(response => {
-            if (!response.ok) {
-              document.getElementById('loginButton').textContent = 'Login';
-              document.getElementById('loginButton').href = 'login.html';
-              throw new Error('Usuário não autenticado');
-            }
-            return response.json();
-          })
-          .then(data => {
-            if (data && data.username) {
-              // Atualiza o botão de login para mostrar o nome do usuário
-              document.getElementById('loginButton').textContent = `Perfil`;
-              document.getElementById('loginButton').href = 'dashboard.html';
+  function toggleMenu() {
+      const menu = document.getElementById('menu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  }
 
-              // Atualiza a mensagem de boas-vindas no dashboard
-              document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
-            }
-          })
-          .catch(error => {
-            console.error('Erro ao verificar autenticação:', error);
-            window.location.href = '/login';
-          });
-      }
-
-      // Função de logout
-      document.getElementById('logoutButton').addEventListener('click', function(event) {
-    event.preventDefault(); // Evita que o link padrão seja seguido
-
-    fetch('/logout', { method: 'GET' })
+  fetch(`${API_BASE}/user-info`)
       .then(response => {
-        if (response.ok) {
-          alert('Logout realizado com sucesso!');
-          window.location.href = 'login.html'; // Redireciona para o login
-        } else {
-          console.error('Erro ao fazer logout');
-        }
+          if (!response.ok) {
+              window.location.href = 'login.html';
+              throw new Error('Não autenticado');
+          }
+          return response.json();
       })
-      .catch(error => {
-        console.error('Erro ao tentar logout:', error);
-      });
+      .then(data => {
+          if (data && data.username) {
+              document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
+              document.getElementById('loginButton').textContent = 'Perfil';
+              document.getElementById('loginButton').href = 'dashboard.html';
+          }
+      })
+      .catch(error => console.error('Erro ao verificar autenticação:', error));
+
+  document.getElementById('logoutButton').addEventListener('click', function(event) {
+      event.preventDefault();
+      fetch(`${API_BASE}/logout`)
+          .then(response => {
+              if (response.ok) window.location.href = 'login.html';
+          })
+          .catch(error => console.error('Erro ao fazer logout:', error));
   });
 
+  fetch(`${API_BASE}/dashboard-stats`)
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('statsContainer').innerHTML = `
+              <h3>Suas Estatísticas:</h3>
+              <p>Total de Postagens: ${data.totalPosts} (${data.publishedCount || 0} publicadas · ${data.draftCount || 0} rascunhos)</p>
+              <p>Total de Visualizações: ${data.totalViews || 0}</p>
+              <p>Post mais visualizado: "${data.mostPopularPost}"</p>
+          `;
 
-      // Chama a função para verificar se o usuário está autenticado e carrega os dados
-      checkAuthentication();
-
-      fetch('/dashboard-stats')
-    .then(response => response.json())
-    .then(data => {
-        document.querySelector('.dashboard-stats').innerHTML = `
-            <h3>Suas Estatísticas:</h3>
-            <p>Total de Postagens: ${data.totalPosts}</p>
-            <p>Postagem mais Popular: "${data.mostPopularPost}"</p>
-        `;
-
-        // Exibir postagens recentes
-        const recentPostsContainer = document.getElementById('recentPosts');
-        recentPostsContainer.innerHTML = '';
-
-        if (data.recentPosts.length === 0) {
-            recentPostsContainer.innerHTML = '<p>Nenhuma postagem recente.</p>';
-        } else {
-            data.recentPosts.forEach(post => {
-                const postElement = document.createElement('div');
-                postElement.classList.add('recent-post-item');
-                postElement.innerHTML = `
-                    <h4>${post.title}</h4>
-                    <p>${post.content.substring(0, 100)}...</p>
-                    <a href="post.html?id=${post._id}">Ler mais</a>
-                `;
-                recentPostsContainer.appendChild(postElement);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao carregar estatísticas:', error);
-    });
-
-
+          const container = document.getElementById('recentPosts');
+          container.innerHTML = '';
+          if (!data.recentPosts || data.recentPosts.length === 0) {
+              container.innerHTML = '<p>Nenhuma postagem recente.</p>';
+          } else {
+              data.recentPosts.forEach(post => {
+                  const isDraft = post.status === 'draft';
+                  const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
+                  const temp = document.createElement('div');
+                  temp.innerHTML = post.content;
+                  const excerpt = (temp.textContent || '').trim().substring(0, 100);
+                  const el = document.createElement('div');
+                  el.className = 'recent-post-item';
+                  el.innerHTML = `
+                      <h4>${post.title} ${isDraft ? '<span class="badge badge-draft">Rascunho</span>' : ''}</h4>
+                      <p>${excerpt}...</p>
+                      ${isDraft ? '' : `<a href="${link}">Ler mais</a>`}
+                  `;
+                  container.appendChild(el);
+              });
+          }
+      })
+      .catch(error => console.error('Erro ao carregar estatísticas:', error));
     </script>
 
     <footer>

@@ -3,7 +3,14 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Completo - Floresta Criativa</title>
+    <title>Post - Floresta Criativa</title>
+    <meta name="description" content="">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="">
+    <meta property="og:site_name" content="Floresta Criativa">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
     <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
@@ -19,17 +26,14 @@
       <p>Bem-vindo ao meu espaço de escrita, projetos e inspiração!</p>
     </header>
     <div id="top-image"></div>
-    <!-- Isso substitui a tag img -->
     <nav>
       <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-      <!-- Ícone de hambúrguer -->
       <div class="menu" id="menu">
         <a href="index.html">Home</a>
         <a href="about.html">Sobre Mim</a>
         <a href="verde-inspiracao.html">Verde Inspiração</a>
         <a href="sapo-imaginario.html">Sapo Imaginário</a>
         <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
-        <!-- Formulário de pesquisa agora está dentro do nav -->
         <form class="search-container" onsubmit="search(); return false;">
           <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos...">
           <button type="submit">Pesquisar</button>
@@ -38,7 +42,6 @@
         </form>
       </div>
     </nav>
-    <!-- Filtros avançados -->
     <div id="advancedFilters" style="display: none;">
       <p>Categorias:</p>
       <label><input type="checkbox" class="category" value="Escrita" name="category[]"> Escrita</label>
@@ -46,86 +49,73 @@
       <label><input type="checkbox" class="category" value="Animes" name="category[]"> Animes</label>
       <label><input type="checkbox" class="category" value="Jogos" name="category[]"> Jogos</label>
       <label><input type="checkbox" class="category" value="Slice of Life" name="category[]"> Slice of Life</label>
-      <!-- Outros filtros opcionais (como autor e data) -->
-      <input type="date" id="startDate" name="startDate" placeholder="Data de início">
-      <input type="date" id="endDate" name="endDate" placeholder="Data de fim">
+      <input type="date" id="startDate" name="startDate">
+      <input type="date" id="endDate" name="endDate">
     </div>
     <div id="searchResults"></div>
     <div class="container" id="post-content">
-      <img src="/imagens/uploads/${data.image_path}" alt="${data.title}" loading="lazy">
-      <!-- Conteúdo do post será carregado aqui -->
+      <!-- Conteúdo do post carregado aqui -->
     </div>
-    <!-- Botão de Voltar -->
     <div class="back-button-container">
       <button onclick="goBack()">Voltar</button>
     </div>
     <script src="search.js"></script>
     <script>
 function fetchPost() {
-    // Captura o ID do post da URL
     const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get('id');
+    const postId = urlParams.get('slug') || urlParams.get('id');
 
-    if (!postId || postId === "undefined") {
-        document.getElementById('post-content').innerHTML = '<p>Post não encontrado.</p>';
-        console.error('ID do post está ausente ou inválido na URL.');
+    if (!postId || postId === 'undefined') {
+        document.getElementById('post-content').innerHTML = '<p class="post-error">Post não encontrado.</p>';
         return;
     }
 
-    // Busca o post pelo ID
     fetch(`${API_BASE}/post/${postId}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Post não encontrado');
-            }
+            if (!response.ok) throw new Error('Post não encontrado');
             return response.json();
         })
         .then(data => {
-            console.log(data); // Debug para conferir os dados no console
+            document.title = `${data.title} — Floresta Criativa`;
+
+            const desc = (data.content || '').replace(/<[^>]+>/g, '').trim().substring(0, 160);
+            document.querySelector('meta[name="description"]').setAttribute('content', desc);
+            document.querySelector('meta[property="og:title"]').setAttribute('content', data.title);
+            document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
+            if (data.image_path) {
+                document.querySelector('meta[property="og:image"]').setAttribute('content',
+                    `${window.location.origin}/imagens/uploads/${data.image_path}`);
+            }
 
             const postContainer = document.getElementById('post-content');
-
-            // Formatar a data de publicação
             const publishDate = new Date(data.publish_date).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
+                day: '2-digit', month: 'long', year: 'numeric'
             });
-
-            // Verifica se há uma imagem para exibir
             const imageHTML = data.image_path
-                ? `<img src="/imagens/uploads/${data.image_path}" alt="${data.title}" style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px;">`
+                ? `<img src="/imagens/uploads/${data.image_path}" alt="${data.title}" style="max-width:100%;height:auto;border-radius:10px;margin-bottom:20px;">`
                 : '';
-
-            // Exibir categorias corretamente
             const categoriesHTML = data.categories && data.categories.length > 0
-                ? data.categories.join(', ')
-                : 'Sem categoria';
+                ? data.categories.join(', ') : 'Sem categoria';
 
             postContainer.innerHTML = `
                 <h2>${data.title}</h2>
                 ${imageHTML}
                 <div class="content-body">${data.content}</div>
-                <p><strong>Publicado em:</strong> ${publishDate}</p>
-                <p><strong>Categorias:</strong> ${categoriesHTML}</p>
+                <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0}</p>
+                <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
             `;
         })
         .catch(error => {
             console.error('Erro ao buscar post:', error);
-            document.getElementById('post-content').innerHTML = '<p>Erro ao carregar a postagem.</p>';
+            document.getElementById('post-content').innerHTML = '<p class="post-error">Erro ao carregar a postagem.</p>';
         });
 }
 
+function goBack() { window.history.back(); }
 
-      function goBack() {
-          window.history.back();
-      }
-      
-      // Chama a função ao carregar a página
-      window.onload = fetchPost;
+window.onload = fetchPost;
     </script>
     <div id="bottom-image"></div>
-    <!-- Isso substitui a tag img -->
     <footer>
       <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>
     </footer>

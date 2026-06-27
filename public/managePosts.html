@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Postagens - Floresta Criativa</title>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
     <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
@@ -25,108 +26,105 @@
         <thead>
           <tr>
             <th>Título</th>
-            <th>Data de Publicação</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th>Views</th>
             <th>Ações</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- As postagens serão carregadas dinamicamente aqui -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
-      // Função para buscar e exibir as postagens
-      function loadPosts() {
-    fetch('/user-posts') // ✅ Agora busca só os posts do usuário logado
-    .then(response => response.json())
-    .then(posts => {
-        const postsTableBody = document.querySelector('#postsTable tbody');
-        postsTableBody.innerHTML = ''; // Limpa a tabela
+  function loadPosts() {
+      fetch(`${API_BASE}/user-posts`)
+          .then(response => {
+              if (!response.ok) {
+                  window.location.href = 'login.html';
+                  throw new Error('Não autenticado');
+              }
+              return response.json();
+          })
+          .then(posts => {
+              const tbody = document.querySelector('#postsTable tbody');
+              tbody.innerHTML = '';
 
-        if (posts.length === 0) {
-            postsTableBody.innerHTML = '<tr><td colspan="3">Nenhuma postagem encontrada.</td></tr>';
-            return;
-        }
+              if (posts.length === 0) {
+                  tbody.innerHTML = '<tr><td colspan="5">Nenhuma postagem encontrada.</td></tr>';
+                  return;
+              }
 
-        posts.forEach(post => {
-            const row = document.createElement('tr');
+              posts.forEach(post => {
+                  const isDraft = post.status === 'draft';
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+                      <td>${post.title}</td>
+                      <td><span class="badge ${isDraft ? 'badge-draft' : 'badge-published'}">${isDraft ? 'Rascunho' : 'Publicado'}</span></td>
+                      <td>${new Date(post.publish_date).toLocaleDateString('pt-BR')}</td>
+                      <td>${post.views || 0}</td>
+                      <td></td>
+                  `;
 
-            // Título
-            const titleCell = document.createElement('td');
-            titleCell.textContent = post.title;
-            row.appendChild(titleCell);
+                  const actionsCell = row.querySelector('td:last-child');
 
-            // Data de Publicação
-            const dateCell = document.createElement('td');
-            dateCell.textContent = new Date(post.publish_date).toLocaleDateString('pt-BR');
-            row.appendChild(dateCell);
+                  const editBtn = document.createElement('button');
+                  editBtn.textContent = 'Editar';
+                  editBtn.onclick = () => window.location.href = `editPost.html?id=${post._id}`;
+                  actionsCell.appendChild(editBtn);
 
-            // Ações (Editar/Excluir)
-            const actionsCell = document.createElement('td');
+                  if (isDraft) {
+                      const publishBtn = document.createElement('button');
+                      publishBtn.textContent = 'Publicar';
+                      publishBtn.style.backgroundColor = '#4a8a4a';
+                      publishBtn.onclick = () => publishPost(post._id, publishBtn);
+                      actionsCell.appendChild(publishBtn);
+                  }
 
-            // Botão de Editar
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Editar';
-            editButton.onclick = () => window.location.href = `editPost.html?id=${post._id}`;
+                  const deleteBtn = document.createElement('button');
+                  deleteBtn.textContent = 'Excluir';
+                  deleteBtn.style.backgroundColor = '#c0392b';
+                  deleteBtn.setAttribute('data-id', post._id);
+                  deleteBtn.onclick = () => deletePost(post._id);
+                  actionsCell.appendChild(deleteBtn);
 
-            actionsCell.appendChild(editButton);
+                  tbody.appendChild(row);
+              });
+          })
+          .catch(error => console.error('Erro ao carregar postagens:', error));
+  }
 
-            // Botão de Excluir
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Excluir';
-            deleteButton.setAttribute('data-id', post._id);
-            deleteButton.onclick = () => deletePost(post._id);
-            actionsCell.appendChild(deleteButton);
+  function publishPost(postId, btn) {
+      btn.disabled = true;
+      btn.textContent = 'Publicando...';
+      fetch(`${API_BASE}/posts/${postId}/publish`, { method: 'PATCH', credentials: 'include' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) loadPosts();
+              else { btn.disabled = false; btn.textContent = 'Publicar'; }
+          })
+          .catch(() => { btn.disabled = false; btn.textContent = 'Publicar'; });
+  }
 
-            row.appendChild(actionsCell);
-            postsTableBody.appendChild(row);
-        });
-    })
-    .catch(error => {
-        console.error('Erro ao carregar postagens:', error);
-    });
-}
+  function deletePost(postId) {
+      if (!confirm('Tem certeza que deseja excluir esta postagem?')) return;
+      const btn = document.querySelector(`button[data-id="${postId}"]`);
+      if (btn) { btn.textContent = 'Excluindo...'; btn.disabled = true; }
 
-// Carregar postagens ao abrir a página
-window.onload = loadPosts;
+      fetch(`${API_BASE}/posts/${postId}`, { method: 'DELETE', credentials: 'include' })
+          .then(response => {
+              if (!response.ok) throw new Error('Erro ao excluir');
+              loadPosts();
+          })
+          .catch(error => {
+              console.error('Erro ao excluir postagem:', error);
+              if (btn) { btn.disabled = false; btn.textContent = 'Excluir'; }
+          });
+  }
 
-      // Função para editar uma postagem
-      function editPost(postId) {
-        window.location.href = `editPost.html?id=${postId}`;
-      }
-
-      // Função para excluir uma postagem
-      function deletePost(postId) {
-    if (confirm('Tem certeza que deseja excluir esta postagem?')) {
-        const deleteButton = document.querySelector(`button[data-id="${postId}"]`);
-        if (deleteButton) {
-            deleteButton.textContent = 'Excluindo...';
-            deleteButton.disabled = true;
-        }
-
-        fetch(`/posts/${postId}`, { method: 'DELETE' })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao excluir post');
-            }
-            return response.text();
-        })
-        .then(() => {
-            alert('Postagem excluída com sucesso!');
-            loadPosts(); // Atualiza a lista após exclusão
-        })
-        .catch(error => {
-            console.error('Erro ao excluir postagem:', error);
-            alert('Não foi possível excluir a postagem. Tente novamente.');
-        });
-    }
-}
-
-      // Carregar as postagens ao abrir a página
-      window.onload = loadPosts;
+  window.onload = loadPosts;
     </script>
 
     <footer>

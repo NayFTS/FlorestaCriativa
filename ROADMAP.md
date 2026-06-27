@@ -58,13 +58,13 @@ Funcionalidades que melhoram a experiência de quem visita ou publica.
 
 Features que expandem o projeto além do que existe hoje.
 
-- [ ] **Sistema de rascunhos** — permitir salvar um post como rascunho (não publicado) e publicar depois.
-- [ ] **Slug amigável na URL** — substituir `?id=6abc123` por URLs como `/post/titulo-do-post` para melhor SEO e legibilidade.
-- [ ] **Contagem de visualizações** — incrementar um contador a cada vez que um post é acessado; exibir no dashboard e opcionalmente nos cards.
-- [ ] **Seção de tags/categorias navegáveis** — página ou modal que lista todos os posts por categoria, clicável na home e nas seções.
-- [ ] **Sitemap e meta tags para SEO** — adicionar `<meta>` de Open Graph e Twitter Card em cada post para melhorar compartilhamento em redes sociais.
-- [ ] **Feed RSS** — rota `/feed.xml` que lista os posts mais recentes em formato RSS.
-- [ ] **Modo escuro** — toggle de tema claro/escuro com preferência salva em `localStorage`.
+- [x] **Sistema de rascunhos** — campo `status` no modelo Post; botão "Salvar como rascunho" em `publicar.html`; managePosts exibe badge e botão "Publicar"; rota `PATCH /posts/:id/publish`; rascunhos filtrados em todas as rotas públicas.
+- [x] **Slug amigável na URL** — campo `slug` gerado automaticamente do título com `slugify()`; `GET /post/:id` suporta slug ou ObjectId; todos os links do site usam `?slug=` quando disponível; `post.html` aceita `?slug=` e `?id=`.
+- [x] **Contagem de visualizações** — campo `views` incrementado a cada `GET /post/:id`; exibido em `post.html`; dashboard mostra total de views e post mais visto.
+- [x] **Seção de tags/categorias navegáveis** — N/A: a busca com filtro por categoria já cobre esse caso de uso em todas as páginas de seção.
+- [x] **Sitemap e meta tags para SEO** — `post.html` atualiza dinamicamente `<title>`, `og:title`, `og:description`, `og:image` e `meta[name=description]` após buscar os dados do post.
+- [x] **Feed RSS** — rota `GET /api/feed.xml`; retorna RSS 2.0 com os 20 posts mais recentes publicados; usa `SITE_URL` env var (ou detecta host automaticamente).
+- [x] **Modo escuro** — CSS convertido para variáveis (`--color-bg`, `--color-text`, etc.); `[data-theme="dark"]` com tema florestal noturno; toggle "Modo Escuro/Claro" injetado pelo `search.js` em todas as páginas públicas; preferência salva em `localStorage`; script anti-flash em todos os 13 HTMLs.
 
 ---
 

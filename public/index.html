@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Floresta Criativa</title>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
     <!--<link rel="stylesheet" href="dist/styles.css">!-->
     <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
@@ -66,13 +67,14 @@
                   data.forEach(post => {
                       const postContent = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
                       const imageUrl = post.image_path ? `/imagens/uploads/${post.image_path}` : 'imagens/quadrado_da_floresta.webp';
+                      const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
                       const postItem = document.createElement('div');
                       postItem.classList.add('post-container');
                       postItem.innerHTML = `
-                          <h3><a href="post.html?id=${post._id}">${post.title}</a></h3>
+                          <h3><a href="${link}">${post.title}</a></h3>
                           <img src="${imageUrl}" alt="${post.title}" loading="lazy">
                           <p>${postContent}</p>
-                          <a href="post.html?id=${post._id}" class="leia-mais">Leia mais</a>
+                          <a href="${link}" class="leia-mais">Leia mais</a>
                       `;
                       container.appendChild(postItem);
                   });
