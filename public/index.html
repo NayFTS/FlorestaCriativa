@@ -148,10 +148,12 @@
     <div class="container" id="content">
       <section id="posts-recentes" class="section-container">
         <h2>Posts Recentes</h2>
-        <div class="carousel-wrap" id="carouselWrap">
-          <div class="carousel-track" id="carouselTrack"></div>
-          <button class="carousel-arrow carousel-prev" id="carouselPrev" onclick="_go(_idx - 1)" aria-label="Post anterior">&#8592;</button>
-          <button class="carousel-arrow carousel-next" id="carouselNext" onclick="_go(_idx + 1)" aria-label="Próximo post">&#8594;</button>
+        <div class="carousel-outer">
+          <div class="carousel-wrap" id="carouselWrap">
+            <div class="carousel-track" id="carouselTrack"></div>
+            <button class="carousel-arrow carousel-prev" id="carouselPrev" onclick="_go(_idx - 1)" aria-label="Post anterior">&#8592;</button>
+            <button class="carousel-arrow carousel-next" id="carouselNext" onclick="_go(_idx + 1)" aria-label="Próximo post">&#8594;</button>
+          </div>
           <div class="carousel-dots" id="carouselDots"></div>
         </div>
       </section>
