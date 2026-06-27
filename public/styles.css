@@ -454,8 +454,7 @@ footer {
 
 /* Área de texto do slide atual */
 .carousel-info {
-    padding: 16px 22px 4px;
-    min-height: 88px;
+    padding: 16px 22px 8px;
     border-top: 1px solid var(--color-border);
 }
 
@@ -495,6 +494,18 @@ footer {
 }
 
 .carousel-card-body:hover h3 { color: var(--color-accent); }
+
+/* .leia-mais no carousel: texto simples, não botão verde */
+.carousel-card-body .leia-mais {
+    background: none;
+    color: var(--color-accent);
+    padding: 0;
+    margin-top: 0;
+    font-size: 0.88em;
+    font-weight: 600;
+    width: auto;
+    display: inline;
+}
 
 /* Dots */
 .carousel-dots {
@@ -1186,8 +1197,7 @@ footer {
     }
 }
 
-/* Carrossel e seções de listagem: empilhar título acima do conteúdo */
-section#posts-recentes,
+/* Seções de listagem: empilhar título acima do conteúdo */
 section#about,
 section#verde-inspiracao,
 section#sapo-imaginario,
