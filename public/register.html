@@ -66,7 +66,7 @@
         }
     
         // Enviar a requisição para o backend
-        fetch('/register', {
+        fetch(`${API_BASE}/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, email, password })

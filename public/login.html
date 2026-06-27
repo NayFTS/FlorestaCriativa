@@ -31,6 +31,7 @@
 
         <button type="submit">Entrar</button>
         <p>Não tem uma conta? <a href="register.html" id="registerLink">Cadastre-se aqui</a></p>
+        <p><a href="reset-password.html">Esqueci minha senha</a></p>
 
       </form>
       <p id="errorMessage" style="color: red;"></p>
@@ -60,7 +61,7 @@
         }
     
         // Enviar requisição ao backend
-        fetch('/login', {
+        fetch(`${API_BASE}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })

@@ -175,6 +175,36 @@ app.post('/login', [
 
 
 
+// Rota de reset de senha (protegida por chave secreta)
+app.post('/reset-password', [
+    body('email').isEmail().withMessage('Email inválido'),
+    body('secret').notEmpty().withMessage('Chave secreta obrigatória'),
+    body('newPassword').isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, secret, newPassword } = req.body;
+
+    if (secret !== process.env.RESET_SECRET) {
+        return res.status(403).json({ message: 'Chave secreta inválida' });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+        user.password = bcrypt.hashSync(newPassword, 10);
+        await user.save();
+        res.status(200).json({ message: 'Senha atualizada com sucesso' });
+    } catch (err) {
+        console.error('Erro no reset de senha:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
 // Rota para buscar informações do usuário
 app.get('/user-info', requireAuth, async (req, res) => {
     try {
