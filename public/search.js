@@ -173,14 +173,27 @@ function loadPosts(pageUrl, containerId, page, limit) {
                 const link = post.slug
                     ? `post.html?slug=${post.slug}`
                     : `post.html?id=${post._id}`;
+                const imgSrc = post.image_path
+                    ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
+                    : null;
+                const dateStr = post.publish_date
+                    ? new Date(post.publish_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+                    : '';
 
                 const postItem = document.createElement('div');
                 postItem.className = 'post-container';
                 postItem.innerHTML =
-                    `<h3><a href="${link}">${post.title}</a></h3>` +
-                    (post.image_path ? `<img src="${post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path}" alt="${post.title}" loading="lazy">` : '') +
-                    `<p>${excerpt}</p>` +
-                    `<a href="${link}" class="leia-mais">Leia mais</a>`;
+                    (imgSrc
+                        ? `<a href="${link}" class="post-img-link" tabindex="-1" aria-hidden="true"><img src="${imgSrc}" alt="${post.title}" loading="lazy"></a>`
+                        : '<div class="post-img-placeholder"></div>') +
+                    `<div class="post-card-body">
+                        <h3><a href="${link}">${post.title}</a></h3>
+                        <p>${excerpt}</p>
+                        <div class="post-card-footer">
+                            <a href="${link}" class="leia-mais">Leia mais</a>
+                            ${dateStr ? `<time class="post-date">${dateStr}</time>` : ''}
+                        </div>
+                    </div>`;
                 container.appendChild(postItem);
             });
 
