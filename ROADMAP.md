@@ -45,12 +45,12 @@ Refatorações que não mudam o comportamento mas tornam o código mais fácil d
 
 Funcionalidades que melhoram a experiência de quem visita ou publica.
 
-- [ ] **Editor CKEditor: configurar toolbar completo** — habilitar parágrafo, negrito, itálico, listas, títulos, links e talvez código no CKEditor de `publicar.html` e `editPost.html`.
-- [ ] **Preview de imagem antes do upload** — em `publicar.html` e `editPost.html`, mostrar preview da imagem selecionada antes de salvar.
-- [ ] **Paginação nas seções** — nas páginas de seção com muitos posts, adicionar paginação ou "carregar mais" em vez de listar tudo de uma vez.
-- [ ] **Feedback de loading** — adicionar indicador de carregamento (spinner ou skeleton) enquanto posts são buscados via Fetch API.
-- [ ] **Tratamento de erro amigável** — quando uma busca não retorna resultados ou um post não é encontrado, exibir mensagem visual clara em vez de tela vazia.
-- [ ] **Melhorar mobile: header e nav** — revisar espaçamentos e tamanho de fonte no menu hambúrguer em telas pequenas.
+- [x] **Editor CKEditor: configurar toolbar completo** — toolbar explícita em `publicar.html` e `editPost.html`: heading, negrito, itálico, sublinhado, link, citação, listas, desfazer/refazer.
+- [x] **Preview de imagem antes do upload** — adicionado em `publicar.html` (existia em `editPost.html`); mostra miniatura ao selecionar arquivo. Fix: imagem atual carrega ao abrir edição.
+- [x] **Paginação nas seções** — backend suporta `?page=&limit=`; `search.js` ganhou `loadPosts()` com "Carregar mais"; 4 páginas de seção reduzidas a 1 linha cada.
+- [x] **Feedback de loading** — texto "Carregando..." pulsante enquanto posts são buscados; animação CSS via `.post-loading`.
+- [x] **Tratamento de erro amigável** — `.post-error` com fundo vermelho exibido em falhas de rede; erros de formulário aparecem no `#errorMessage` sem `alert()`; botão desabilitado durante submit.
+- [x] **Melhorar mobile: header e nav** — CSS para telas ≤480px: search bar em coluna, toque mínimo 44px no hambúrguer, fontes do header menores, botão "Leia mais" full-width.
 
 ---
 

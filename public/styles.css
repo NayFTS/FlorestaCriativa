@@ -957,3 +957,92 @@ section#rascunhos-da-floresta {
 .content-body p {
     margin-bottom: 1em;
 }
+
+/* Carregando posts */
+.post-loading {
+    text-align: center;
+    padding: 30px;
+    color: #4d774e;
+    font-style: italic;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.post-error {
+    text-align: center;
+    padding: 15px 20px;
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
+
+/* Botão "Carregar mais" */
+.load-more-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 12px 30px;
+    background-color: #4d774e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.load-more-btn:hover {
+    background-color: #365a3f;
+}
+
+/* Preview de imagem no formulário */
+.image-preview {
+    display: none;
+    max-width: 200px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #4d774e;
+}
+
+/* Mobile pequeno (até 480px) */
+@media (max-width: 480px) {
+    .search-container input[type="text"] {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .search-container {
+        flex-direction: column;
+    }
+
+    .search-container button {
+        width: 100%;
+    }
+
+    header h1 {
+        font-size: 1.3em;
+        padding: 3px 8px;
+    }
+
+    header p {
+        font-size: 0.85em;
+    }
+
+    .hamburger {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .leia-mais {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+}

@@ -58,33 +58,7 @@
     </section>
     <script src="search.js"></script>
     <script>
-      function fetchPosts() {
-          fetch(`${API_BASE}/posts?url=about.html`)
-              .then(response => response.json())
-              .then(data => {
-                  const postContainer = document.getElementById('post-list');
-                  postContainer.innerHTML = '';
-                  if (data.length === 0) {
-                      postContainer.innerHTML = '<p>Nenhum post encontrado.</p>';
-                  } else {
-                      data.forEach(post => {
-                          const postContent = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
-                          const postItem = document.createElement('div');
-                          postItem.className = 'post-container';
-                          postItem.innerHTML = `
-                              <h3><a href="post.html?id=${post._id}">${post.title}</a></h3>
-                              <img src="/imagens/uploads/${post.image_path}" alt="${post.title}">
-                              <p>${postContent}</p>
-                              <a href="post.html?id=${post._id}" class="leia-mais">Leia mais</a>
-                          `;
-                          postContainer.appendChild(postItem);
-                      });
-                  }
-              })
-              .catch(error => console.error('Erro ao buscar posts:', error));
-      }
-
-      window.onload = fetchPosts;
+      window.onload = () => loadPosts('about.html', 'post-list');
     </script>
     <div id="bottom-image"></div>
     <!-- Isso substitui a tag img -->

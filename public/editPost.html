@@ -16,23 +16,18 @@
     </header>
     <div id="top-image"></div>
 
-    <!-- Formulário de edição -->
     <form id="editPostForm" enctype="multipart/form-data">
       <label for="title">Título:</label>
       <input type="text" id="title" name="title" required><br><br>
 
-      <!-- Editor de conteúdo -->
       <label for="editor">Conteúdo:</label>
       <textarea id="editor" aria-label="Editor de texto do post"></textarea>
-
-      <!-- Campo escondido para armazenar o conteúdo final -->
       <textarea id="content" name="content" style="display:none;"></textarea><br><br>
 
       <label for="image">Imagem de Capa:</label>
-      <input type="file" id="image" name="image" accept="image/*"><br><br>
-      <!-- Preview da Imagem Atual -->
-      <img id="previewImage" src="" alt="Preview da Imagem" style="display: none; max-width: 200px; margin-top: 10px;">
-
+      <input type="file" id="image" name="image" accept="image/*"><br>
+      <img id="previewImage" class="image-preview" alt="Preview da imagem">
+      <br><br>
 
       <label for="url">Página de destino:</label>
       <select id="url" name="url" required>
@@ -43,87 +38,79 @@
         <option value="rascunhos-da-floresta.html">eu que escrevi</option>
       </select><br><br>
 
-      <!-- Categorias -->
       <fieldset>
         <legend>Categorias:</legend>
         <div class="category">
-          <input type="checkbox" id="cat1" value="1" name="category[]">
+          <input type="checkbox" id="cat1" value="Escrita" name="category[]">
           <label for="cat1">Escrita</label>
         </div>
         <div class="category">
-          <input type="checkbox" id="cat2" value="2" name="category[]">
+          <input type="checkbox" id="cat2" value="Projetos" name="category[]">
           <label for="cat2">Projetos</label>
         </div>
         <div class="category">
-          <input type="checkbox" id="cat3" value="3" name="category[]">
+          <input type="checkbox" id="cat3" value="Animes" name="category[]">
           <label for="cat3">Animes</label>
         </div>
         <div class="category">
-          <input type="checkbox" id="cat4" value="4" name="category[]">
+          <input type="checkbox" id="cat4" value="Jogos" name="category[]">
           <label for="cat4">Jogos</label>
         </div>
         <div class="category">
-          <input type="checkbox" id="cat5" value="5" name="category[]">
+          <input type="checkbox" id="cat5" value="Slice of Life" name="category[]">
           <label for="cat5">Slice of Life</label>
         </div>
       </fieldset><br><br>
 
       <button type="submit">Salvar Alterações</button>
     </form>
+    <p id="errorMessage"></p>
 
-    <!-- CKEditor Script -->
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
-let editorInstance;
-let postId = new URLSearchParams(window.location.search).get('id');
+  let editorInstance;
+  const postId = (new URLSearchParams(window.location.search).get('id') || '').trim();
 
-// 🔹 Limpa espaços extras e verifica o ID
-postId = postId ? postId.trim() : null;
+  if (!postId || postId === 'null' || postId === 'undefined' || postId.length !== 24) {
+      alert('ID de post inválido.');
+      window.location.href = 'managePosts.html';
+  }
 
-console.log("ID Capturado:", `"${postId}"`); // 🔹 Verifique se agora está correto
-
-if (!postId || postId === "null" || postId === "undefined" || postId.length !== 24) {
-    alert('ID de post inválido.');
-    window.location.href = 'managePosts.html';
-    throw new Error('ID do post não encontrado ou inválido');
-}
-
-      function fetchPost() {
-          if (!postId) {
-              alert('ID de post inválido.');
-              window.location.href = 'managePosts.html';
-              return;
-          }
-    
-          fetch(`/post/${postId}`)
+  function fetchPost() {
+      fetch(`${API_BASE}/post/${postId}`)
           .then(response => {
-              if (!response.ok) {
-                  throw new Error('Post não encontrado');
-              }
+              if (!response.ok) throw new Error('Post não encontrado');
               return response.json();
           })
           .then(data => {
               document.getElementById('title').value = data.title;
               document.getElementById('url').value = data.url;
-    
-              // Inicializa o editor com o conteúdo do post
+
               ClassicEditor
-                  .create(document.querySelector('#editor'))
+                  .create(document.querySelector('#editor'), {
+                      toolbar: {
+                          items: [
+                              'heading', '|',
+                              'bold', 'italic', 'underline', '|',
+                              'link', 'blockQuote', '|',
+                              'bulletedList', 'numberedList', '|',
+                              'undo', 'redo'
+                          ]
+                      }
+                  })
                   .then(editor => {
                       editorInstance = editor;
                       editorInstance.setData(data.content);
                   })
                   .catch(error => console.error('Erro ao inicializar o CKEditor:', error));
-    
-              // Exibir preview da imagem atual (se existir)
+
               if (data.image_path) {
                   const previewImage = document.getElementById('previewImage');
                   previewImage.src = `/imagens/uploads/${data.image_path}`;
                   previewImage.style.display = 'block';
               }
-    
-              // Marcar as categorias já selecionadas
+
               if (data.categories) {
                   data.categories.forEach(category => {
                       const checkbox = document.querySelector(`input[name="category[]"][value="${category}"]`);
@@ -133,61 +120,77 @@ if (!postId || postId === "null" || postId === "undefined" || postId.length !== 
           })
           .catch(error => {
               console.error('Erro ao carregar o post:', error);
-              alert('Erro ao carregar a postagem. Redirecionando para Gerenciar Postagens.');
+              alert('Erro ao carregar a postagem. Redirecionando...');
               window.location.href = 'managePosts.html';
           });
-      }
-    
-      window.onload = fetchPost;
+  }
 
-      document.getElementById('image').addEventListener('change', function(event) {
+  document.getElementById('image').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (file) {
           const reader = new FileReader();
           reader.onload = function(e) {
-              document.getElementById('previewImage').src = e.target.result;
-              document.getElementById('previewImage').style.display = 'block';
+              const preview = document.getElementById('previewImage');
+              preview.src = e.target.result;
+              preview.style.display = 'block';
           };
           reader.readAsDataURL(file);
       }
   });
 
-  document.getElementById('editPostForm').addEventListener('submit', function (event) {
-    event.preventDefault();
+  document.getElementById('editPostForm').addEventListener('submit', function(event) {
+      event.preventDefault();
 
-    // Adicionar o conteúdo do CKEditor ao campo escondido
-    document.getElementById('content').value = editorInstance.getData();
+      document.getElementById('content').value = editorInstance.getData();
+      const formData = new FormData(this);
+      const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
+          .map(checkbox => checkbox.value);
+      formData.append('categories', JSON.stringify(selectedCategories));
+      formData.append('postId', postId);
 
-    const formData = new FormData(this);
+      const btn = document.querySelector('#editPostForm button[type="submit"]');
+      const errorMsg = document.getElementById('errorMessage');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+      errorMsg.textContent = '';
 
-    // Captura categorias selecionadas
-    const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
-        .map(checkbox => checkbox.value);
-    formData.append('categories', JSON.stringify(selectedCategories));
+      fetch(`${API_BASE}/editPost/${postId}`, {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              window.location.href = 'managePosts.html';
+          } else {
+              errorMsg.textContent = `Erro: ${data.message}`;
+              btn.disabled = false;
+              btn.textContent = 'Salvar Alterações';
+          }
+      })
+      .catch(error => {
+          console.error('Erro ao enviar as alterações:', error);
+          errorMsg.textContent = 'Erro de rede. Tente novamente.';
+          btn.disabled = false;
+          btn.textContent = 'Salvar Alterações';
+      });
+  });
 
-    // Envia o postId para o backend
-    formData.append('postId', postId);
-
-    fetch(`/editPost/${postId}`, {
-        method: 'POST',
-        body: formData,
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Post atualizado com sucesso!');
-                window.location.href = 'managePosts.html';
-            } else {
-                alert(`Erro ao atualizar o post: ${data.message}`);
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao enviar as alterações:', error);
-            alert('Erro ao salvar as alterações do post. Tente novamente.');
-        });
-});
+  window.onload = function() {
+      fetch(`${API_BASE}/user-info`)
+          .then(response => {
+              if (!response.ok) {
+                  alert('Você precisa estar logada para editar um post.');
+                  window.location.href = 'login.html';
+                  return;
+              }
+              fetchPost();
+          })
+          .catch(error => console.error('Erro ao verificar autenticação:', error));
+  };
     </script>
-    
+
     <div id="bottom-image"></div>
     <footer>
       <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>

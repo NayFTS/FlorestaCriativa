@@ -247,9 +247,20 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
 
 // Rota para buscar posts
 app.get('/posts', async (req, res) => {
-    const { url } = req.query; // Captura a URL da query string
+    const { url, page, limit } = req.query;
     try {
-        const posts = await Post.find({ url }); // Filtra posts pelo campo `url`
+        const query = url ? { url } : {};
+        if (page && limit) {
+            const pageNum = Math.max(1, parseInt(page) || 1);
+            const limitNum = Math.min(50, parseInt(limit) || 5);
+            const skip = (pageNum - 1) * limitNum;
+            const [posts, total] = await Promise.all([
+                Post.find(query).sort({ publish_date: -1 }).skip(skip).limit(limitNum),
+                Post.countDocuments(query)
+            ]);
+            return res.json({ posts, total });
+        }
+        const posts = await Post.find(query).sort({ publish_date: -1 });
         res.json(posts);
     } catch (err) {
         console.error('Erro ao buscar posts:', err);

@@ -15,22 +15,21 @@
       <h1>Publicar Post</h1>
     </header>
     <div id="top-image"></div>
-    <!-- Isso substitui a tag img -->
+
     <form id="postForm" enctype="multipart/form-data">
       <label for="title">Título:</label>
       <input type="text" id="title" name="title" required><br><br>
-    
-      <!-- Editor de conteúdo -->
+
       <label for="editor">Conteúdo:</label>
       <textarea id="editor" aria-label="Editor de texto do post"></textarea>
-    
-      <!-- Campo escondido para armazenar o conteúdo final -->
       <textarea id="content" name="content" style="display:none;"></textarea>
       <br><br>
-    
+
       <label for="image">Imagem de Capa:</label>
-      <input type="file" id="image" name="image" accept="image/*"><br><br>
-    
+      <input type="file" id="image" name="image" accept="image/*"><br>
+      <img id="previewImage" class="image-preview" alt="Preview da imagem">
+      <br>
+
       <label for="url">Página de destino:</label>
       <select id="url" name="url" required>
         <option label="escolha uma das opções"></option>
@@ -40,67 +39,99 @@
         <option value="rascunhos-da-floresta.html">eu que escrevi</option>
       </select>
       <br><br>
-    
+
       <fieldset>
-          <legend>Categorias:</legend>
-          <div class="category">
-              <input type="checkbox" id="cat1" value="Escrita" name="category[]">
-              <label for="cat1">Escrita</label>
-          </div>
-          <div class="category">
-              <input type="checkbox" id="cat2" value="Projetos" name="category[]">
-              <label for="cat2">Projetos</label>
-          </div>
-          <div class="category">
-              <input type="checkbox" id="cat3" value="Animes" name="category[]">
-              <label for="cat3">Animes</label>
-          </div>
-          <div class="category">
-              <input type="checkbox" id="cat4" value="Jogos" name="category[]">
-              <label for="cat4">Jogos</label>
-          </div>
-          <div class="category">
-              <input type="checkbox" id="cat5" value="Slice of Life" name="category[]">
-              <label for="cat5">Slice of Life</label>
-          </div>
+        <legend>Categorias:</legend>
+        <div class="category">
+          <input type="checkbox" id="cat1" value="Escrita" name="category[]">
+          <label for="cat1">Escrita</label>
+        </div>
+        <div class="category">
+          <input type="checkbox" id="cat2" value="Projetos" name="category[]">
+          <label for="cat2">Projetos</label>
+        </div>
+        <div class="category">
+          <input type="checkbox" id="cat3" value="Animes" name="category[]">
+          <label for="cat3">Animes</label>
+        </div>
+        <div class="category">
+          <input type="checkbox" id="cat4" value="Jogos" name="category[]">
+          <label for="cat4">Jogos</label>
+        </div>
+        <div class="category">
+          <input type="checkbox" id="cat5" value="Slice of Life" name="category[]">
+          <label for="cat5">Slice of Life</label>
+        </div>
       </fieldset><br><br>
-    
+
       <button type="submit">Publicar</button>
     </form>
-    <p id="errorMessage" style="color: red;"></p>
+    <p id="errorMessage"></p>
+
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
   ClassicEditor
-    .create(document.querySelector('#editor'))
+    .create(document.querySelector('#editor'), {
+        toolbar: {
+            items: [
+                'heading', '|',
+                'bold', 'italic', 'underline', '|',
+                'link', 'blockQuote', '|',
+                'bulletedList', 'numberedList', '|',
+                'undo', 'redo'
+            ]
+        }
+    })
     .then(editor => {
+        document.getElementById('image').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('previewImage');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         document.getElementById('postForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            document.getElementById('content').value = editor.getData(); // Obtém conteúdo do CKEditor
+            document.getElementById('content').value = editor.getData();
             const formData = new FormData(this);
-
-            // Captura categorias selecionadas
             const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
-                                           .map(checkbox => checkbox.value);
+                .map(checkbox => checkbox.value);
             formData.append('categories', JSON.stringify(selectedCategories));
 
-            fetch('/addPost', {
+            const btn = document.querySelector('#postForm button[type="submit"]');
+            const errorMsg = document.getElementById('errorMessage');
+            btn.disabled = true;
+            btn.textContent = 'Publicando...';
+            errorMsg.textContent = '';
+
+            fetch(`${API_BASE}/addPost`, {
                 method: 'POST',
                 body: formData,
-                credentials: 'include' // 🔹 Garante que a sessão do usuário seja enviada com a requisição
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Post publicado com sucesso!');
-                    window.location.href = 'managePosts.html'; // Redireciona para Gerenciar Postagens
+                    window.location.href = 'managePosts.html';
                 } else {
-                    alert(`Erro: ${data.message}`);
+                    errorMsg.textContent = `Erro: ${data.message}`;
+                    btn.disabled = false;
+                    btn.textContent = 'Publicar';
                 }
             })
             .catch(error => {
                 console.error('Erro ao enviar o formulário:', error);
+                errorMsg.textContent = 'Erro de rede. Tente novamente.';
+                btn.disabled = false;
+                btn.textContent = 'Publicar';
             });
         });
     })
@@ -108,32 +139,19 @@
         console.error('Erro ao inicializar o CKEditor:', error);
     });
 
-  function checkAuthentication() {
-    fetch('/user-info')
-      .then(response => {
-        if (!response.ok) {
-          alert('Você precisa estar logado para publicar um post.');
-          window.location.href = 'login.html'; // Redireciona para login
-          throw new Error('Usuário não autenticado');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data && data.username) {
-          document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
-        }
-      })
-      .catch(error => console.error('Erro ao verificar autenticação:', error));
-  }
-
-  // Executa a verificação ao carregar a página
-  window.onload = checkAuthentication;
-</script>
-    
-    
+  window.onload = function() {
+      fetch(`${API_BASE}/user-info`)
+          .then(response => {
+              if (!response.ok) {
+                  alert('Você precisa estar logada para publicar um post.');
+                  window.location.href = 'login.html';
+              }
+          })
+          .catch(error => console.error('Erro ao verificar autenticação:', error));
+  };
+    </script>
 
     <div id="bottom-image"></div>
-    <!-- Isso substitui a tag img -->
     <footer>
       <p>Floresta Criativa © 2024 - Todos os direitos reservados.</p>
     </footer>

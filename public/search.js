@@ -91,3 +91,62 @@ function updateLoginButton() {
 }
 
 updateLoginButton();
+
+function loadPosts(pageUrl, containerId, page, limit) {
+    if (page === undefined) page = 1;
+    if (limit === undefined) limit = 5;
+    const container = document.getElementById(containerId);
+
+    if (page === 1) {
+        container.innerHTML = '<p class="post-loading">Carregando...</p>';
+    }
+
+    const existing = document.getElementById('loadMoreBtn');
+    if (existing) existing.remove();
+
+    fetch(`${API_BASE}/posts?url=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`)
+        .then(response => response.json())
+        .then(data => {
+            if (page === 1) container.innerHTML = '';
+
+            const posts = data.posts || [];
+            const total = data.total || 0;
+
+            if (posts.length === 0 && page === 1) {
+                container.innerHTML = '<p>Nenhum post encontrado.</p>';
+                return;
+            }
+
+            posts.forEach(post => {
+                const temp = document.createElement('div');
+                temp.innerHTML = post.content;
+                const text = (temp.textContent || temp.innerText || '').trim();
+                const excerpt = text.length > 150 ? text.substring(0, 150) + '...' : text;
+
+                const postItem = document.createElement('div');
+                postItem.className = 'post-container';
+                postItem.innerHTML =
+                    `<h3><a href="post.html?id=${post._id}">${post.title}</a></h3>` +
+                    (post.image_path ? `<img src="/imagens/uploads/${post.image_path}" alt="${post.title}" loading="lazy">` : '') +
+                    `<p>${excerpt}</p>` +
+                    `<a href="post.html?id=${post._id}" class="leia-mais">Leia mais</a>`;
+                container.appendChild(postItem);
+            });
+
+            const loaded = (page - 1) * limit + posts.length;
+            if (loaded < total) {
+                const btn = document.createElement('button');
+                btn.id = 'loadMoreBtn';
+                btn.className = 'load-more-btn';
+                btn.textContent = 'Carregar mais';
+                btn.onclick = () => loadPosts(pageUrl, containerId, page + 1, limit);
+                container.parentNode.insertBefore(btn, container.nextSibling);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar posts:', error);
+            if (page === 1) {
+                container.innerHTML = '<p class="post-error">Erro ao carregar os posts. Tente novamente mais tarde.</p>';
+            }
+        });
+}
