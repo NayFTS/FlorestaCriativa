@@ -20,12 +20,9 @@
       <h1>Floresta Criativa</h1>
       <p>Bem-vindo ao meu espaço de escrita, projetos e inspiração!</p>
     </header>
-    <div id="top-image">
-    </div>
-    <!-- Isso substitui a tag img -->
+    <div id="top-image"></div>
     <nav>
       <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-      <!-- Ícone de hambúrguer -->
       <div class="menu" id="menu">
         <a href="index.html">Home</a>
         <a href="about.html">Sobre Mim</a>
@@ -60,16 +57,14 @@
     </div>
     <script src="search.js"></script>
     <script>
-      let _idx = 0;
-      let _posts = [];
-      let _timer = null;
+      let _idx = 0, _posts = [], _timer = null;
 
       function _build(data) {
           _posts = data;
           const track = document.getElementById('carouselTrack');
+          const info  = document.getElementById('carouselInfo');
           const dots  = document.getElementById('carouselDots');
-          track.innerHTML = '';
-          dots.innerHTML  = '';
+          track.innerHTML = info.innerHTML = dots.innerHTML = '';
 
           data.forEach((post, i) => {
               const img  = post.image_path
@@ -78,23 +73,26 @@
               const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
               const tmp  = document.createElement('div');
               tmp.innerHTML = post.content;
-              const text = (tmp.textContent || tmp.innerText || '').trim();
-              const excerpt = text.length > 160 ? text.substring(0, 160) + '...' : text;
+              const text    = (tmp.textContent || tmp.innerText || '').trim();
+              const excerpt = text.length > 130 ? text.substring(0, 130) + '...' : text;
 
+              /* slide: só a imagem — fica dentro do carousel-clip (overflow:hidden) */
               const slide = document.createElement('div');
               slide.className = 'carousel-slide';
-              slide.innerHTML = `
-                  <a href="${link}" class="carousel-card">
-                      <div class="carousel-img-wrap">
-                          <img src="${img}" alt="${post.title}" loading="${i === 0 ? 'eager' : 'lazy'}">
-                      </div>
-                      <div class="carousel-card-body">
-                          <h3>${post.title}</h3>
-                          <p>${excerpt}</p>
-                          <span class="leia-mais">Leia mais →</span>
-                      </div>
-                  </a>`;
+              slide.innerHTML = `<a href="${link}" aria-label="${post.title}">
+                  <img src="${img}" alt="${post.title}" loading="${i === 0 ? 'eager' : 'lazy'}">
+              </a>`;
               track.appendChild(slide);
+
+              /* card de texto: fora do clip, aparece/desaparece via JS */
+              const card = document.createElement('div');
+              card.className = 'carousel-info-card' + (i === 0 ? ' active' : '');
+              card.innerHTML = `<a href="${link}" class="carousel-card-body">
+                  <h3>${post.title}</h3>
+                  <p>${excerpt}</p>
+                  <span class="leia-mais">Leia mais →</span>
+              </a>`;
+              info.appendChild(card);
 
               const dot = document.createElement('button');
               dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
@@ -106,15 +104,15 @@
           _render();
           _startTimer();
 
-          const wrap = document.getElementById('carouselWrap');
+          const clip = document.getElementById('carouselWrap');
           let sx = 0;
-          wrap.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
-          wrap.addEventListener('touchend',   e => {
+          clip.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+          clip.addEventListener('touchend',   e => {
               const d = sx - e.changedTouches[0].clientX;
               if (Math.abs(d) > 40) _go(_idx + (d > 0 ? 1 : -1));
           }, { passive: true });
-          wrap.addEventListener('mouseenter', () => clearInterval(_timer));
-          wrap.addEventListener('mouseleave', _startTimer);
+          clip.addEventListener('mouseenter', () => clearInterval(_timer));
+          clip.addEventListener('mouseleave', _startTimer);
       }
 
       function _go(i) {
@@ -127,6 +125,7 @@
       function _render() {
           document.getElementById('carouselTrack').style.transform = `translateX(-${_idx * 100}%)`;
           document.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === _idx));
+          document.querySelectorAll('.carousel-info-card').forEach((c, i) => c.classList.toggle('active', i === _idx));
           document.getElementById('carouselPrev').disabled = _idx === 0;
           document.getElementById('carouselNext').disabled = _idx === _posts.length - 1;
       }
@@ -140,26 +139,28 @@
               .then(r => r.json())
               .then(_build)
               .catch(() => {
-                  document.getElementById('carouselWrap').innerHTML =
-                      '<p style="padding:48px;text-align:center;color:var(--color-text-secondary)">Não foi possível carregar os posts.</p>';
+                  document.getElementById('carouselInfo').innerHTML =
+                      '<p style="padding:16px;text-align:center;color:var(--color-text-secondary)">Não foi possível carregar os posts.</p>';
               });
       };
     </script>
     <div class="container" id="content">
-      <section id="posts-recentes" class="section-container">
+      <section id="posts-recentes">
         <h2>Posts Recentes</h2>
         <div class="carousel-outer">
-          <div class="carousel-wrap" id="carouselWrap">
+          <!-- carousel-clip: overflow:hidden, altura = imagem 16:9 → setas top:50% ficam centradas -->
+          <div class="carousel-clip" id="carouselWrap">
             <div class="carousel-track" id="carouselTrack"></div>
             <button class="carousel-arrow carousel-prev" id="carouselPrev" onclick="_go(_idx - 1)" aria-label="Post anterior">&#8592;</button>
             <button class="carousel-arrow carousel-next" id="carouselNext" onclick="_go(_idx + 1)" aria-label="Próximo post">&#8594;</button>
           </div>
+          <!-- texto fora do clip, sem interferência do overflow -->
+          <div class="carousel-info" id="carouselInfo"></div>
           <div class="carousel-dots" id="carouselDots"></div>
         </div>
       </section>
     </div>
     <div id="bottom-image"></div>
-    <!-- Isso substitui a tag img -->
     <footer>
       <div class="footer-content">
         <p>Floresta Criativa © 2024–2026 Nay</p>
