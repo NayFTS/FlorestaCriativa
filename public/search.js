@@ -1,24 +1,30 @@
-// Aplica o tema salvo antes do primeiro paint
 (function () {
     const t = localStorage.getItem('theme');
     if (t) document.documentElement.setAttribute('data-theme', t);
 
     function injectThemeToggle() {
-        const menu = document.getElementById('menu');
-        if (!menu || document.getElementById('themeToggle')) return;
+        if (document.getElementById('themeToggle')) return;
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const btn = document.createElement('button');
         btn.id = 'themeToggle';
-        btn.className = 'theme-toggle';
-        btn.textContent = isDark ? 'Modo Claro' : 'Modo Escuro';
+        btn.setAttribute('aria-label', isDark ? 'Ativar modo claro' : 'Ativar modo escuro');
+        btn.textContent = isDark ? '☀️' : '🌙';
         btn.onclick = function () {
             const dark = document.documentElement.getAttribute('data-theme') === 'dark';
             const next = dark ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
-            btn.textContent = next === 'dark' ? 'Modo Claro' : 'Modo Escuro';
+            btn.textContent = next === 'dark' ? '☀️' : '🌙';
+            btn.setAttribute('aria-label', next === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro');
         };
-        menu.appendChild(btn);
+        const menu = document.getElementById('menu');
+        if (menu) {
+            btn.className = 'theme-toggle';
+            menu.appendChild(btn);
+        } else {
+            btn.className = 'theme-toggle theme-toggle-float';
+            document.body.appendChild(btn);
+        }
     }
 
     if (document.readyState === 'loading') {

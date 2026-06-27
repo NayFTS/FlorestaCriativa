@@ -89,7 +89,8 @@
           const totalPosts = document.querySelectorAll('.post-container').length;
           if (index >= totalPosts) currentIndex = totalPosts - 1;
           if (index < 0) currentIndex = 0;
-          document.querySelector('.carousel').style.transform = `translateX(-${currentIndex * 100}%)`;
+          const slideWidth = document.querySelector('.carousel-container').offsetWidth;
+          document.querySelector('.carousel').style.transform = `translateX(-${currentIndex * slideWidth}px)`;
           updateButtons();
       }
 
