@@ -14,16 +14,14 @@
   <body>
     <header>
       <a href="index.html">
-      <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
+        <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
       </a>
       <h1>Floresta Criativa</h1>
       <p>Bem-vindo ao meu espaço de escrita, projetos e inspiração!</p>
     </header>
     <div id="top-image"></div>
-    <!-- Isso substitui a tag img -->
     <nav>
       <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-      <!-- Ícone de hambúrguer -->
       <div class="menu" id="menu">
         <a href="index.html">Home</a>
         <a href="about.html" class="active">Sobre Mim</a>
@@ -56,15 +54,63 @@
         <div id="searchResults"></div>
       </div>
     </div>
-    <section id="about" class="section-container">
-      <div id="post-list"></div>
-    </section>
-    <script src="search.js"></script>
-    <script>
-      window.onload = () => loadPosts('about.html', 'post-list');
-    </script>
+
+    <div class="container" id="content">
+      <section id="about">
+
+        <!-- Perfil -->
+        <div class="about-profile">
+          <!-- Troque o src pela sua foto pessoal -->
+          <img src="imagens/quadrado_da_floresta.webp" alt="Foto de Nay" class="about-avatar">
+          <div class="about-intro">
+            <h2>Olá, sou a Nay!</h2>
+            <!-- Edite a tagline abaixo -->
+            <p class="about-tagline">Escritora, curiosa e habitante da floresta.</p>
+          </div>
+        </div>
+
+        <!-- Bio principal -->
+        <div class="about-section">
+          <h3>Sobre mim</h3>
+          <!-- Edite os parágrafos com sua bio -->
+          <p>
+            Bem-vinda à Floresta Criativa! Este é o meu espaço pessoal na internet —
+            um lugar onde junto tudo que me move: escrita, projetos, referências e
+            devaneios do dia a dia.
+          </p>
+          <p>
+            Sou apaixonada por histórias, seja consumindo animes e jogos, seja criando
+            as minhas próprias. Também me aventuro pelo desenvolvimento web, onde
+            código e criatividade andam juntos.
+          </p>
+        </div>
+
+        <!-- O que você vai encontrar aqui -->
+        <div class="about-section">
+          <h3>O que tem por aqui</h3>
+          <p>
+            <strong>Verde Inspiração</strong> — hobbies, animes, jogos e leituras que me
+            inspiram.<br>
+            <strong>Sapo Imaginário</strong> — projetos e experimentos de programação.<br>
+            <strong>Rascunhos da Floresta</strong> — textos, crônicas e tudo que escrevo.
+          </p>
+        </div>
+
+        <!-- Links -->
+        <div class="about-section">
+          <h3>Encontre-me por aí</h3>
+          <div class="about-links">
+            <a href="https://github.com/nayfts" target="_blank" rel="noopener" class="about-link-btn">
+              GitHub
+            </a>
+            <!-- Adicione outros links aqui se quiser -->
+          </div>
+        </div>
+
+      </section>
+    </div>
+
     <div id="bottom-image"></div>
-    <!-- Isso substitui a tag img -->
     <footer>
       <div class="footer-content">
         <p>Floresta Criativa © 2024–2026 Nay</p>
@@ -74,5 +120,6 @@
         </div>
       </div>
     </footer>
+    <script src="search.js"></script>
   </body>
 </html>

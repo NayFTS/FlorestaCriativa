@@ -1197,13 +1197,12 @@ footer {
     }
 }
 
-/* Seções de listagem: empilhar título acima do conteúdo */
-section#about,
+/* Seções de listagem de posts (sem .section-container) */
 section#verde-inspiracao,
 section#sapo-imaginario,
 section#rascunhos-da-floresta {
-    flex-direction: column;
-    align-items: stretch;
+    display: block;
+    padding: 0;
 }
 
 /* Lista de posts nas páginas de seção */
@@ -1219,6 +1218,8 @@ section#rascunhos-da-floresta {
     text-align: left;
     padding: 0;
     overflow: hidden;
+    margin: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 #post-list .post-container:hover {
@@ -1226,29 +1227,139 @@ section#rascunhos-da-floresta {
     box-shadow: 0 8px 24px rgba(0,0,0,0.13);
 }
 
+/* Imagem do card: 16:9, full-width, sem distorção */
 #post-list .post-container img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: center;
+    display: block;
     border-radius: 8px 8px 0 0;
-    margin-bottom: 0;
-    aspect-ratio: 16/9;
+    margin: 0;
     height: auto;
 }
 
 #post-list .post-container h3 {
     padding: 14px 16px 4px;
     margin: 0;
-    font-size: 1.25em;
+    font-size: 1.2em;
+    line-height: 1.35;
 }
 
 #post-list .post-container p {
     padding: 0 16px;
     margin: 6px 0 0;
     color: var(--color-text-secondary);
-    font-size: 0.95em;
+    font-size: 0.93em;
+    line-height: 1.6;
+    width: auto;
 }
 
 #post-list .post-container .leia-mais {
     margin: 12px 16px 16px;
     display: inline-block;
+}
+
+/* Página Sobre Mim */
+#about {
+    display: block;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 8px 0 24px;
+}
+
+.about-profile {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 32px;
+    padding: 28px 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+.about-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-accent);
+    flex-shrink: 0;
+}
+
+.about-intro h2 {
+    margin: 0 0 6px;
+    font-size: 1.6em;
+}
+
+.about-tagline {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    font-size: 0.97em;
+}
+
+.about-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+}
+
+.about-section h3 {
+    margin: 0 0 12px;
+    font-size: 1.1em;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 0.82em;
+}
+
+.about-section p {
+    margin: 0 0 12px;
+    line-height: 1.75;
+    color: var(--color-text);
+}
+
+.about-section p:last-child { margin-bottom: 0; }
+
+.about-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.about-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.about-link-btn:hover {
+    background: var(--color-accent-dark);
+    color: white;
+}
+
+@media (max-width: 520px) {
+    .about-profile {
+        flex-direction: column;
+        text-align: center;
+        padding: 22px 16px;
+    }
+    .about-section { padding: 18px 16px; }
 }
 
 /* Conteúdo do post individual (post.html) */
