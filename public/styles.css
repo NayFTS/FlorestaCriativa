@@ -45,12 +45,11 @@ header h1, header p {
 
 nav {
     display: flex;
-    justify-content: space-between; /* Faz os elementos dentro do nav se espaçarem corretamente */
-    align-items: center; /* Alinha verticalmente o conteúdo do nav */
+    justify-content: space-between;
+    align-items: center;
     padding: 10px;
     background-color: #f3f7f0;
-    flex-wrap: wrap; /* Permite que os elementos do nav se reorganizem em telas menores */
-    border-bottom: 1px solid #4d774e; /* Linha abaixo do nav */
+    flex-wrap: wrap;
 }
 
 nav a {
@@ -920,4 +919,41 @@ footer {
     #header-image {
         max-width: 300px;
     }
+}
+
+/* Carrossel e seções de listagem: empilhar título acima do conteúdo */
+section#posts-recentes,
+section#about,
+section#verde-inspiracao,
+section#sapo-imaginario,
+section#rascunhos-da-floresta {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Lista de posts nas páginas de seção */
+#post-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#post-list .post-container {
+    flex: none;
+    text-align: left;
+}
+
+/* Conteúdo do post individual (post.html) */
+#post-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.content-body {
+    line-height: 1.7;
+}
+
+.content-body p {
+    margin-bottom: 1em;
 }

@@ -34,6 +34,7 @@
           <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos...">
           <button type="submit">Pesquisar</button>
           <button type="button" onclick="toggleFilters()">Mostrar Filtros</button>
+          <button type="button" onclick="clearSearch()">Limpar</button>
         </form>
         <a href="login.html" id="loginButton">Login</a>
       </div>
@@ -58,8 +59,6 @@
     <script>
   const API_BASE = location.hostname === 'localhost' ? '' : '/api';
 
-  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
-
       function toggleMenu() {
           const menu = document.getElementById('menu');
           if (menu.style.display === 'block') {
@@ -78,6 +77,15 @@
           }
       }
       
+      function clearSearch() {
+          document.getElementById('searchBar').value = '';
+          document.querySelectorAll('.category').forEach(cb => cb.checked = false);
+          document.getElementById('startDate').value = '';
+          document.getElementById('endDate').value = '';
+          document.getElementById('searchResults').innerHTML = '';
+          document.getElementById('advancedFilters').style.display = 'none';
+      }
+
       function search() {
     const query = document.getElementById('searchBar').value.trim();
     const selectedCategories = Array.from(document.querySelectorAll('.category:checked')).map(checkbox => checkbox.value);

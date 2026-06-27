@@ -36,6 +36,7 @@
           <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos...">
           <button type="submit">Pesquisar</button>
           <button type="button" onclick="toggleFilters()">Mostrar Filtros</button>
+          <button type="button" onclick="clearSearch()">Limpar</button>
         </form>
         <a href="login.html" id="loginButton">Login</a>
       </div>
@@ -74,65 +75,7 @@
             }
           }
         
-          function search() {
-            const query = document.getElementById('searchBar').value.trim();
-            const selectedCategories = Array.from(document.querySelectorAll('.category:checked')).map(checkbox => checkbox.value);
-            const startDate = document.getElementById('startDate').value || '';
-            const endDate = document.getElementById('endDate').value || '';
-
-            // Verificação se pelo menos um campo foi preenchido
-            if (!query && selectedCategories.length === 0 && !startDate && !endDate) {
-                alert("Por favor, preencha ao menos um campo para realizar a pesquisa.");
-                return; // Não faz nada se nenhum parâmetro for preenchido
-            }
-
-            // Monta a URL da pesquisa com os filtros
-            const categoriesString = selectedCategories.join(',');
-            const searchURL = `/search?q=${query}&category=${categoriesString}&startDate=${startDate}&endDate=${endDate}`;
-
-            fetch(searchURL)
-                .then(response => response.json())
-                .then(data => {
-                    const resultContainer = document.getElementById('searchResults');
-                    resultContainer.innerHTML = '';
-
-                    if (data.length === 0) {
-                        resultContainer.style.display = 'block';
-                        resultContainer.innerHTML = '<p>Nenhum resultado encontrado.</p>';
-                    } else {
-                        resultContainer.style.display = 'block';
-                        data.forEach(post => {
-                            const resultItem = document.createElement('div');
-                            resultItem.className = "search-result";
-
-                            // Título do post
-                            const titleElement = document.createElement('h3');
-                            titleElement.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
-                            resultItem.appendChild(titleElement);
-
-                            // Exibe as categorias concatenadas
-                            const categoryElement = document.createElement('p');
-                            categoryElement.innerHTML = `<strong>Categoria(s):</strong> ${post.categories}`;
-                            resultItem.appendChild(categoryElement);
-
-                            // Filtrar o trecho do texto e colocar em negrito
-                            const regex = new RegExp(query, 'gi');
-                            const highlightedText = post.content.replace(regex, match => `<strong>${match}</strong>`);
-                            const excerpt = highlightedText.substring(0, 100) + '...';  // Limita o trecho a 100 caracteres
-
-                            const excerptElement = document.createElement('p');
-                            excerptElement.innerHTML = excerpt;
-                            resultItem.appendChild(excerptElement);
-
-                            resultContainer.appendChild(resultItem);
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro na busca:', error);
-                });
-      }
-      function search() {
+        function search() {
     const query = document.getElementById('searchBar').value.trim();
     const selectedCategories = Array.from(document.querySelectorAll('.category:checked')).map(checkbox => checkbox.value);
     const startDate = document.getElementById('startDate').value || '';
@@ -190,7 +133,15 @@
         });
 }
 
-      // Função para buscar posts recentes e exibi-los nas seções
+      function clearSearch() {
+          document.getElementById('searchBar').value = '';
+          document.querySelectorAll('.category').forEach(cb => cb.checked = false);
+          document.getElementById('startDate').value = '';
+          document.getElementById('endDate').value = '';
+          document.getElementById('searchResults').innerHTML = '';
+          document.getElementById('advancedFilters').style.display = 'none';
+      }
+
       function fetchRecentPosts() {
     fetch(`${API_BASE}/recent-posts`)
     .then(response => response.json())
@@ -212,7 +163,7 @@
             `;
             postsRecentesContainer.appendChild(postItem);
         });
-
+        updateButtons();
     })
     .catch(error => {
         console.error('Erro ao buscar posts recentes:', error);
@@ -304,12 +255,7 @@ window.onload = function() {
           <button class="carousel-btn prev-btn" onclick="prevPost()" aria-label="Post Anterior">&#10094;</button>
           <!-- Container dos posts recentes -->
           <div id="recent-posts-container" class="carousel">
-            <!-- Aqui seus posts serão inseridos -->
-            <div class="post-container">Post 1</div>
-            <div class="post-container">Post 2</div>
-            <div class="post-container">Post 3</div>
-            <div class="post-container">Post 4</div>
-            <div class="post-container">Post 5</div>
+            <!-- Posts carregados dinamicamente -->
           </div>
           <!-- Botão de navegação à direita -->
           <button class="carousel-btn next-btn" onclick="nextPost()" aria-label="Próximo Post">&#10095;</button>
