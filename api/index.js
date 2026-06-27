@@ -203,6 +203,10 @@ app.post('/addPost', upload.single('image'), async (req, res) => {
 // Rota de edição (exemplo semelhante)
 app.post('/editPost/:id', upload.single('image'), async (req, res) => {
     try {
+        if (!req.session.userId) {
+            return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
+        }
+
         const postId = req.params.id;
 
         if (!mongoose.Types.ObjectId.isValid(postId)) {
@@ -215,6 +219,10 @@ app.post('/editPost/:id', upload.single('image'), async (req, res) => {
 
         if (!post) {
             return res.status(404).json({ success: false, message: 'Post não encontrado' });
+        }
+
+        if (post.author.toString() !== req.session.userId.toString()) {
+            return res.status(403).json({ success: false, message: 'Sem permissão para editar este post' });
         }
 
         // Atualiza os campos
@@ -275,7 +283,15 @@ app.get('/post/:id', async (req, res) => {
 
 // Rota para deletar posts
 app.delete('/posts/:id', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).send('Usuário não autenticado');
+    }
     try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).send('Post não encontrado');
+        if (post.author.toString() !== req.session.userId.toString()) {
+            return res.status(403).send('Sem permissão para excluir este post');
+        }
         await Post.findByIdAndDelete(req.params.id);
         res.status(200).send('Postagem excluída com sucesso');
     } catch (err) {

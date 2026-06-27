@@ -1,37 +1,126 @@
-# 🌿 Floresta Criativa
+# Floresta Criativa
 
-Seu site criativo e portfolio pessoal. Um espaço para compartilhar projetos, ideias e criatividade.
+Blog e portfolio pessoal da Nay — um espaço para compartilhar escritas, projetos, hobbies e inspirações.
 
 **Live:** https://floresta-criativa.vercel.app
 
 ---
 
-## 🎯 Objetivo
+## Sobre o Projeto
 
-Criar um site moderno e responsivo que funcione como:
-- Portfolio pessoal
-- Vitrine de projetos e trabalhos
-- Espaço para experimentação criativa
+A Floresta Criativa é um site com backend próprio que funciona como blog e vitrine pessoal. O conteúdo é organizado em quatro seções temáticas:
 
----
-
-## 🚀 Tecnologias
-
-- **Frontend:** HTML5, CSS3, JavaScript
-- **Deploy:** Vercel
-- **Versionamento:** Git + GitHub
+| Seção | Descrição |
+|-------|-----------|
+| **Sobre Mim** | Apresentação pessoal |
+| **Verde Inspiração** | Hobbies, animes, jogos e leituras |
+| **Sapo Imaginário** | Portfolio e projetos |
+| **Rascunhos da Floresta** | Escritas e ideias pessoais |
 
 ---
 
-## 📋 Pré-requisitos
+## Stack
 
-- Git instalado
-- Node.js 18+ (se usar ferramentas de build)
-- Editor de código (VS Code recomendado)
+**Backend**
+- Node.js + Express 4
+- MongoDB Atlas (cloud) via Mongoose
+- Autenticação com sessões (`express-session` + `connect-mongo`)
+- Upload de imagens com Multer (máx. 2MB, JPEG/PNG/GIF/WebP)
+- Validação com `express-validator`
+- Hash de senhas com `bcryptjs`
+
+**Frontend**
+- HTML5, CSS3, JavaScript vanilla
+- CKEditor 5 (editor de texto rico para posts)
+- Tailwind CSS (instalado, uso parcial)
+
+**Deploy**
+- Vercel (`@vercel/node` para o backend, `@vercel/static` para o frontend)
 
 ---
 
-## 🛠️ Como Rodar Localmente
+## Estrutura do Projeto
+
+```
+Floresta Criativa/
+├── api/
+│   └── index.js              # Servidor Express + todas as rotas
+├── models/
+│   ├── User.js               # Schema de usuários (username, email, senha)
+│   └── Post.js               # Schema de posts (título, conteúdo, imagem, url, categorias, autor)
+├── public/
+│   ├── index.html            # Home com carrossel de posts recentes
+│   ├── about.html            # Sobre Mim
+│   ├── verde-inspiracao.html # Verde Inspiração
+│   ├── sapo-imaginario.html  # Sapo Imaginário (portfolio)
+│   ├── rascunhos-da-floresta.html
+│   ├── post.html             # Visualização de post individual
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html        # Painel do usuário autenticado
+│   ├── publicar.html         # Criar novo post
+│   ├── managePosts.html      # Gerenciar e excluir posts
+│   ├── editPost.html         # Editar post existente
+│   ├── styles.css
+│   └── imagens/
+│       ├── uploads/          # Imagens enviadas nos posts
+│       └── favicon_io/
+├── .env                      # Variáveis de ambiente (não commitar)
+├── vercel.json               # Configuração de deploy
+├── package.json
+└── ROADMAP.md
+```
+
+---
+
+## Rotas da API
+
+| Método | Rota | Auth | Descrição |
+|--------|------|------|-----------|
+| POST | `/register` | — | Criar conta |
+| POST | `/login` | — | Autenticar e criar sessão |
+| GET | `/logout` | Sim | Encerrar sessão |
+| GET | `/user-info` | Sim | Dados do usuário logado |
+| GET | `/posts?url=X` | — | Posts filtrados por página |
+| GET | `/post/:id` | — | Post individual |
+| GET | `/recent-posts` | — | 5 posts mais recentes |
+| GET | `/search` | — | Busca por texto, categorias e datas |
+| POST | `/addPost` | Sim | Criar post com imagem |
+| POST | `/editPost/:id` | Sim | Editar post |
+| DELETE | `/posts/:id` | — | Excluir post |
+| GET | `/user-posts` | Sim | Posts do usuário logado |
+| GET | `/dashboard-stats` | Sim | Estatísticas do dashboard |
+
+---
+
+## Modelos de Dados
+
+**User**
+```js
+{ username: String, email: String (único), password: String (bcrypt) }
+```
+
+**Post**
+```js
+{
+  title: String,
+  content: String,           // HTML gerado pelo CKEditor
+  url: String,               // página de destino do post
+  image_path: String,        // nome do arquivo em /imagens/uploads/
+  publish_date: Date,
+  categories: [String],      // "Escrita" | "Projetos" | "Animes" | "Jogos" | "Slice of Life"
+  author: ObjectId           // ref: User
+}
+```
+
+---
+
+## Como Rodar Localmente
+
+### Pré-requisitos
+- Node.js 18+
+- Vercel CLI (`npm i -g vercel`)
+- Conta no MongoDB Atlas (ou instância local)
 
 ### 1. Clone o repositório
 ```bash
@@ -39,112 +128,36 @@ git clone https://github.com/NayFTS/FlorestaCriativa.git
 cd FlorestaCriativa
 ```
 
-### 2. Abra localmente
-Se estiver usando apenas HTML/CSS/JS:
-```bash
-# Opção 1: Abra o arquivo diretamente no navegador
-open index.html
-
-# Opção 2: Use um servidor local (Python)
-python -m http.server 8000
-# Acesse: http://localhost:8000
+### 2. Configure as variáveis de ambiente
+Crie um arquivo `.env` na raiz:
+```env
+SESSION_SECRET=seu_segredo_aqui
+MONGO_ATLAS=mongodb+srv://usuario:senha@cluster.mongodb.net/dbname
 ```
 
-Se estiver usando npm/build tools:
+### 3. Instale as dependências e inicie
 ```bash
 npm install
-npm run dev
+npm start        # executa "vercel dev"
 ```
 
----
-
-## 📁 Estrutura do Projeto
-
-```
-FlorestaCriativa/
-├── README.md              # Este arquivo
-├── index.html             # Página principal
-├── src/
-│   ├── css/              # Estilos
-│   ├── js/               # Scripts
-│   └── assets/           # Imagens, fontes, etc
-├── components/           # Componentes reutilizáveis (se aplicável)
-└── public/               # Arquivos estáticos
-```
+Acesse `http://localhost:3000`.
 
 ---
 
-## 🐛 Problemas Conhecidos
+## Problemas Conhecidos
 
-- Código legado sem documentação
-- Falta de tratamento de erros
-- Performance a otimizar
-- Responsividade inconsistente
-
-> **Status:** Em refatoração completa
-
----
-
-## 🔄 Como Contribuir (Seu Workflow)
-
-### Padrão de Branches
-```bash
-# Para features novas
-git checkout -b feature/nome-da-feature
-
-# Para correções
-git checkout -b bugfix/nome-do-bug
-
-# Para melhorias
-git checkout -b refactor/nome-da-melhoria
-```
-
-### Processo
-1. Crie uma branch
-2. Faça suas mudanças
-3. Commit com mensagens claras
-4. Push para a branch
-5. Abra um Pull Request no GitHub
+- Posts recentes no carrossel não ficam centralizados quando há poucos posts
+- Linha de borda visível abaixo do nav sem propósito
+- Título e conteúdo (`<p>`) dentro do post individual sem alinhamento consistente
+- Ausência de separador visual entre posts nas páginas de seção
+- Código de busca duplicado em múltiplas páginas
+- Tailwind CSS instalado mas `content: []` vazio (sem purge configurado)
+- DELETE `/posts/:id` sem verificação de autoria
+- Pasta `FlorestaCriativa/` duplicada na raiz (cópia redundante)
 
 ---
 
-## ✅ Checklist para Recomeço
+## Licença
 
-- [ ] Estrutura de pastas organizada
-- [ ] README.md completo
-- [ ] Remover código legado não utilizado
-- [ ] Implementar página inicial
-- [ ] Seção de projetos
-- [ ] Seção de contato
-- [ ] Responsividade (mobile, tablet, desktop)
-- [ ] Otimização de performance
-- [ ] Testes de compatibilidade de navegadores
-- [ ] Deploy e verificação em produção
-
----
-
-## 📝 Próximos Passos
-
-- [ ] Definir paleta de cores e design system
-- [ ] Criar wireframes das páginas principais
-- [ ] Implementar estrutura HTML base
-- [ ] Estilizar com CSS
-- [ ] Adicionar interatividade com JavaScript
-- [ ] Testar e fazer deploy
-
----
-
-## 📞 Suporte
-
-Dúvidas? Abra uma issue neste repositório com a tag de dúvida ou sugestão.
-
----
-
-## 📄 Licença
-
-Projeto pessoal. Todos os direitos reservados © 2024-2026
-
----
-
-**Última atualização:** Junho 2026  
-**Status:** 🔨 Em desenvolvimento
+Projeto pessoal. Todos os direitos reservados © 2024–2026 Nay.
