@@ -41,6 +41,18 @@ function toggleMenu() {
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 }
 
+function toggleSearch() {
+    const overlay = document.getElementById('searchOverlay');
+    if (!overlay) return;
+    const open = overlay.style.display === 'flex';
+    overlay.style.display = open ? 'none' : 'flex';
+    if (!open) setTimeout(() => document.getElementById('searchBar')?.focus(), 50);
+}
+
+function closeSearchOverlay(e) {
+    if (e.target.id === 'searchOverlay') toggleSearch();
+}
+
 function toggleFilters() {
     const filters = document.getElementById('advancedFilters');
     filters.style.display = filters.style.display === 'none' ? 'block' : 'none';

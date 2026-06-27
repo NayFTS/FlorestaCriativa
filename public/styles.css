@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap');
+
 /* ===================== */
 /* CSS VARIABLES */
 /* ===================== */
@@ -25,11 +27,15 @@
 /* GLOBAL STYLES */
 /* ===================== */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     background-color: var(--color-bg);
     color: var(--color-text);
     margin: 0;
     padding: 0;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Lora', Georgia, serif;
 }
 
 /* Imagem do cabeçalho */
@@ -54,9 +60,9 @@ body {
 /* HEADER AND NAVIGATION */
 /* ===================== */
 header {
-    background-color: var(--color-accent);
+    background: linear-gradient(135deg, var(--color-accent-dark) 0%, var(--color-accent) 100%);
     color: white;
-    padding: 10px 0;  /* Reduz o padding para diminuir a altura */
+    padding: 28px 20px;
     text-align: center;
 }
 
@@ -70,8 +76,13 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    background-color: var(--color-bg);
+    padding: 0 16px;
+    height: 52px;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
     flex-wrap: wrap;
 }
 
@@ -124,8 +135,14 @@ a:hover {
 
 /* Telas pequenas */
 @media (max-width: 768px) {
+    nav {
+        height: auto;
+        min-height: 52px;
+        padding: 8px 16px;
+    }
+
     .menu {
-        display: none; /* Esconde o menu padrão */
+        display: none;
         flex-direction: column;
         width: 100%;
         background-color: var(--color-bg);
@@ -133,7 +150,7 @@ a:hover {
     }
 
     .hamburger {
-        display: block; /* Exibe o ícone de hambúrguer */
+        display: block;
         font-size: 30px;
         cursor: pointer;
     }
@@ -195,10 +212,33 @@ a:hover {
 footer {
     background-color: var(--color-accent);
     color: white;
-    text-align: center;
-    padding: 10px 0;
+    padding: 24px 20px;
     width: 100%;
+    box-sizing: border-box;
 }
+
+.footer-content {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.footer-content p { margin: 0; font-size: 0.9em; }
+
+.footer-links { display: flex; gap: 20px; }
+
+.footer-links a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover { color: white; text-decoration: underline; }
 
 /* Flexbox geral para seções */
 .section-container {
@@ -965,6 +1005,38 @@ section#rascunhos-da-floresta {
 #post-list .post-container {
     flex: none;
     text-align: left;
+    padding: 0;
+    overflow: hidden;
+}
+
+#post-list .post-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+}
+
+#post-list .post-container img {
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    aspect-ratio: 16/9;
+    height: auto;
+}
+
+#post-list .post-container h3 {
+    padding: 14px 16px 4px;
+    margin: 0;
+    font-size: 1.25em;
+}
+
+#post-list .post-container p {
+    padding: 0 16px;
+    margin: 6px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.95em;
+}
+
+#post-list .post-container .leia-mais {
+    margin: 12px 16px 16px;
+    display: inline-block;
 }
 
 /* Conteúdo do post individual (post.html) */
@@ -974,11 +1046,22 @@ section#rascunhos-da-floresta {
 }
 
 .content-body {
-    line-height: 1.7;
+    font-size: 1.1em;
+    line-height: 1.8;
 }
 
 .content-body p {
-    margin-bottom: 1em;
+    margin-bottom: 1.2em;
+}
+
+.content-body blockquote {
+    border-left: 4px solid var(--color-accent);
+    margin: 1.5em 0;
+    padding: 12px 20px;
+    background: var(--color-surface-alt);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--color-text-secondary);
 }
 
 /* Inputs herdam a cor do tema */
@@ -1012,24 +1095,96 @@ select {
     border-color: #7a4a4a;
 }
 
+/* Botão de ícone genérico */
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--color-text);
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    line-height: 1;
+    transition: background-color 0.2s;
+}
+
+.icon-btn:hover { background-color: var(--color-surface-alt); }
+
+/* Overlay de busca */
+.search-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 200;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 70px;
+}
+
+.search-overlay-box {
+    background: var(--color-surface);
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.search-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 1.2em;
+}
+
+.search-overlay-box form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.search-overlay-box form input[type="text"] {
+    flex: 1;
+    min-width: 180px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 1em;
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+.search-overlay-box #advancedFilters {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+}
+
+.search-overlay-box #searchResults {
+    margin-top: 16px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
 /* Botão de modo escuro */
 .theme-toggle {
     background: none;
-    border: 1px solid var(--color-accent);
+    border: none;
     color: var(--color-text);
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 6px 8px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.85em;
-    margin-left: 8px;
-    transition: background-color 0.2s, color 0.2s;
+    font-size: 1.1em;
+    margin-left: 4px;
+    line-height: 1;
+    transition: background-color 0.2s;
     white-space: nowrap;
 }
 
-.theme-toggle:hover {
-    background-color: var(--color-accent);
-    color: white;
-}
+.theme-toggle:hover { background-color: var(--color-surface-alt); }
 
 .theme-toggle-float {
     position: fixed;
@@ -1044,8 +1199,8 @@ select {
     align-items: center;
     justify-content: center;
     background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
     padding: 0;
     margin-left: 0;
 }
