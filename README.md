@@ -1,6 +1,6 @@
 # Floresta Criativa
 
-Blog e portfolio pessoal da Nay — um espaço para compartilhar escritas, projetos, hobbies e inspirações.
+Blog e portfólio pessoal da Nay — um espaço para compartilhar escritas, projetos, hobbies e inspirações.
 
 **Live:** https://floresta-criativa.vercel.app
 
@@ -8,14 +8,15 @@ Blog e portfolio pessoal da Nay — um espaço para compartilhar escritas, proje
 
 ## Sobre o Projeto
 
-A Floresta Criativa é um site com backend próprio que funciona como blog e vitrine pessoal. O conteúdo é organizado em quatro seções temáticas:
+A Floresta Criativa é um site com backend próprio que funciona como blog e vitrine pessoal. O conteúdo é organizado em quatro seções temáticas, mais uma ferramenta extra:
 
-| Seção | Descrição |
-|-------|-----------|
+| Página | Descrição |
+|--------|-----------|
 | **Sobre Mim** | Apresentação pessoal |
 | **Verde Inspiração** | Hobbies, animes, jogos e leituras |
-| **Sapo Imaginário** | Portfolio e projetos |
+| **Sapo Imaginário** | Portfólio e projetos |
 | **Rascunhos da Floresta** | Escritas e ideias pessoais |
+| **Roleta** | Ferramenta de sorteio (mini-app em `/roleta.html`) |
 
 ---
 
@@ -25,14 +26,14 @@ A Floresta Criativa é um site com backend próprio que funciona como blog e vit
 - Node.js + Express 4
 - MongoDB Atlas (cloud) via Mongoose
 - Autenticação com sessões (`express-session` + `connect-mongo`)
-- Upload de imagens com Multer (máx. 2MB, JPEG/PNG/GIF/WebP)
+- Upload de imagens via **Cloudinary** (SDK oficial)
 - Validação com `express-validator`
 - Hash de senhas com `bcryptjs`
 
 **Frontend**
 - HTML5, CSS3, JavaScript vanilla
-- CKEditor 5 (editor de texto rico para posts)
-- Tailwind CSS (instalado, uso parcial)
+- CKEditor 5 (editor rico para posts)
+- CSS com variáveis (`--color-bg`, `--color-text`, etc.) + modo escuro
 
 **Deploy**
 - Vercel (`@vercel/node` para o backend, `@vercel/static` para o frontend)
@@ -44,29 +45,28 @@ A Floresta Criativa é um site com backend próprio que funciona como blog e vit
 ```
 Floresta Criativa/
 ├── api/
-│   └── index.js              # Servidor Express + todas as rotas
-├── models/
-│   ├── User.js               # Schema de usuários (username, email, senha)
-│   └── Post.js               # Schema de posts (título, conteúdo, imagem, url, categorias, autor)
+│   └── index.js                  # Servidor Express + todas as rotas
 ├── public/
-│   ├── index.html            # Home com carrossel de posts recentes
-│   ├── about.html            # Sobre Mim
-│   ├── verde-inspiracao.html # Verde Inspiração
-│   ├── sapo-imaginario.html  # Sapo Imaginário (portfolio)
+│   ├── index.html                # Home com carrossel de posts recentes
+│   ├── about.html                # Sobre Mim
+│   ├── verde-inspiracao.html     # Verde Inspiração
+│   ├── sapo-imaginario.html      # Sapo Imaginário (portfólio)
 │   ├── rascunhos-da-floresta.html
-│   ├── post.html             # Visualização de post individual
+│   ├── post.html                 # Visualização de post individual
+│   ├── roleta.html               # Mini-app de sorteio
 │   ├── login.html
-│   ├── register.html
-│   ├── dashboard.html        # Painel do usuário autenticado
-│   ├── publicar.html         # Criar novo post
-│   ├── managePosts.html      # Gerenciar e excluir posts
-│   ├── editPost.html         # Editar post existente
+│   ├── reset-password.html       # Reset de senha via chave secreta
+│   ├── dashboard.html            # Painel da autora
+│   ├── publicar.html             # Criar novo post
+│   ├── managePosts.html          # Gerenciar e excluir posts
+│   ├── editPost.html             # Editar post existente
+│   ├── search.js                 # Busca, paginação, toggle de tema
 │   ├── styles.css
 │   └── imagens/
-│       ├── uploads/          # Imagens enviadas nos posts
+│       ├── uploads/              # (legado) imagens locais de posts antigos
 │       └── favicon_io/
-├── .env                      # Variáveis de ambiente (não commitar)
-├── vercel.json               # Configuração de deploy
+├── .env                          # Variáveis de ambiente (não commitar)
+├── vercel.json
 ├── package.json
 └── ROADMAP.md
 ```
@@ -77,19 +77,23 @@ Floresta Criativa/
 
 | Método | Rota | Auth | Descrição |
 |--------|------|------|-----------|
-| POST | `/register` | — | Criar conta |
 | POST | `/login` | — | Autenticar e criar sessão |
 | GET | `/logout` | Sim | Encerrar sessão |
-| GET | `/user-info` | Sim | Dados do usuário logado |
-| GET | `/posts?url=X` | — | Posts filtrados por página |
-| GET | `/post/:id` | — | Post individual |
+| POST | `/reset-password` | — | Redefinir senha via `RESET_SECRET` |
+| GET | `/user-info` | Sim | Dados da usuária logada |
+| GET | `/posts?url=X&page=N&limit=N` | — | Posts filtrados por página |
+| GET | `/post/:id` | — | Post individual (aceita slug ou ObjectId) |
 | GET | `/recent-posts` | — | 5 posts mais recentes |
 | GET | `/search` | — | Busca por texto, categorias e datas |
-| POST | `/addPost` | Sim | Criar post com imagem |
+| POST | `/addPost` | Sim | Criar post (imagem enviada ao Cloudinary) |
 | POST | `/editPost/:id` | Sim | Editar post |
-| DELETE | `/posts/:id` | — | Excluir post |
-| GET | `/user-posts` | Sim | Posts do usuário logado |
+| DELETE | `/posts/:id` | Sim | Excluir post |
+| PATCH | `/posts/:id/publish` | Sim | Publicar rascunho |
+| GET | `/user-posts` | Sim | Posts da usuária logada |
 | GET | `/dashboard-stats` | Sim | Estatísticas do dashboard |
+| GET | `/feed.xml` | — | Feed RSS com os 20 posts mais recentes |
+
+> **Nota:** A rota `POST /register` está desativada (retorna 403). O cadastro é feito localmente via `node create-user.js`.
 
 ---
 
@@ -106,10 +110,13 @@ Floresta Criativa/
   title: String,
   content: String,           // HTML gerado pelo CKEditor
   url: String,               // página de destino do post
-  image_path: String,        // nome do arquivo em /imagens/uploads/
+  image_path: String,        // URL do Cloudinary ou caminho local legado
+  slug: String,              // gerado automaticamente do título
   publish_date: Date,
   categories: [String],      // "Escrita" | "Projetos" | "Animes" | "Jogos" | "Slice of Life"
-  author: ObjectId           // ref: User
+  author: ObjectId,          // ref: User
+  status: String,            // "published" | "draft"
+  views: Number
 }
 ```
 
@@ -120,7 +127,8 @@ Floresta Criativa/
 ### Pré-requisitos
 - Node.js 18+
 - Vercel CLI (`npm i -g vercel`)
-- Conta no MongoDB Atlas (ou instância local)
+- Conta no MongoDB Atlas
+- Conta no Cloudinary
 
 ### 1. Clone o repositório
 ```bash
@@ -133,28 +141,39 @@ Crie um arquivo `.env` na raiz:
 ```env
 SESSION_SECRET=seu_segredo_aqui
 MONGO_ATLAS=mongodb+srv://usuario:senha@cluster.mongodb.net/dbname
+RESET_SECRET=chave_para_reset_de_senha
+CLOUDINARY_CLOUD_NAME=seu_cloud_name
+CLOUDINARY_API_KEY=sua_api_key
+CLOUDINARY_API_SECRET=seu_api_secret
 ```
 
-### 3. Instale as dependências e inicie
+### 3. Crie o usuário inicial
+```bash
+node create-user.js
+```
+
+### 4. Instale as dependências e inicie
 ```bash
 npm install
-npm start        # executa "vercel dev"
+npm start   # executa "vercel dev"
 ```
 
 Acesse `http://localhost:3000`.
 
 ---
 
-## Problemas Conhecidos
+## Variáveis de Ambiente no Vercel
 
-- Posts recentes no carrossel não ficam centralizados quando há poucos posts
-- Linha de borda visível abaixo do nav sem propósito
-- Título e conteúdo (`<p>`) dentro do post individual sem alinhamento consistente
-- Ausência de separador visual entre posts nas páginas de seção
-- Código de busca duplicado em múltiplas páginas
-- Tailwind CSS instalado mas `content: []` vazio (sem purge configurado)
-- DELETE `/posts/:id` sem verificação de autoria
-- Pasta `FlorestaCriativa/` duplicada na raiz (cópia redundante)
+Configure em **Settings → Environment Variables**:
+
+| Variável | Descrição |
+|----------|-----------|
+| `SESSION_SECRET` | Segredo da sessão |
+| `MONGO_ATLAS` | URI do MongoDB Atlas |
+| `RESET_SECRET` | Chave para resetar senha via `/reset-password.html` |
+| `CLOUDINARY_CLOUD_NAME` | Cloud name do Cloudinary |
+| `CLOUDINARY_API_KEY` | API key do Cloudinary |
+| `CLOUDINARY_API_SECRET` | API secret do Cloudinary |
 
 ---
 
