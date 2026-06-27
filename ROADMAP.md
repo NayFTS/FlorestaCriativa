@@ -22,11 +22,11 @@ Problemas que afetam segurança ou funcionamento básico.
 
 Problemas anotados no `Alterações e Updates.txt`.
 
-- [ ] **Carrossel: centralizar posts quando há menos de 3** — adicionar lógica para desabilitar botão "próximo" no último post e "anterior" no primeiro.
-- [ ] **Remover linha de borda abaixo do nav** — ajuste de CSS no header/nav.
-- [ ] **Alinhar título e conteúdo dentro de `post.html`** — `h1` e `p` dentro do post não estão alinhados; verificar padding/margin do container.
-- [ ] **Adicionar separador visual entre posts** — nas páginas de seção (sapo-imaginario, verde-inspiracao, etc.), adicionar `border-bottom` ou `gap` entre cards.
-- [ ] **Botão de limpar busca** — adicionar botão "×" ou "Limpar" no campo de pesquisa para resetar o formulário.
+- [x] **Carrossel: centralizar posts quando há menos de 3** — `updateButtons()` agora é chamado após o fetch dos posts reais; placeholders estáticos removidos.
+- [x] **Remover linha de borda abaixo do nav** — removida do `styles.css`.
+- [x] **Alinhar título e conteúdo dentro de `post.html`** — conteúdo CKEditor movido de `<p>` para `<div class="content-body">` com `line-height: 1.7`; container com `max-width` e centralizado.
+- [x] **Adicionar separador visual entre posts** — `#post-list` vira flex coluna com `gap: 20px`; seções deixaram de ser flex-row.
+- [x] **Botão de limpar busca** — adicionado em todas as 6 páginas com busca; reseta campo, checkboxes, datas, resultados e fecha filtros.
 
 ---
 
