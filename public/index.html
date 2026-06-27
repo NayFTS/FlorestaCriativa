@@ -60,68 +60,99 @@
     </div>
     <script src="search.js"></script>
     <script>
-      function fetchRecentPosts() {
-          fetch(`${API_BASE}/recent-posts`)
-              .then(response => response.json())
-              .then(data => {
-                  const container = document.getElementById('recent-posts-container');
-                  container.innerHTML = '';
-                  data.forEach(post => {
-                      const postContent = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
-                      const imageUrl = post.image_path ? (post.image_path.startsWith('http') ? post.image_path : `/imagens/uploads/${post.image_path}`) : 'imagens/quadrado_da_floresta.webp';
-                      const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
-                      const postItem = document.createElement('div');
-                      postItem.classList.add('post-container');
-                      postItem.innerHTML = `
-                          <h3><a href="${link}">${post.title}</a></h3>
-                          <img src="${imageUrl}" alt="${post.title}" loading="lazy">
-                          <p>${postContent}</p>
-                          <a href="${link}" class="leia-mais">Leia mais</a>
-                      `;
-                      container.appendChild(postItem);
-                  });
-                  updateButtons();
-              })
-              .catch(error => console.error('Erro ao buscar posts recentes:', error));
+      let _idx = 0;
+      let _posts = [];
+      let _timer = null;
+
+      function _build(data) {
+          _posts = data;
+          const track = document.getElementById('carouselTrack');
+          const dots  = document.getElementById('carouselDots');
+          track.innerHTML = '';
+          dots.innerHTML  = '';
+
+          data.forEach((post, i) => {
+              const img  = post.image_path
+                  ? (post.image_path.startsWith('http') ? post.image_path : `/imagens/uploads/${post.image_path}`)
+                  : 'imagens/quadrado_da_floresta.webp';
+              const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
+              const tmp  = document.createElement('div');
+              tmp.innerHTML = post.content;
+              const text = (tmp.textContent || tmp.innerText || '').trim();
+              const excerpt = text.length > 160 ? text.substring(0, 160) + '...' : text;
+
+              const slide = document.createElement('div');
+              slide.className = 'carousel-slide';
+              slide.innerHTML = `
+                  <a href="${link}" class="carousel-card">
+                      <div class="carousel-img-wrap">
+                          <img src="${img}" alt="${post.title}" loading="${i === 0 ? 'eager' : 'lazy'}">
+                      </div>
+                      <div class="carousel-card-body">
+                          <h3>${post.title}</h3>
+                          <p>${excerpt}</p>
+                          <span class="leia-mais">Leia mais →</span>
+                      </div>
+                  </a>`;
+              track.appendChild(slide);
+
+              const dot = document.createElement('button');
+              dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+              dot.setAttribute('aria-label', `Post ${i + 1}`);
+              dot.onclick = () => _go(i);
+              dots.appendChild(dot);
+          });
+
+          _render();
+          _startTimer();
+
+          const wrap = document.getElementById('carouselWrap');
+          let sx = 0;
+          wrap.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+          wrap.addEventListener('touchend',   e => {
+              const d = sx - e.changedTouches[0].clientX;
+              if (Math.abs(d) > 40) _go(_idx + (d > 0 ? 1 : -1));
+          }, { passive: true });
+          wrap.addEventListener('mouseenter', () => clearInterval(_timer));
+          wrap.addEventListener('mouseleave', _startTimer);
       }
 
-      let currentIndex = 0;
-
-      function showPost(index) {
-          const totalPosts = document.querySelectorAll('.post-container').length;
-          if (index >= totalPosts) currentIndex = totalPosts - 1;
-          if (index < 0) currentIndex = 0;
-          const slideWidth = document.querySelector('.carousel-container').offsetWidth;
-          document.querySelector('.carousel').style.transform = `translateX(-${currentIndex * slideWidth}px)`;
-          updateButtons();
+      function _go(i) {
+          _idx = Math.max(0, Math.min(i, _posts.length - 1));
+          _render();
+          clearInterval(_timer);
+          _startTimer();
       }
 
-      function nextPost() { currentIndex++; showPost(currentIndex); }
-      function prevPost() { currentIndex--; showPost(currentIndex); }
+      function _render() {
+          document.getElementById('carouselTrack').style.transform = `translateX(-${_idx * 100}%)`;
+          document.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === _idx));
+          document.getElementById('carouselPrev').disabled = _idx === 0;
+          document.getElementById('carouselNext').disabled = _idx === _posts.length - 1;
+      }
 
-      function updateButtons() {
-          const totalPosts = document.querySelectorAll('.post-container').length;
-          document.querySelector('.prev-btn').disabled = currentIndex === 0;
-          document.querySelector('.next-btn').disabled = currentIndex === totalPosts - 1;
+      function _startTimer() {
+          _timer = setInterval(() => _go(_idx < _posts.length - 1 ? _idx + 1 : 0), 5000);
       }
 
       window.onload = function() {
-          fetchRecentPosts();
-          updateButtons();
+          fetch(`${API_BASE}/recent-posts`)
+              .then(r => r.json())
+              .then(_build)
+              .catch(() => {
+                  document.getElementById('carouselWrap').innerHTML =
+                      '<p style="padding:48px;text-align:center;color:var(--color-text-secondary)">Não foi possível carregar os posts.</p>';
+              });
       };
     </script>
     <div class="container" id="content">
       <section id="posts-recentes" class="section-container">
-        <h2 id="recent-posts-title">Posts Recentes</h2>
-        <div class="carousel-container">
-          <!-- Botão de navegação à esquerda -->
-          <button class="carousel-btn prev-btn" onclick="prevPost()" aria-label="Post Anterior">&#10094;</button>
-          <!-- Container dos posts recentes -->
-          <div id="recent-posts-container" class="carousel">
-            <!-- Posts carregados dinamicamente -->
-          </div>
-          <!-- Botão de navegação à direita -->
-          <button class="carousel-btn next-btn" onclick="nextPost()" aria-label="Próximo Post">&#10095;</button>
+        <h2>Posts Recentes</h2>
+        <div class="carousel-wrap" id="carouselWrap">
+          <div class="carousel-track" id="carouselTrack"></div>
+          <button class="carousel-arrow carousel-prev" id="carouselPrev" onclick="_go(_idx - 1)" aria-label="Post anterior">&#8592;</button>
+          <button class="carousel-arrow carousel-next" id="carouselNext" onclick="_go(_idx + 1)" aria-label="Próximo post">&#8594;</button>
+          <div class="carousel-dots" id="carouselDots"></div>
         </div>
       </section>
     </div>
