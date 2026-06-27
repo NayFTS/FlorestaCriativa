@@ -111,26 +111,8 @@ function requireAuth(req, res, next) {
 // Rota de registro
 const { body, validationResult } = require('express-validator');
 
-app.post('/register', [
-    body('username').trim().isLength({ min: 3 }).withMessage('Nome de usuário deve ter pelo menos 3 caracteres'),
-    body('email').isEmail().withMessage('Email inválido'),
-    body('password').isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-        const { username, email, password } = req.body;
-        if (await User.findOne({ email })) return res.status(400).send('Email já registrado');
-        const hashedPassword = bcrypt.hashSync(password, 10);
-        await new User({ username, email, password: hashedPassword }).save();
-        res.status(200).send('Usuário registrado com sucesso');
-    } catch (err) {
-        console.error('Erro no registro:', err);
-        res.status(500).send('Erro no servidor');
-    }
+app.post('/register', (req, res) => {
+    res.status(403).json({ message: 'Registro desativado.' });
 });
 
 
