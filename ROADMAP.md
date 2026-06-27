@@ -34,10 +34,10 @@ Problemas anotados no `Alterações e Updates.txt`.
 
 Refatorações que não mudam o comportamento mas tornam o código mais fácil de manter.
 
-- [ ] **Eliminar código de busca duplicado** — o bloco de busca/filtros avançados está copiado em 4+ páginas. Extrair para um arquivo `search.js` e incluir via `<script src>`.
-- [ ] **Configurar Tailwind CSS corretamente** — preencher `content: []` no `tailwind.config.js` com os caminhos dos arquivos HTML e JS, ou remover o Tailwind se não for usar.
-- [ ] **Mover imagens de CSS para HTML** — substituir `background-image` em CSS por `<img>` nos lugares onde são conteúdo (não decoração).
-- [ ] **Centralizar verificação de autenticação** — criar um middleware `requireAuth` no backend e um helper JS no frontend para verificar sessão, em vez de repetir a lógica em cada página.
+- [x] **Eliminar código de busca duplicado** — extraído para `public/search.js`; todas as 6 páginas usam `<script src="search.js">`. Fix de produção incluído: calls fetch agora usam `${API_BASE}`.
+- [x] **Configurar Tailwind CSS corretamente** — Tailwind não estava sendo usado (`content: []` vazio). Removido via `npm uninstall`, `tailwind.config.js` e `public/tailwind.css` apagados.
+- [x] **Mover imagens de CSS para HTML** — N/A: as duas únicas ocorrências (`#top-image`, `#bottom-image`) são padrões decorativos que repetem horizontalmente com `background-repeat: repeat-x`. CSS é a ferramenta correta; `<img>` não replica esse efeito.
+- [x] **Centralizar verificação de autenticação** — criado middleware `requireAuth` em `api/index.js`; aplicado em `/user-info`, `/addPost`, `/editPost/:id`, `DELETE /posts/:id`, `/user-posts`, `/dashboard-stats`. Checagens inline removidas.
 
 ---
 

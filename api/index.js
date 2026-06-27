@@ -88,6 +88,13 @@ const upload = multer({
     }
 });
 
+function requireAuth(req, res, next) {
+    if (!req.session.userId) {
+        return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+    next();
+}
+
 // Rota de registro
 const { body, validationResult } = require('express-validator');
 
@@ -151,8 +158,7 @@ app.post('/login', [
 
 
 // Rota para buscar informações do usuário
-app.get('/user-info', async (req, res) => {
-    if (!req.session.userId) return res.status(401).send('Usuário não autenticado');
+app.get('/user-info', requireAuth, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
         res.json({ username: user.username });
@@ -173,12 +179,8 @@ app.get('/logout', (req, res) => {
 });
 
 
-app.post('/addPost', upload.single('image'), async (req, res) => {
+app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        if (!req.session.userId) {
-            return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
-        }
-
         const { title, content, url } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         const image_path = req.file ? req.file.filename : null;
@@ -201,12 +203,8 @@ app.post('/addPost', upload.single('image'), async (req, res) => {
 });
 
 // Rota de edição (exemplo semelhante)
-app.post('/editPost/:id', upload.single('image'), async (req, res) => {
+app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        if (!req.session.userId) {
-            return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
-        }
-
         const postId = req.params.id;
 
         if (!mongoose.Types.ObjectId.isValid(postId)) {
@@ -282,10 +280,7 @@ app.get('/post/:id', async (req, res) => {
 
 
 // Rota para deletar posts
-app.delete('/posts/:id', async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).send('Usuário não autenticado');
-    }
+app.delete('/posts/:id', requireAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).send('Post não encontrado');
@@ -340,11 +335,7 @@ app.get('/search', async (req, res) => {
     }
 });
 
-app.get('/user-posts', async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).send('Usuário não autenticado');
-    }
-
+app.get('/user-posts', requireAuth, async (req, res) => {
     try {
         const posts = await Post.find({ author: req.session.userId }).sort({ publish_date: -1 });
         res.json(posts);
@@ -354,12 +345,8 @@ app.get('/user-posts', async (req, res) => {
     }
 });
 
-app.get('/dashboard-stats', async (req, res) => {
+app.get('/dashboard-stats', requireAuth, async (req, res) => {
     try {
-        if (!req.session.userId) {
-            return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
-        }
-
         const totalPosts = await Post.countDocuments({ author: req.session.userId });
         const mostPopularPost = await Post.findOne({ author: req.session.userId }).sort({ publish_date: -1 });
         const recentPosts = await Post.find({ author: req.session.userId }).sort({ publish_date: -1 }).limit(3);
