@@ -34,9 +34,8 @@
     }
 })();
 
-if (typeof API_BASE === 'undefined') {
-    // eslint-disable-next-line no-var
-    var API_BASE = '/api';
+if (typeof window.API_BASE === 'undefined') {
+    window.API_BASE = '/api';
 }
 
 function toggleMenu() {
