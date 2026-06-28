@@ -84,6 +84,14 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     gallery: { type: [String], default: [] }
 }));
 
+const Comment = mongoose.model('Comment', new mongoose.Schema({
+    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
+    author: { type: String, required: true, maxlength: 60 },
+    content: { type: String, required: true, maxlength: 1000 },
+    createdAt: { type: Date, default: Date.now },
+    approved: { type: Boolean, default: false }
+}));
+
 function slugify(text) {
     return text.toString().toLowerCase()
         .normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -144,6 +152,14 @@ const resetLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 3,
     message: { message: 'Muitas tentativas de redefinição de senha. Tente novamente em 1 hora.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const commentLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: { message: 'Muitas tentativas de comentário. Tente novamente em 1 hora.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -523,6 +539,68 @@ app.get('/posts/:id/data', requireAuth, async (req, res) => {
         res.json(post);
     } catch (err) {
         res.status(500).json({ success: false, message: 'Erro no servidor' });
+    }
+});
+
+// ── Comentários ──────────────────────────────────────────
+
+app.post('/comments', commentLimiter, [
+    body('author').trim().notEmpty().isLength({ max: 60 }).withMessage('Nome inválido'),
+    body('content').trim().notEmpty().isLength({ max: 1000 }).withMessage('Comentário inválido'),
+    body('postId').notEmpty().withMessage('Post inválido')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    const { postId, author, content } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(postId)) return res.status(400).json({ message: 'Post inválido' });
+    try {
+        const comment = new Comment({ post: postId, author: author.trim(), content: content.trim() });
+        await comment.save();
+        res.json({ success: true, message: 'Comentário enviado para moderação!' });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao salvar comentário' });
+    }
+});
+
+app.get('/comments/:postId', async (req, res) => {
+    const { postId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(postId)) return res.status(400).json({ message: 'Post inválido' });
+    try {
+        const comments = await Comment.find({ post: postId, approved: true }).sort({ createdAt: 1 });
+        res.json(comments);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar comentários' });
+    }
+});
+
+app.get('/admin/comments/pending', requireAuth, async (req, res) => {
+    try {
+        const comments = await Comment.find({ approved: false })
+            .populate('post', 'title slug _id')
+            .sort({ createdAt: -1 });
+        res.json(comments);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar comentários pendentes' });
+    }
+});
+
+app.patch('/admin/comments/:id/approve', requireAuth, async (req, res) => {
+    try {
+        const comment = await Comment.findByIdAndUpdate(req.params.id, { approved: true }, { new: true });
+        if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao aprovar comentário' });
+    }
+});
+
+app.delete('/admin/comments/:id', requireAuth, async (req, res) => {
+    try {
+        const comment = await Comment.findByIdAndDelete(req.params.id);
+        if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao deletar comentário' });
     }
 });
 

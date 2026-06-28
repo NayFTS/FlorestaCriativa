@@ -69,9 +69,7 @@
       <p id="lightboxCounter" class="lightbox-counter"></p>
     </div>
 
-    <div class="container" id="post-content">
-      <!-- Conteúdo do post carregado aqui -->
-    </div>
+    <div class="container" id="post-content"></div>
     <div class="back-button-container">
       <button onclick="goBack()">Voltar</button>
     </div>
@@ -120,7 +118,7 @@ document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') lightboxNav(1);
 });
 
-// ── Galeria DOM ───────────────────────────────────────────
+// ── Galeria ───────────────────────────────────────────────
 function buildGallery(gallery) {
     if (!gallery || !gallery.length) return null;
     _lbImages = gallery;
@@ -147,6 +145,95 @@ function buildGallery(gallery) {
     section.appendChild(grid);
     return section;
 }
+
+// ── Comentários ───────────────────────────────────────────
+let _currentPostId = null;
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(String(str)));
+    return div.innerHTML;
+}
+
+function loadComments(postId) {
+    fetch(`${API_BASE}/comments/${postId}`)
+        .then(r => r.json())
+        .then(comments => {
+            const section = document.getElementById('comments-section');
+            section.style.display = 'block';
+            const list = document.getElementById('comments-list');
+
+            if (!comments.length) {
+                list.innerHTML = '<p class="no-comments">Nenhum comentário ainda. Seja a primeira!</p>';
+                return;
+            }
+
+            const heading = document.createElement('h3');
+            heading.className = 'comments-heading';
+            heading.textContent = `${comments.length} comentário${comments.length !== 1 ? 's' : ''}`;
+            list.appendChild(heading);
+
+            comments.forEach(c => {
+                const date = new Date(c.createdAt).toLocaleDateString('pt-BR', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                const el = document.createElement('div');
+                el.className = 'comment-item';
+                el.innerHTML = `
+                    <div class="comment-header">
+                        <span class="comment-author">${escapeHtml(c.author)}</span>
+                        <time class="comment-date">${date}</time>
+                    </div>
+                    <p class="comment-body">${escapeHtml(c.content)}</p>
+                `;
+                list.appendChild(el);
+            });
+        })
+        .catch(() => {
+            document.getElementById('comments-section').style.display = 'block';
+        });
+}
+
+// Formulário de comentário
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('commentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!_currentPostId) return;
+        const author = document.getElementById('commentAuthor').value.trim();
+        const content = document.getElementById('commentContent').value.trim();
+        const btn = this.querySelector('button[type="submit"]');
+        const msg = document.getElementById('commentMsg');
+
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+        msg.textContent = '';
+
+        fetch(`${API_BASE}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postId: _currentPostId, author, content })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                msg.textContent = '✓ Comentário enviado! Ele aparecerá após aprovação.';
+                msg.className = 'comment-msg comment-msg-success';
+                this.reset();
+            } else {
+                msg.textContent = data.message || 'Erro ao enviar comentário.';
+                msg.className = 'comment-msg comment-msg-error';
+            }
+            btn.disabled = false;
+            btn.textContent = 'Enviar comentário';
+        })
+        .catch(() => {
+            msg.textContent = 'Erro de rede. Tente novamente.';
+            msg.className = 'comment-msg comment-msg-error';
+            btn.disabled = false;
+            btn.textContent = 'Enviar comentário';
+        });
+    });
+});
 
 // ── Utils ─────────────────────────────────────────────────
 function readingTime(content) {
@@ -215,8 +302,9 @@ function fetchPost() {
             return response.json();
         })
         .then(data => {
-            document.title = `${data.title} — Floresta Criativa`;
+            _currentPostId = data._id;
 
+            document.title = `${data.title} — Floresta Criativa`;
             const desc = (data.content || '').replace(/<[^>]+>/g, '').trim().substring(0, 160);
             document.querySelector('meta[name="description"]').setAttribute('content', desc);
             document.querySelector('meta[property="og:title"]').setAttribute('content', data.title);
@@ -273,7 +361,6 @@ function fetchPost() {
                 `;
             }
 
-            // Galeria: inserida após .content-body, antes da meta
             const galleryEl = buildGallery(gallery);
             if (galleryEl) {
                 const meta = postContainer.querySelector('.post-meta');
@@ -282,6 +369,7 @@ function fetchPost() {
 
             document.getElementById('shareBtn').addEventListener('click', () => sharePost(data.title));
             loadRelatedPosts(data.url, data._id);
+            loadComments(data._id);
         })
         .catch(error => {
             console.error('Erro ao buscar post:', error);
@@ -293,10 +381,25 @@ function goBack() { window.history.back(); }
 
 window.onload = fetchPost;
     </script>
+
     <section id="related-posts" style="display:none">
       <h3>Posts relacionados</h3>
       <div id="related-grid" class="related-grid"></div>
     </section>
+
+    <section id="comments-section" style="display:none">
+      <div id="comments-list"></div>
+      <div class="comment-form-wrap">
+        <h3 class="comments-heading">Deixe um comentário</h3>
+        <form id="commentForm" novalidate>
+          <input type="text" id="commentAuthor" placeholder="Seu nome" maxlength="60" required autocomplete="name">
+          <textarea id="commentContent" placeholder="Escreva seu comentário..." maxlength="1000" required rows="4"></textarea>
+          <button type="submit">Enviar comentário</button>
+        </form>
+        <p id="commentMsg" class="comment-msg"></p>
+      </div>
+    </section>
+
     <div id="bottom-image"></div>
     <footer>
       <div class="footer-content">

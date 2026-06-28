@@ -53,6 +53,11 @@
       <div id="recentPosts"></div>
     </div>
 
+    <div class="dashboard-recent-posts" id="pendingCommentsWrap" style="display:none">
+      <h3>Comentários pendentes <span id="pendingCommentCount" class="badge badge-draft"></span></h3>
+      <div id="pendingComments"></div>
+    </div>
+
     <script>
   const API_BASE = '/api';
 
@@ -120,6 +125,85 @@
           }
       })
       .catch(error => console.error('Erro ao carregar estatísticas:', error));
+
+  // ── Moderação de comentários ───────────────────────────
+  function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(String(str)));
+      return div.innerHTML;
+  }
+
+  function loadPendingComments() {
+      fetch(`${API_BASE}/admin/comments/pending`)
+          .then(r => r.json())
+          .then(comments => {
+              if (!comments.length) return;
+              const wrap = document.getElementById('pendingCommentsWrap');
+              wrap.style.display = 'block';
+              document.getElementById('pendingCommentCount').textContent = comments.length;
+              const container = document.getElementById('pendingComments');
+              container.innerHTML = '';
+              comments.forEach(c => {
+                  const date = new Date(c.createdAt).toLocaleDateString('pt-BR', {
+                      day: '2-digit', month: 'short', year: 'numeric'
+                  });
+                  const postTitle = c.post ? escapeHtml(c.post.title) : 'Post removido';
+                  const postLink = c.post
+                      ? (c.post.slug ? `post.html?slug=${c.post.slug}` : `post.html?id=${c.post._id}`)
+                      : '#';
+                  const el = document.createElement('div');
+                  el.className = 'pending-comment-item';
+                  el.dataset.id = c._id;
+                  el.innerHTML = `
+                      <div class="pending-comment-meta">
+                          <strong>${escapeHtml(c.author)}</strong>
+                          <time>${date}</time>
+                          <span>em <a href="${postLink}">${postTitle}</a></span>
+                      </div>
+                      <p class="pending-comment-body">${escapeHtml(c.content)}</p>
+                      <div class="pending-comment-actions">
+                          <button class="btn-approve" onclick="approveComment('${c._id}', this)">Aprovar</button>
+                          <button class="btn-reject" onclick="rejectComment('${c._id}', this)">Rejeitar</button>
+                      </div>
+                  `;
+                  container.appendChild(el);
+              });
+          })
+          .catch(() => {});
+  }
+
+  function approveComment(id, btn) {
+      btn.disabled = true;
+      fetch(`${API_BASE}/admin/comments/${id}/approve`, { method: 'PATCH' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) removeCommentCard(id);
+          })
+          .catch(() => { btn.disabled = false; });
+  }
+
+  function rejectComment(id, btn) {
+      btn.disabled = true;
+      fetch(`${API_BASE}/admin/comments/${id}`, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) removeCommentCard(id);
+          })
+          .catch(() => { btn.disabled = false; });
+  }
+
+  function removeCommentCard(id) {
+      const el = document.querySelector(`.pending-comment-item[data-id="${id}"]`);
+      if (el) el.remove();
+      const remaining = document.querySelectorAll('.pending-comment-item').length;
+      if (!remaining) {
+          document.getElementById('pendingCommentsWrap').style.display = 'none';
+      } else {
+          document.getElementById('pendingCommentCount').textContent = remaining;
+      }
+  }
+
+  loadPendingComments();
     </script>
 
     <footer>
