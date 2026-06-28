@@ -31,7 +31,10 @@
     </nav>
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
       <div class="search-overlay-box">
-        <button class="icon-btn search-close-btn" onclick="toggleSearch()" aria-label="Fechar">✕</button>
+        <div class="search-overlay-box-header">
+          <span style="font-weight:600;font-size:1em;">Pesquisar</span>
+          <button class="icon-btn search-close-btn" onclick="toggleSearch()" aria-label="Fechar">✕</button>
+        </div>
         <form onsubmit="search(); return false;">
           <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos...">
           <button type="submit">Pesquisar</button>
