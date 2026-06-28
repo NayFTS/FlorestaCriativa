@@ -30,6 +30,13 @@
       <img id="previewImage" class="image-preview" alt="Preview da imagem">
       <br><br>
 
+      <label>Galeria de imagens <span style="font-weight:400;font-size:0.9em">(clique no ✕ para remover · até 10 fotos)</span></label>
+      <div id="existingGallery" class="gallery-preview-edit"></div>
+      <input type="file" id="galleryInput" name="gallery" accept="image/*" multiple>
+      <div id="newGalleryPreview" class="gallery-preview-edit"></div>
+      <input type="hidden" id="galleryKeep" name="gallery_keep" value="[]">
+      <br>
+
       <label for="url">Página de destino:</label>
       <select id="url" name="url" required>
         <option value="">escolha uma das opções</option>
@@ -160,6 +167,34 @@
                   previewImage.style.display = 'block';
               }
 
+              // Galeria existente
+              const existingGallery = Array.isArray(data.gallery) ? data.gallery : [];
+              let galleryKeep = [...existingGallery];
+              const galleryKeepInput = document.getElementById('galleryKeep');
+              galleryKeepInput.value = JSON.stringify(galleryKeep);
+
+              const existingGalleryContainer = document.getElementById('existingGallery');
+              existingGallery.forEach((url, idx) => {
+                  const wrap = document.createElement('div');
+                  wrap.className = 'gallery-preview-item';
+                  wrap.dataset.idx = idx;
+                  const img = document.createElement('img');
+                  img.src = url;
+                  img.className = 'gallery-preview-thumb';
+                  const btn = document.createElement('button');
+                  btn.type = 'button';
+                  btn.className = 'gallery-remove-btn';
+                  btn.textContent = '✕';
+                  btn.addEventListener('click', () => {
+                      galleryKeep = galleryKeep.filter(u => u !== url);
+                      galleryKeepInput.value = JSON.stringify(galleryKeep);
+                      wrap.remove();
+                  });
+                  wrap.appendChild(img);
+                  wrap.appendChild(btn);
+                  existingGalleryContainer.appendChild(wrap);
+              });
+
               if (data.categories) {
                   data.categories.forEach(category => {
                       const checkbox = document.querySelector(`input[name="category[]"][value="${category}"]`);
@@ -196,6 +231,21 @@
           };
           reader.readAsDataURL(file);
       }
+  });
+
+  document.getElementById('galleryInput').addEventListener('change', function() {
+      const container = document.getElementById('newGalleryPreview');
+      container.innerHTML = '';
+      Array.from(this.files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = e => {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = 'gallery-preview-thumb';
+              container.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+      });
   });
 
   document.getElementById('editPostForm').addEventListener('submit', function(event) {

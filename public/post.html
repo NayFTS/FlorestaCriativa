@@ -59,6 +59,16 @@
         <div id="searchResults"></div>
       </div>
     </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Galeria de imagens" style="display:none">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Fechar">✕</button>
+      <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Anterior">&#8249;</button>
+      <img id="lightboxImg" src="" alt="">
+      <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Próxima">&#8250;</button>
+      <p id="lightboxCounter" class="lightbox-counter"></p>
+    </div>
+
     <div class="container" id="post-content">
       <!-- Conteúdo do post carregado aqui -->
     </div>
@@ -67,6 +77,78 @@
     </div>
     <script src="search.js"></script>
     <script>
+// ── Lightbox ──────────────────────────────────────────────
+let _lbImages = [], _lbIdx = 0;
+
+function openLightbox(idx) {
+    _lbIdx = idx;
+    _renderLightbox();
+    const lb = document.getElementById('lightbox');
+    lb.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    document.getElementById('lightboxClose').focus();
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function lightboxNav(dir) {
+    _lbIdx = (_lbIdx + dir + _lbImages.length) % _lbImages.length;
+    _renderLightbox();
+}
+
+function _renderLightbox() {
+    document.getElementById('lightboxImg').src = _lbImages[_lbIdx];
+    document.getElementById('lightboxCounter').textContent = `${_lbIdx + 1} / ${_lbImages.length}`;
+    document.getElementById('lightboxPrev').style.display = _lbImages.length > 1 ? '' : 'none';
+    document.getElementById('lightboxNext').style.display = _lbImages.length > 1 ? '' : 'none';
+}
+
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+document.getElementById('lightboxPrev').addEventListener('click', () => lightboxNav(-1));
+document.getElementById('lightboxNext').addEventListener('click', () => lightboxNav(1));
+document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+});
+document.addEventListener('keydown', e => {
+    const lb = document.getElementById('lightbox');
+    if (lb.style.display === 'none') return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lightboxNav(-1);
+    if (e.key === 'ArrowRight') lightboxNav(1);
+});
+
+// ── Galeria DOM ───────────────────────────────────────────
+function buildGallery(gallery) {
+    if (!gallery || !gallery.length) return null;
+    _lbImages = gallery;
+    const section = document.createElement('div');
+    section.className = 'post-gallery';
+    const label = document.createElement('p');
+    label.className = 'post-gallery-label';
+    label.textContent = 'Galeria';
+    section.appendChild(label);
+    const grid = document.createElement('div');
+    grid.className = 'post-gallery-grid';
+    gallery.forEach((img, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'gallery-thumb';
+        btn.setAttribute('aria-label', `Abrir imagem ${i + 1}`);
+        const image = document.createElement('img');
+        image.src = img;
+        image.alt = '';
+        image.loading = 'lazy';
+        btn.appendChild(image);
+        btn.addEventListener('click', () => openLightbox(i));
+        grid.appendChild(btn);
+    });
+    section.appendChild(grid);
+    return section;
+}
+
+// ── Utils ─────────────────────────────────────────────────
 function readingTime(content) {
     const words = content.replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(Boolean).length;
     return Math.max(1, Math.ceil(words / 200));
@@ -117,6 +199,7 @@ function loadRelatedPosts(pageUrl, currentId) {
         .catch(() => {});
 }
 
+// ── fetchPost ─────────────────────────────────────────────
 function fetchPost() {
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('slug') || urlParams.get('id');
@@ -154,6 +237,7 @@ function fetchPost() {
             const categoriesHTML = data.categories && data.categories.length > 0
                 ? data.categories.join(', ') : 'Sem categoria';
             const mins = readingTime(data.content || '');
+            const gallery = Array.isArray(data.gallery) ? data.gallery : [];
 
             const isSapo = data.url === 'sapo-imaginario.html';
 
@@ -187,6 +271,13 @@ function fetchPost() {
                     <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
                     <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
                 `;
+            }
+
+            // Galeria: inserida após .content-body, antes da meta
+            const galleryEl = buildGallery(gallery);
+            if (galleryEl) {
+                const meta = postContainer.querySelector('.post-meta');
+                postContainer.insertBefore(galleryEl, meta);
             }
 
             document.getElementById('shareBtn').addEventListener('click', () => sharePost(data.title));

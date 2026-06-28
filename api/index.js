@@ -80,7 +80,8 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     status: { type: String, enum: ['published', 'draft'], default: 'published' },
     external_link: { type: String, default: '' },
     preview_link: { type: String, default: '' },
-    technologies: [String]
+    technologies: [String],
+    gallery: { type: [String], default: [] }
 }));
 
 function slugify(text) {
@@ -110,6 +111,11 @@ const upload = multer({
         cb(new Error('Apenas arquivos de imagem são permitidos (JPEG, PNG, GIF).'));
     }
 });
+
+const galleryUpload = upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'gallery', maxCount: 10 }
+]);
 
 function requireAuth(req, res, next) {
     if (!req.session.userId) {
@@ -230,16 +236,19 @@ app.get('/logout', (req, res) => {
 });
 
 
-app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
+app.post('/addPost', requireAuth, galleryUpload, async (req, res) => {
     try {
         const { title, content, url, status, external_link, preview_link } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         let technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
-        const image_path = req.file ? await uploadToCloudinary(req.file.buffer) : null;
+        const imageFile = req.files?.['image']?.[0];
+        const image_path = imageFile ? await uploadToCloudinary(imageFile.buffer) : null;
+        const galleryFiles = req.files?.['gallery'] || [];
+        const gallery = await Promise.all(galleryFiles.map(f => uploadToCloudinary(f.buffer)));
         const slug = await uniqueSlug(title);
 
         const newPost = new Post({
-            title, content, url, image_path, categories, technologies,
+            title, content, url, image_path, categories, technologies, gallery,
             author: req.session.userId,
             slug,
             external_link: external_link || '',
@@ -256,7 +265,7 @@ app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
 });
 
 // Rota de edição (exemplo semelhante)
-app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) => {
+app.post('/editPost/:id', requireAuth, galleryUpload, async (req, res) => {
     try {
         const postId = req.params.id;
 
@@ -286,9 +295,16 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
         post.external_link = external_link || '';
         post.preview_link = preview_link || '';
 
-        if (req.file) {
-            post.image_path = await uploadToCloudinary(req.file.buffer);
+        const imageFile = req.files?.['image']?.[0];
+        if (imageFile) {
+            post.image_path = await uploadToCloudinary(imageFile.buffer);
         }
+
+        let keepGallery = [];
+        try { keepGallery = JSON.parse(req.body.gallery_keep || '[]'); } catch(e) {}
+        const newGalleryFiles = req.files?.['gallery'] || [];
+        const newGalleryUrls = await Promise.all(newGalleryFiles.map(f => uploadToCloudinary(f.buffer)));
+        post.gallery = [...keepGallery, ...newGalleryUrls];
 
         await post.save();
         res.json({ success: true, message: 'Post atualizado com sucesso!' });
