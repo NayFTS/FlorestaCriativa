@@ -840,6 +840,7 @@ footer {
 .dashboard-actions {
     display: flex;
     gap: 16px;
+    justify-content: center;
     margin-bottom: 30px;
 }
 
