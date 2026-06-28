@@ -122,9 +122,10 @@ a:hover {
 /* Estilo para telas grandes */
 @media (min-width: 769px) {
     .menu {
-        display: flex; /* Mantém o menu visível e lado a lado com a barra de pesquisa */
-        justify-content: space-between;
-        align-items: center; /* Alinha verticalmente o conteúdo */
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-left: auto;
     }
 
     .search-container {
