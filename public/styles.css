@@ -439,7 +439,7 @@ footer {
 .carousel-clip {
     position: relative;
     width: 100%;
-    max-height: 280px;
+    max-height: 420px;
     overflow: hidden;
     background: var(--color-surface-alt);
     user-select: none;
@@ -1323,7 +1323,7 @@ section#rascunhos-da-floresta {
 
 /* Sitemap na home */
 #sobre {
-    margin-top: 40px;
+    margin-top: 12px;
     margin-bottom: 8px;
     padding-top: 0;
 }
