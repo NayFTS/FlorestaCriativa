@@ -838,7 +838,7 @@ footer {
 
 .dashboard-actions {
     display: flex;
-    justify-content: space-around;
+    gap: 16px;
     margin-bottom: 30px;
 }
 
