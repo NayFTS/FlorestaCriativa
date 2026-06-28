@@ -71,6 +71,22 @@
       <p id="lightboxCounter" class="lightbox-counter"></p>
     </div>
 
+    <!-- Preview Drawer -->
+    <div id="previewOverlay" class="preview-overlay" onclick="closePreview()"></div>
+    <div id="previewDrawer" class="preview-drawer" role="dialog" aria-modal="true">
+      <div class="preview-drawer-header">
+        <span id="previewTitle" class="preview-drawer-title"></span>
+        <div class="preview-drawer-controls">
+          <a id="previewNewTab" href="#" target="_blank" rel="noopener" class="btn-newtab" style="display:none">↗ Abrir em nova aba</a>
+          <button class="icon-btn" onclick="closePreview()" aria-label="Fechar preview">✕</button>
+        </div>
+      </div>
+      <div class="preview-drawer-body">
+        <iframe id="previewIframe" src="" title="Preview do projeto" style="display:none; width:100%; height:100%; border:none;"></iframe>
+        <div id="previewContent" class="preview-post-content" style="display:none"></div>
+      </div>
+    </div>
+
     <div class="container" id="post-content"></div>
     <div class="back-button-container">
       <button onclick="goBack()">Voltar</button>
@@ -350,8 +366,15 @@ function fetchPost() {
                     <div class="content-body">${data.content}</div>
                     <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                     <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
-                    <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
+                    <div class="post-actions">
+                        <button id="previewBtn" class="btn-preview">◈ Preview</button>
+                        <button id="shareBtn" class="share-btn">↗ Compartilhar</button>
+                    </div>
                 `;
+                const previewLink = data.preview_link || '';
+                document.getElementById('previewBtn').addEventListener('click', () => {
+                    openPreview(data._id, previewLink, data.title);
+                });
             } else {
                 postContainer.innerHTML = `
                     <h2>${data.title}</h2>
@@ -380,6 +403,52 @@ function fetchPost() {
 }
 
 function goBack() { window.history.back(); }
+
+function openPreview(postId, externalLink, title) {
+    const drawer    = document.getElementById('previewDrawer');
+    const overlay   = document.getElementById('previewOverlay');
+    const titleEl   = document.getElementById('previewTitle');
+    const newTabBtn = document.getElementById('previewNewTab');
+    const iframe    = document.getElementById('previewIframe');
+    const content   = document.getElementById('previewContent');
+
+    titleEl.textContent = title;
+    iframe.style.display = 'none';
+    content.style.display = 'none';
+    iframe.src = '';
+    content.innerHTML = '';
+
+    if (externalLink) {
+        iframe.src = externalLink;
+        iframe.style.display = 'block';
+        newTabBtn.href = externalLink;
+        newTabBtn.style.display = 'inline-flex';
+    } else {
+        content.style.display = 'block';
+        content.innerHTML = '<p class="post-loading">Carregando...</p>';
+        newTabBtn.style.display = 'none';
+        fetch(`${API_BASE}/post/${postId}`)
+            .then(r => r.json())
+            .then(p => { content.innerHTML = `<div class="content-body">${p.content}</div>`; })
+            .catch(() => { content.innerHTML = '<p>Erro ao carregar conteúdo.</p>'; });
+    }
+
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePreview() {
+    const drawer  = document.getElementById('previewDrawer');
+    const overlay = document.getElementById('previewOverlay');
+    const iframe  = document.getElementById('previewIframe');
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { iframe.src = ''; }, 350);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
 
 window.onload = fetchPost;
     </script>
