@@ -1,208 +1,267 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleta de Sorteio</title>
+    <title>Roleta de Sorteio - Floresta Criativa</title>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
+    <link rel="stylesheet" href="styles.css">
     <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-            margin: 0;
-        }
-        
-        .container {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        .roleta-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-        }
-        .roleta {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-color: #c5c4c4;
-            transform-origin: center;
-        }
-        .ponteiro {
-            position: absolute;
-            top: 50%;
-            left: 100%;
-            transform: translate(-50%, -50%) rotate(270deg);
-            width: 20px;
-            height: 40px;
-            background-color: grey;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            z-index: 10;
-        }
-        .centro {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background-color: white;
-            border-radius: 50%;
-            z-index: 5;
-        }
-        .input-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        textarea {
-            width: 250px;
-            height: 150px;
-            margin-bottom: 20px;
-            resize: none;
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            z-index: 1000;
-            text-align: center;
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        .modal button {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
+  </head>
+  <body>
+    <header>
+      <a href="index.html">
+        <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
+      </a>
+      <h1>Floresta Criativa</h1>
+      <p>Roleta de Sorteio</p>
+    </header>
+    <div id="top-image"></div>
+    <nav>
+      <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
+      <div class="menu" id="menu">
+        <a href="index.html">Home</a>
+        <a href="verde-inspiracao.html">Verde Inspiração</a>
+        <a href="sapo-imaginario.html">Sapo Imaginário</a>
+        <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
+        <a href="login.html" id="loginButton">Login</a>
+        <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+      </div>
+    </nav>
+    <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
+      <div class="search-overlay-box">
+        <button class="icon-btn search-close-btn" onclick="toggleSearch()" aria-label="Fechar">✕</button>
+        <form onsubmit="search(); return false;">
+          <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos...">
+          <button type="submit">Pesquisar</button>
+          <button type="button" onclick="toggleFilters()">Filtros</button>
+          <button type="button" onclick="clearSearch()">Limpar</button>
+        </form>
+        <div id="advancedFilters" style="display:none;">
+          <p>Categorias:</p>
+          <label><input type="checkbox" class="category" value="Escrita" name="category[]"> Escrita</label>
+          <label><input type="checkbox" class="category" value="Projetos" name="category[]"> Projetos</label>
+          <label><input type="checkbox" class="category" value="Animes" name="category[]"> Animes</label>
+          <label><input type="checkbox" class="category" value="Jogos" name="category[]"> Jogos</label>
+          <label><input type="checkbox" class="category" value="Slice of Life" name="category[]"> Slice of Life</label>
+          <input type="date" id="startDate" name="startDate">
+          <input type="date" id="endDate" name="endDate">
+        </div>
+        <div id="searchResults"></div>
+      </div>
+    </div>
+
+    <div class="container" style="padding: 32px 20px;">
+      <div class="roleta-wrapper">
         <div class="roleta-container">
-            <div class="ponteiro"></div>
-            <canvas id="roleta" class="roleta"></canvas>
-            <div class="centro"></div>
+          <div class="ponteiro"></div>
+          <canvas id="roleta" class="roleta"></canvas>
+          <div class="centro"></div>
         </div>
-        <div class="input-container">
-            <textarea id="inputItens" placeholder="Digite os itens, separados por ENTER" oninput="atualizarRoleta()"></textarea>
-            <button onclick="sortear()">Sortear</button>
+        <div class="roleta-input-container">
+          <label for="inputItens" style="font-weight:600;margin-bottom:8px;display:block;">Itens (um por linha)</label>
+          <textarea id="inputItens" placeholder="Digite os itens, separados por ENTER" oninput="atualizarRoleta()"></textarea>
+          <button onclick="sortear()">Sortear</button>
         </div>
+      </div>
     </div>
 
     <div class="modal-overlay" onclick="fecharModal()"></div>
     <div class="modal" id="modalResultado">
-        <p id="resultadoTexto"></p>
-        <button onclick="fecharModal()">Fechar</button>
+      <p id="resultadoTexto"></p>
+      <button onclick="fecharModal()">Fechar</button>
     </div>
+
+    <div id="bottom-image"></div>
+    <footer>
+      <div class="footer-content">
+        <p>Floresta Criativa &copy; 2026</p>
+      </div>
+    </footer>
+
+    <style>
+      .roleta-wrapper {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          gap: 40px;
+          flex-wrap: wrap;
+      }
+      .roleta-container {
+          position: relative;
+          width: 360px;
+          height: 360px;
+          flex-shrink: 0;
+      }
+      .roleta {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background-color: var(--color-border);
+          transform-origin: center;
+      }
+      .ponteiro {
+          position: absolute;
+          top: 50%;
+          left: 100%;
+          transform: translate(-50%, -50%) rotate(270deg);
+          width: 18px;
+          height: 36px;
+          background-color: var(--color-accent-dark);
+          clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+          z-index: 10;
+      }
+      .centro {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 64px;
+          height: 64px;
+          background-color: var(--color-surface);
+          border-radius: 50%;
+          z-index: 5;
+          border: 3px solid var(--color-accent);
+      }
+      .roleta-input-container {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          width: 260px;
+      }
+      .roleta-input-container textarea {
+          width: 100%;
+          height: 160px;
+          margin-bottom: 12px;
+          resize: vertical;
+          border-radius: 8px;
+          padding: 10px;
+          font-size: 0.95rem;
+          font-family: inherit;
+          background: var(--color-surface);
+          color: var(--color-text);
+          border: 1px solid var(--color-border);
+          box-sizing: border-box;
+      }
+      .modal {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--color-surface);
+          color: var(--color-text);
+          padding: 28px 32px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+          border-radius: 12px;
+          z-index: 1000;
+          text-align: center;
+          border: 1px solid var(--color-border);
+          min-width: 220px;
+      }
+      .modal p {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin: 0 0 16px;
+      }
+      .modal-overlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.45);
+          z-index: 999;
+      }
+      @media (max-width: 600px) {
+          .roleta-container { width: 280px; height: 280px; }
+          .roleta-input-container { width: 100%; }
+      }
+    </style>
 
     <script>
   const API_BASE = '/api';
+  let anguloAtual = 0;
 
-        let anguloAtual = 0;
-        let velocidadeInicial = 50;
-        let desaceleracao = 0.98;
+  document.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('roletaItens');
+      if (saved) {
+          document.getElementById('inputItens').value = saved;
+          atualizarRoleta();
+      }
+  });
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const savedItems = localStorage.getItem("roletaItens");
-            if (savedItems) {
-                document.getElementById("inputItens").value = savedItems;
-                atualizarRoleta();
-            }
-        });
+  function desenharRoleta(itens) {
+      const canvas = document.getElementById('roleta');
+      const ctx = canvas.getContext('2d');
+      const n = itens.length;
+      const ang = 2 * Math.PI / n;
+      const cores = ['#3a7d44','#5cb86a','#2a5c32','#7ec88a','#1e4a2a','#4a9a56','#93d49c','#265c30','#6ab87a','#1a3d22'];
 
-        function desenharRoleta(itens) {
-            const canvas = document.getElementById("roleta");
-            const ctx = canvas.getContext("2d");
-            const numItens = itens.length;
-            const angulo = 2 * Math.PI / numItens;
-            const cores = ["#f39c12", "#e74c3c", "#8e44ad", "#3498db", "#1abc9c", "#2ecc71", "#e67e22", "#d35400", "#c0392b", "#16a085", "#2980b9"];
+      canvas.width = canvas.parentElement.offsetWidth || 360;
+      canvas.height = canvas.parentElement.offsetWidth || 360;
+      const r = canvas.width / 2;
+      const cx = r, cy = r;
 
-            canvas.width = 400;
-            canvas.height = 400;
+      for (let i = 0; i < n; i++) {
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, r, i * ang, (i + 1) * ang);
+          ctx.fillStyle = cores[i % cores.length];
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
 
-            for (let i = 0; i < numItens; i++) {
-                ctx.beginPath();
-                ctx.moveTo(200, 200);
-                ctx.arc(200, 200, 200, i * angulo, (i + 1) * angulo);
-                ctx.fillStyle = cores[i % cores.length];
-                ctx.fill();
-                ctx.stroke();
-                ctx.fillStyle = "white";
-                ctx.textAlign = "center";
-                ctx.font = "16px Arial";
-                ctx.translate(200, 200);
-                ctx.rotate(i * angulo + angulo / 2);
-                ctx.fillText(itens[i], 120, 10);
-                ctx.rotate(- (i * angulo + angulo / 2));
-                ctx.translate(-200, -200);
-            }
-        }
+          ctx.save();
+          ctx.fillStyle = 'white';
+          ctx.textAlign = 'center';
+          ctx.font = \`bold \${Math.max(10, Math.min(14, r/n*1.5))}px Inter, Arial, sans-serif\`;
+          ctx.translate(cx, cy);
+          ctx.rotate(i * ang + ang / 2);
+          ctx.fillText(itens[i].length > 16 ? itens[i].substring(0,14)+'…' : itens[i], r * 0.6, 5);
+          ctx.restore();
+      }
+  }
 
-        function atualizarRoleta() {
-            const input = document.getElementById("inputItens").value;
-            localStorage.setItem("roletaItens", input);
-            const itens = input.split("\n").filter(item => item.trim() !== "");
-            desenharRoleta(itens);
-        }
+  function atualizarRoleta() {
+      const input = document.getElementById('inputItens').value;
+      localStorage.setItem('roletaItens', input);
+      const itens = input.split('\n').filter(i => i.trim());
+      if (itens.length > 0) desenharRoleta(itens);
+  }
 
-        function sortear() {
-            const input = document.getElementById("inputItens").value;
-            localStorage.setItem("roletaItens", input);
-            const itens = input.split("\n").filter(item => item.trim() !== "");
-            if (itens.length === 0) return;
-            desenharRoleta(itens);
-            let roleta = document.getElementById("roleta");
-            let velocidade = velocidadeInicial;
-            let intervalo = setInterval(() => {
-                velocidade *= desaceleracao;
-                anguloAtual += velocidade;
-                roleta.style.transform = `rotate(${anguloAtual}deg)`;
-                if (velocidade < 0.5) {
-                    clearInterval(intervalo);
-                    let indiceSorteado = Math.floor(((360 - (anguloAtual % 360)) / (360 / itens.length)) % itens.length);
-                    document.getElementById("resultadoTexto").innerText = `Item sorteado: ${itens[indiceSorteado]}`;
-                    document.querySelector(".modal-overlay").style.display = "block";
-                    document.getElementById("modalResultado").style.display = "block";
-                }
-            }, 30);
-        }
+  function sortear() {
+      const input = document.getElementById('inputItens').value;
+      localStorage.setItem('roletaItens', input);
+      const itens = input.split('\n').filter(i => i.trim());
+      if (!itens.length) return;
+      desenharRoleta(itens);
+      const canvas = document.getElementById('roleta');
+      let velocidade = 50;
+      const dec = 0.98;
+      const intervalo = setInterval(() => {
+          velocidade *= dec;
+          anguloAtual += velocidade;
+          canvas.style.transform = \`rotate(\${anguloAtual}deg)\`;
+          if (velocidade < 0.5) {
+              clearInterval(intervalo);
+              const idx = Math.floor(((360 - (anguloAtual % 360)) / (360 / itens.length)) % itens.length);
+              document.getElementById('resultadoTexto').textContent = \`🎉 \${itens[idx]}\`;
+              document.querySelector('.modal-overlay').style.display = 'block';
+              document.getElementById('modalResultado').style.display = 'block';
+          }
+      }, 30);
+  }
 
-        function fecharModal() {
-            document.querySelector(".modal-overlay").style.display = "none";
-            document.getElementById("modalResultado").style.display = "none";
-        }
+  function fecharModal() {
+      document.querySelector('.modal-overlay').style.display = 'none';
+      document.getElementById('modalResultado').style.display = 'none';
+  }
     </script>
-</body>
+    <script src="search.js"></script>
+  </body>
 </html>

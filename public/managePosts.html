@@ -19,7 +19,41 @@
       <h1>Floresta Criativa</h1>
       <p>Gerencie suas postagens aqui.</p>
     </header>
-
+    <div id="top-image"></div>
+    <nav>
+      <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
+      <div class="menu" id="menu">
+        <a href="index.html">Home</a>
+        <a href="verde-inspiracao.html">Verde Inspiração</a>
+        <a href="sapo-imaginario.html">Sapo Imaginário</a>
+        <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
+        <a href="login.html" id="loginButton">Login</a>
+        <a href="#" id="logoutButton">Sair</a>
+        <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+      </div>
+    </nav>
+    <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
+      <div class="search-overlay-box">
+        <button class="icon-btn search-close-btn" onclick="toggleSearch()" aria-label="Fechar">✕</button>
+        <form onsubmit="search(); return false;">
+          <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos...">
+          <button type="submit">Pesquisar</button>
+          <button type="button" onclick="toggleFilters()">Filtros</button>
+          <button type="button" onclick="clearSearch()">Limpar</button>
+        </form>
+        <div id="advancedFilters" style="display:none;">
+          <p>Categorias:</p>
+          <label><input type="checkbox" class="category" value="Escrita" name="category[]"> Escrita</label>
+          <label><input type="checkbox" class="category" value="Projetos" name="category[]"> Projetos</label>
+          <label><input type="checkbox" class="category" value="Animes" name="category[]"> Animes</label>
+          <label><input type="checkbox" class="category" value="Jogos" name="category[]"> Jogos</label>
+          <label><input type="checkbox" class="category" value="Slice of Life" name="category[]"> Slice of Life</label>
+          <input type="date" id="startDate" name="startDate">
+          <input type="date" id="endDate" name="endDate">
+        </div>
+        <div id="searchResults"></div>
+      </div>
+    </div>
     <!-- Modal de confirmação de exclusão -->
     <div id="deleteModal" class="modal-overlay" style="display:none;">
       <div class="modal-box">
@@ -196,10 +230,7 @@
 
     <footer>
       <div class="footer-content">
-        <p>Floresta Criativa © 2024–2026 Nay</p>
-        <div class="footer-links">
-          <a href="https://github.com/nayfts" target="_blank" rel="noopener">GitHub</a>
-        </div>
+        <p>Floresta Criativa &copy; 2026</p>
       </div>
     </footer>
     <script src="search.js"></script>

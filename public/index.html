@@ -6,7 +6,6 @@
     <title>Floresta Criativa</title>
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
-    <!--<link rel="stylesheet" href="dist/styles.css">!-->
     <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
@@ -25,7 +24,6 @@
       <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
       <div class="menu" id="menu">
         <a href="index.html">Home</a>
-        <a href="about.html">Sobre Mim</a>
         <a href="verde-inspiracao.html">Verde Inspiração</a>
         <a href="sapo-imaginario.html">Sapo Imaginário</a>
         <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
@@ -76,7 +74,6 @@
               const text    = (tmp.textContent || tmp.innerText || '').trim();
               const excerpt = text.length > 130 ? text.substring(0, 130) + '...' : text;
 
-              /* slide: só a imagem — fica dentro do carousel-clip (overflow:hidden) */
               const slide = document.createElement('div');
               slide.className = 'carousel-slide';
               slide.innerHTML = `<a href="${link}" aria-label="${post.title}">
@@ -84,7 +81,6 @@
               </a>`;
               track.appendChild(slide);
 
-              /* card de texto: fora do clip, aparece/desaparece via JS */
               const card = document.createElement('div');
               card.className = 'carousel-info-card' + (i === 0 ? ' active' : '');
               card.innerHTML = `<a href="${link}" class="carousel-card-body">
@@ -144,30 +140,86 @@
               });
       };
     </script>
+
     <div class="container" id="content">
       <section id="posts-recentes">
         <h2>Posts Recentes</h2>
         <div class="carousel-outer">
-          <!-- carousel-clip: overflow:hidden, altura = imagem 16:9 → setas top:50% ficam centradas -->
           <div class="carousel-clip" id="carouselWrap">
             <div class="carousel-track" id="carouselTrack"></div>
             <button class="carousel-arrow carousel-prev" id="carouselPrev" onclick="_go(_idx - 1)" aria-label="Post anterior">&#8592;</button>
             <button class="carousel-arrow carousel-next" id="carouselNext" onclick="_go(_idx + 1)" aria-label="Próximo post">&#8594;</button>
           </div>
-          <!-- texto fora do clip, sem interferência do overflow -->
           <div class="carousel-info" id="carouselInfo"></div>
           <div class="carousel-dots" id="carouselDots"></div>
         </div>
       </section>
     </div>
+
+    <section id="sobre" class="container">
+      <div class="about-profile">
+        <img src="imagens/profile-picture.jpeg" alt="Foto de Nay" class="about-avatar">
+        <div class="about-intro">
+          <h2>Olá, sou a Nay!</h2>
+          <p class="about-tagline">Escritora, curiosa e habitante da floresta.</p>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <h3>Sobre mim</h3>
+        <p>
+          Bem-vinda à Floresta Criativa! Este é o meu espaço pessoal na internet —
+          um lugar onde junto tudo que me move: escrita, projetos, referências e
+          devaneios do dia a dia.
+        </p>
+        <p>
+          Sou apaixonada por histórias, seja consumindo animes e jogos, seja criando
+          as minhas próprias. Também me aventuro pelo desenvolvimento web, onde
+          código e criatividade andam juntos.
+        </p>
+      </div>
+
+      <div class="about-section">
+        <h3>O que tem por aqui</h3>
+        <div class="about-sitemap">
+          <a href="verde-inspiracao.html" class="about-sitemap-item">
+            <span class="about-sitemap-icon">🌿</span>
+            <div>
+              <strong>Verde Inspiração</strong>
+              <p>Hobbies, animes, jogos e leituras que me inspiram.</p>
+            </div>
+          </a>
+          <a href="sapo-imaginario.html" class="about-sitemap-item">
+            <span class="about-sitemap-icon">🐸</span>
+            <div>
+              <strong>Sapo Imaginário</strong>
+              <p>Projetos e experimentos de programação.</p>
+            </div>
+          </a>
+          <a href="rascunhos-da-floresta.html" class="about-sitemap-item">
+            <span class="about-sitemap-icon">📝</span>
+            <div>
+              <strong>Rascunhos da Floresta</strong>
+              <p>Textos, crônicas e tudo que escrevo.</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <h3>Encontre-me por aí</h3>
+        <div class="about-links">
+          <a href="https://github.com/nayfts" target="_blank" rel="noopener" class="about-link-btn">
+            GitHub
+          </a>
+        </div>
+      </div>
+    </section>
+
     <div id="bottom-image"></div>
     <footer>
       <div class="footer-content">
-        <p>Floresta Criativa © 2024–2026 Nay</p>
-        <div class="footer-links">
-          <a href="https://github.com/nayfts" target="_blank" rel="noopener">GitHub</a>
-          <a href="/api/feed.xml" target="_blank">RSS</a>
-        </div>
+        <p>Floresta Criativa &copy; 2026</p>
       </div>
     </footer>
   </body>

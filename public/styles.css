@@ -4,23 +4,25 @@
 /* CSS VARIABLES */
 /* ===================== */
 :root {
-    --color-bg: #f3f7f0;
-    --color-text: #2f4f2f;
-    --color-accent: #4d774e;
-    --color-accent-dark: #365a3f;
+    --color-bg: #faf7f2;
+    --color-text: #1c2b1c;
+    --color-accent: #3a7d44;
+    --color-accent-dark: #2a5c32;
     --color-surface: #ffffff;
-    --color-surface-alt: #f8f8f8;
-    --color-border: #ddd;
-    --color-text-secondary: #333;
+    --color-surface-alt: #f4f0e8;
+    --color-border: #e0d9cf;
+    --color-text-secondary: #6b5f50;
 }
 
 [data-theme="dark"] {
-    --color-bg: #1a2b1a;
-    --color-text: #c8e0c8;
-    --color-surface: #1e301e;
-    --color-surface-alt: #243324;
-    --color-border: #3d5a3d;
-    --color-text-secondary: #9ab89a;
+    --color-bg: #131e13;
+    --color-text: #d0e8d0;
+    --color-accent: #5cb86a;
+    --color-accent-dark: #4a9a56;
+    --color-surface: #1a2a1a;
+    --color-surface-alt: #1f301f;
+    --color-border: #2d4a2d;
+    --color-text-secondary: #8aab8a;
 }
 
 /* ===================== */
@@ -32,6 +34,9 @@ body {
     color: var(--color-text);
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 h1, h2, h3, h4 {
@@ -245,6 +250,24 @@ a:hover {
     padding: 20px;
 }
 
+/* Mensagens de erro/sucesso — esconde quando vazias */
+#errorMessage:empty,
+#successMessage:empty {
+    display: none;
+}
+
+#errorMessage {
+    color: #c0392b;
+    font-size: 0.9em;
+    margin-top: 8px;
+}
+
+#successMessage {
+    color: var(--color-accent);
+    font-size: 0.9em;
+    margin-top: 8px;
+}
+
 /* Campo de formulário com erro */
 input.input-error, input.input-error:focus {
     border-color: #e74c3c !important;
@@ -327,33 +350,28 @@ input.input-error, input.input-error:focus {
 footer {
     background-color: var(--color-accent);
     color: white;
-    padding: 24px 20px;
+    padding: 18px 20px;
+    text-align: center;
+    margin-top: auto;
     width: 100%;
     box-sizing: border-box;
 }
 
+/* Quando #bottom-image existe, ele absorve o espaço e o footer fica colado abaixo */
+#bottom-image {
+    margin-top: auto;
+}
+#bottom-image + footer {
+    margin-top: 0;
+}
+
 .footer-content {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
+    font-size: 0.88em;
+    opacity: 0.92;
 }
 
-.footer-content p { margin: 0; font-size: 0.9em; }
+.footer-content p { margin: 0; }
 
-.footer-links { display: flex; gap: 20px; }
-
-.footer-links a {
-    color: rgba(255,255,255,0.85);
-    text-decoration: none;
-    font-size: 0.9em;
-    transition: color 0.2s;
-}
-
-.footer-links a:hover { color: white; text-decoration: underline; }
 
 /* Flexbox geral para seções */
 .section-container {
@@ -417,10 +435,11 @@ footer {
     width: 100%;
 }
 
-/* Clip: só as imagens — altura exata da imagem, overflow:hidden clipa o track */
+/* Clip: só as imagens — overflow:hidden clipa o track */
 .carousel-clip {
     position: relative;
     width: 100%;
+    max-height: 280px;
     overflow: hidden;
     background: var(--color-surface-alt);
     user-select: none;
@@ -730,6 +749,23 @@ footer {
 
 #postForm button[type="submit"]:hover {
     background-color: var(--color-accent-dark);
+}
+
+#draftBtn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: var(--color-surface-alt);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+#draftBtn:hover {
+    background-color: var(--color-border);
+    border-color: var(--color-text-secondary);
 }
 
 /* Estilo para as categorias */
@@ -1283,6 +1319,62 @@ section#rascunhos-da-floresta {
         padding: 22px 16px;
     }
     .about-section { padding: 18px 16px; }
+}
+
+/* Sitemap na home */
+#sobre {
+    margin-top: 40px;
+    margin-bottom: 8px;
+    padding-top: 0;
+}
+
+.about-sitemap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.about-sitemap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-text);
+    background: var(--color-bg);
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.about-sitemap-item:hover {
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+}
+
+.about-sitemap-item:hover strong {
+    color: var(--color-accent);
+}
+
+.about-sitemap-icon {
+    font-size: 1.4em;
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+
+.about-sitemap-item strong {
+    display: block;
+    font-size: 0.97em;
+    margin-bottom: 2px;
+    transition: color 0.2s;
+}
+
+.about-sitemap-item p {
+    margin: 0;
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
 }
 
 /* Conteúdo do post individual (post.html) */
