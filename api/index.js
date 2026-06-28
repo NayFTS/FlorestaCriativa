@@ -465,6 +465,38 @@ ${items}
     }
 });
 
+// Rota para carregar post no editor (sem incrementar views)
+app.get('/posts/:id/data', requireAuth, async (req, res) => {
+    try {
+        const id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'ID inválido' });
+        }
+        const post = await Post.findById(id);
+        if (!post) return res.status(404).json({ success: false, message: 'Post não encontrado' });
+        if (post.author && post.author.toString() !== req.session.userId.toString()) {
+            return res.status(403).json({ success: false, message: 'Sem permissão' });
+        }
+        res.json(post);
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Erro no servidor' });
+    }
+});
+
+// Tratamento de erros do Multer
+app.use((err, req, res, next) => {
+    if (err && err.name === 'MulterError') {
+        const msg = err.code === 'LIMIT_FILE_SIZE'
+            ? 'Imagem muito grande. O limite é 2 MB.'
+            : `Erro no upload: ${err.message}`;
+        return res.status(400).json({ success: false, message: msg });
+    }
+    if (err && err.message && err.message.includes('imagem')) {
+        return res.status(400).json({ success: false, message: err.message });
+    }
+    next(err);
+});
+
 // Servir arquivos estáticos
 app.use(express.static('public'));
 

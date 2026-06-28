@@ -17,7 +17,7 @@
     </header>
     <div id="top-image"></div>
 
-    <form id="editPostForm" enctype="multipart/form-data">
+    <form id="editPostForm" method="post" enctype="multipart/form-data">
       <label for="title">Título:</label>
       <input type="text" id="title" name="title" required><br><br>
 
@@ -32,8 +32,7 @@
 
       <label for="url">Página de destino:</label>
       <select id="url" name="url" required>
-        <option label="escolha uma das opções"></option>
-        <option value="about.html">Sobre Mim</option>
+        <option value="">escolha uma das opções</option>
         <option value="verde-inspiracao.html">Hobbies, animes, jogos e leituras</option>
         <option value="sapo-imaginario.html">portfolio e projetos</option>
         <option value="rascunhos-da-floresta.html">eu que escrevi</option>
@@ -68,8 +67,6 @@
     <p id="errorMessage"></p>
 
     <script>
-  const API_BASE = location.hostname === 'localhost' ? '' : '/api';
-
   let editorInstance;
   const postId = (new URLSearchParams(window.location.search).get('id') || '').trim();
 
@@ -79,14 +76,15 @@
   }
 
   function fetchPost() {
-      fetch(`${API_BASE}/post/${postId}`)
+      fetch(`${API_BASE}/posts/${postId}/data`, { credentials: 'include' })
           .then(response => {
               if (!response.ok) throw new Error('Post não encontrado');
               return response.json();
           })
           .then(data => {
-              document.getElementById('title').value = data.title;
-              document.getElementById('url').value = data.url;
+              document.getElementById('title').value = data.title || '';
+              const urlSelect = document.getElementById('url');
+              if (data.url) urlSelect.value = data.url;
 
               ClassicEditor
                   .create(document.querySelector('#editor'), {
@@ -102,9 +100,14 @@
                   })
                   .then(editor => {
                       editorInstance = editor;
-                      editorInstance.setData(data.content);
+                      editorInstance.setData(data.content || '');
                   })
-                  .catch(error => console.error('Erro ao inicializar o CKEditor:', error));
+                  .catch(error => {
+                      console.error('Erro ao inicializar o CKEditor:', error);
+                      document.getElementById('editor').style.display = 'block';
+                      document.getElementById('editor').value = data.content || '';
+                      editorInstance = { getData: () => document.getElementById('editor').value };
+                  });
 
               if (data.image_path) {
                   const previewImage = document.getElementById('previewImage');
@@ -142,12 +145,16 @@
   document.getElementById('editPostForm').addEventListener('submit', function(event) {
       event.preventDefault();
 
+      if (!editorInstance) {
+          document.getElementById('errorMessage').textContent = 'O editor ainda está carregando. Aguarde um momento e tente novamente.';
+          return;
+      }
+
       document.getElementById('content').value = editorInstance.getData();
       const formData = new FormData(this);
       const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
           .map(checkbox => checkbox.value);
       formData.append('categories', JSON.stringify(selectedCategories));
-      formData.append('postId', postId);
 
       const btn = document.querySelector('#editPostForm button[type="submit"]');
       const errorMsg = document.getElementById('errorMessage');
@@ -160,7 +167,16 @@
           body: formData,
           credentials: 'include'
       })
-      .then(response => response.json())
+      .then(response => {
+          if (!response.ok) {
+              return response.text().then(text => {
+                  let msg = text;
+                  try { msg = JSON.parse(text).message || text; } catch (_) {}
+                  throw new Error(`HTTP ${response.status}: ${msg}`);
+              });
+          }
+          return response.json();
+      })
       .then(data => {
           if (data.success) {
               window.location.href = 'managePosts.html';
@@ -172,14 +188,14 @@
       })
       .catch(error => {
           console.error('Erro ao enviar as alterações:', error);
-          errorMsg.textContent = 'Erro de rede. Tente novamente.';
+          errorMsg.textContent = error.message || 'Erro de rede. Tente novamente.';
           btn.disabled = false;
           btn.textContent = 'Salvar Alterações';
       });
   });
 
   window.onload = function() {
-      fetch(`${API_BASE}/user-info`)
+      fetch(`${API_BASE}/user-info`, { credentials: 'include' })
           .then(response => {
               if (!response.ok) {
                   alert('Você precisa estar logada para editar um post.');

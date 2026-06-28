@@ -34,7 +34,10 @@
     }
 })();
 
-const API_BASE = location.hostname === 'localhost' ? '' : '/api';
+if (typeof API_BASE === 'undefined') {
+    // eslint-disable-next-line no-var
+    var API_BASE = location.hostname === 'localhost' ? '' : '/api';
+}
 
 function toggleMenu() {
     const menu = document.getElementById('menu');
