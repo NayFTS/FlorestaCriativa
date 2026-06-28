@@ -78,6 +78,7 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     views: { type: Number, default: 0 },
     status: { type: String, enum: ['published', 'draft'], default: 'published' },
     external_link: { type: String, default: '' },
+    preview_link: { type: String, default: '' },
     technologies: [String]
 }));
 
@@ -214,7 +215,7 @@ app.get('/logout', (req, res) => {
 
 app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        const { title, content, url, status, external_link } = req.body;
+        const { title, content, url, status, external_link, preview_link } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         let technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
         const image_path = req.file ? await uploadToCloudinary(req.file.buffer) : null;
@@ -225,6 +226,7 @@ app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
             author: req.session.userId,
             slug,
             external_link: external_link || '',
+            preview_link: preview_link || '',
             status: status === 'draft' ? 'draft' : 'published'
         });
 
@@ -245,7 +247,7 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
             return res.status(400).json({ success: false, message: 'ID de post inválido' });
         }
 
-        const { title, content, url, external_link } = req.body;
+        const { title, content, url, external_link, preview_link } = req.body;
         const categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         const technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
         const post = await Post.findById(postId);
@@ -265,6 +267,7 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
         post.categories = categories;
         post.technologies = technologies;
         post.external_link = external_link || '';
+        post.preview_link = preview_link || '';
 
         if (req.file) {
             post.image_path = await uploadToCloudinary(req.file.buffer);

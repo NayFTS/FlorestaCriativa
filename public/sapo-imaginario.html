@@ -108,6 +108,7 @@
           const excerpt = text.length > 115 ? text.substring(0, 115) + '...' : text;
           const techs = (post.technologies || []);
           const extLink = post.external_link || '';
+          const previewLink = post.preview_link || '';
 
           const card = document.createElement('article');
           card.className = 'project-card';
@@ -137,7 +138,7 @@
               </div>`;
 
           card.querySelector('.btn-preview').addEventListener('click', () => {
-              openPreview(post._id, extLink, post.title);
+              openPreview(post._id, previewLink, post.title);
           });
 
           return card;

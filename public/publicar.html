@@ -40,8 +40,10 @@
       </select>
 
       <div id="projectFields" style="display:none">
-        <label for="external_link">Link do Projeto <span style="font-weight:400;font-size:0.9em">(opcional)</span></label>
+        <label for="external_link">Link do Repositório <span style="font-weight:400;font-size:0.9em">(opcional — GitHub, etc.)</span></label>
         <input type="url" id="external_link" name="external_link" placeholder="https://github.com/...">
+        <label for="preview_link" style="margin-top:12px">Link do Preview <span style="font-weight:400;font-size:0.9em">(opcional — site ao vivo)</span></label>
+        <input type="url" id="preview_link" name="preview_link" placeholder="https://meu-projeto.vercel.app">
         <label style="margin-top:12px">Tecnologias <span style="font-weight:400;font-size:0.9em">(opcional — Enter ou vírgula para adicionar)</span></label>
         <input type="text" id="techInput" class="tech-input" placeholder="ex: Node.js, React...">
         <div id="techTagsList" class="tech-tags-editable"></div>
