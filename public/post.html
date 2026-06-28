@@ -353,6 +353,7 @@ function fetchPost() {
                 const techHtml = techs.length
                     ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>`
                     : '';
+                const previewLink = data.preview_link || '';
                 const externalLinkHtml = data.external_link
                     ? `<a class="sapo-external-link" href="${data.external_link}" target="_blank" rel="noopener">Ver Projeto ↗</a>`
                     : '';
@@ -360,18 +361,17 @@ function fetchPost() {
                     <div class="sapo-post-header">
                         <h2>${data.title}</h2>
                         ${techHtml}
-                        ${externalLinkHtml}
+                        <div class="project-card-actions">
+                            <button id="previewBtn" class="btn-preview">◈ Preview</button>
+                            ${externalLinkHtml}
+                        </div>
                     </div>
                     ${imageHTML}
                     <div class="content-body">${data.content}</div>
                     <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                     <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
-                    <div class="post-actions">
-                        <button id="previewBtn" class="btn-preview">◈ Preview</button>
-                        <button id="shareBtn" class="share-btn">↗ Compartilhar</button>
-                    </div>
+                    <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
                 `;
-                const previewLink = data.preview_link || '';
                 document.getElementById('previewBtn').addEventListener('click', () => {
                     openPreview(data._id, previewLink, data.title);
                 });
