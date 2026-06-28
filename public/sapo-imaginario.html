@@ -14,16 +14,14 @@
   <body>
     <header>
       <a href="index.html">
-      <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
+        <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
       </a>
       <h1>Sapo Imaginário</h1>
       <p>Veja um pouco do meu portfólio e projetos que estou participando!</p>
     </header>
     <div id="top-image"></div>
-    <!-- Isso substitui a tag img -->
     <nav>
       <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-      <!-- Ícone de hambúrguer -->
       <div class="menu" id="menu">
         <a href="index.html">Home</a>
         <a href="about.html">Sobre Mim</a>
@@ -56,15 +54,145 @@
         <div id="searchResults"></div>
       </div>
     </div>
-    <section id="sapo-imaginario">
-      <div id="post-list"></div>
+
+    <section id="sapo-imaginario" style="padding: 0 16px;">
+      <div id="project-grid" class="project-grid"></div>
     </section>
+
+    <!-- Preview Drawer -->
+    <div id="previewOverlay" class="preview-overlay" onclick="closePreview()"></div>
+    <div id="previewDrawer" class="preview-drawer" role="dialog" aria-modal="true">
+      <div class="preview-drawer-header">
+        <span id="previewTitle" class="preview-drawer-title"></span>
+        <div class="preview-drawer-controls">
+          <a id="previewNewTab" href="#" target="_blank" rel="noopener" class="btn-newtab" style="display:none">↗ Abrir em nova aba</a>
+          <button class="icon-btn" onclick="closePreview()" aria-label="Fechar preview">✕</button>
+        </div>
+      </div>
+      <div class="preview-drawer-body">
+        <iframe id="previewIframe" src="" title="Preview do projeto" style="display:none; width:100%; height:100%; border:none;"></iframe>
+        <div id="previewContent" class="preview-post-content" style="display:none"></div>
+      </div>
+    </div>
+
     <script src="search.js"></script>
     <script>
-      window.onload = () => loadPosts('sapo-imaginario.html', 'post-list');
+      function loadProjects() {
+          const grid = document.getElementById('project-grid');
+          grid.innerHTML = '<p class="post-loading" style="grid-column:1/-1">Carregando projetos...</p>';
+
+          fetch(`${API_BASE}/posts?url=${encodeURIComponent('sapo-imaginario.html')}&limit=50`)
+              .then(r => r.json())
+              .then(data => {
+                  const posts = (data.posts || []);
+                  grid.innerHTML = '';
+                  if (!posts.length) {
+                      grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:32px 0; color:var(--color-text-secondary)">Nenhum projeto ainda. Em breve!</p>';
+                      return;
+                  }
+                  posts.forEach(post => grid.appendChild(buildCard(post)));
+              })
+              .catch(() => {
+                  grid.innerHTML = '<p class="post-error" style="grid-column:1/-1">Erro ao carregar projetos. Tente novamente.</p>';
+              });
+      }
+
+      function buildCard(post) {
+          const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
+          const imgSrc = post.image_path
+              ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
+              : null;
+          const tmp = document.createElement('div');
+          tmp.innerHTML = post.content || '';
+          const text = (tmp.textContent || '').trim();
+          const excerpt = text.length > 115 ? text.substring(0, 115) + '...' : text;
+          const techs = (post.technologies || []);
+          const extLink = post.external_link || '';
+
+          const card = document.createElement('article');
+          card.className = 'project-card';
+
+          const imgHtml = imgSrc
+              ? `<a href="${link}"><img src="${imgSrc}" alt="${post.title}" loading="lazy"></a>`
+              : '<div class="project-card-img-placeholder">🌿</div>';
+
+          const techHtml = techs.length
+              ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>`
+              : '';
+
+          const verHtml = extLink
+              ? `<a href="${extLink}" target="_blank" rel="noopener" class="btn-ver-projeto">Ver Projeto ↗</a>`
+              : '';
+
+          card.innerHTML = `
+              <div class="project-card-img">${imgHtml}</div>
+              <div class="project-card-body">
+                  <h3><a href="${link}">${post.title}</a></h3>
+                  <p>${excerpt}</p>
+                  ${techHtml}
+                  <div class="project-card-actions">
+                      <button class="btn-preview">◈ Preview</button>
+                      ${verHtml}
+                  </div>
+              </div>`;
+
+          card.querySelector('.btn-preview').addEventListener('click', () => {
+              openPreview(post._id, extLink, post.title);
+          });
+
+          return card;
+      }
+
+      function openPreview(postId, externalLink, title) {
+          const drawer   = document.getElementById('previewDrawer');
+          const overlay  = document.getElementById('previewOverlay');
+          const titleEl  = document.getElementById('previewTitle');
+          const newTabBtn = document.getElementById('previewNewTab');
+          const iframe   = document.getElementById('previewIframe');
+          const content  = document.getElementById('previewContent');
+
+          titleEl.textContent = title;
+          iframe.style.display = 'none';
+          content.style.display = 'none';
+          iframe.src = '';
+          content.innerHTML = '';
+
+          if (externalLink) {
+              iframe.src = externalLink;
+              iframe.style.display = 'block';
+              newTabBtn.href = externalLink;
+              newTabBtn.style.display = 'inline-flex';
+          } else {
+              content.style.display = 'block';
+              content.innerHTML = '<p class="post-loading">Carregando...</p>';
+              newTabBtn.style.display = 'none';
+              fetch(`${API_BASE}/post/${postId}`)
+                  .then(r => r.json())
+                  .then(p => { content.innerHTML = `<div class="content-body">${p.content}</div>`; })
+                  .catch(() => { content.innerHTML = '<p>Erro ao carregar conteúdo.</p>'; });
+          }
+
+          overlay.classList.add('open');
+          drawer.classList.add('open');
+          document.body.style.overflow = 'hidden';
+      }
+
+      function closePreview() {
+          const drawer  = document.getElementById('previewDrawer');
+          const overlay = document.getElementById('previewOverlay');
+          const iframe  = document.getElementById('previewIframe');
+          drawer.classList.remove('open');
+          overlay.classList.remove('open');
+          document.body.style.overflow = '';
+          setTimeout(() => { iframe.src = ''; }, 350);
+      }
+
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+
+      window.onload = loadProjects;
     </script>
+
     <div id="bottom-image"></div>
-    <!-- Isso substitui a tag img -->
     <footer>
       <div class="footer-content">
         <p>Floresta Criativa © 2024–2026 Nay</p>

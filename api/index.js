@@ -76,7 +76,9 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     slug: { type: String, sparse: true },
     views: { type: Number, default: 0 },
-    status: { type: String, enum: ['published', 'draft'], default: 'published' }
+    status: { type: String, enum: ['published', 'draft'], default: 'published' },
+    external_link: { type: String, default: '' },
+    technologies: [String]
 }));
 
 function slugify(text) {
@@ -212,15 +214,17 @@ app.get('/logout', (req, res) => {
 
 app.post('/addPost', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        const { title, content, url, status } = req.body;
+        const { title, content, url, status, external_link } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
+        let technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
         const image_path = req.file ? await uploadToCloudinary(req.file.buffer) : null;
         const slug = await uniqueSlug(title);
 
         const newPost = new Post({
-            title, content, url, image_path, categories,
+            title, content, url, image_path, categories, technologies,
             author: req.session.userId,
             slug,
+            external_link: external_link || '',
             status: status === 'draft' ? 'draft' : 'published'
         });
 
@@ -241,15 +245,16 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
             return res.status(400).json({ success: false, message: 'ID de post inválido' });
         }
 
-        const { title, content, url } = req.body;
+        const { title, content, url, external_link } = req.body;
         const categories = req.body.categories ? JSON.parse(req.body.categories) : [];
+        const technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
         const post = await Post.findById(postId);
 
         if (!post) {
             return res.status(404).json({ success: false, message: 'Post não encontrado' });
         }
 
-        if (post.author.toString() !== req.session.userId.toString()) {
+        if (post.author && post.author.toString() !== req.session.userId.toString()) {
             return res.status(403).json({ success: false, message: 'Sem permissão para editar este post' });
         }
 
@@ -258,6 +263,8 @@ app.post('/editPost/:id', requireAuth, upload.single('image'), async (req, res) 
         post.content = content;
         post.url = url;
         post.categories = categories;
+        post.technologies = technologies;
+        post.external_link = external_link || '';
 
         if (req.file) {
             post.image_path = await uploadToCloudinary(req.file.buffer);

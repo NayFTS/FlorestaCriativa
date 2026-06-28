@@ -36,7 +36,17 @@
         <option value="verde-inspiracao.html">Hobbies, animes, jogos e leituras</option>
         <option value="sapo-imaginario.html">portfolio e projetos</option>
         <option value="rascunhos-da-floresta.html">eu que escrevi</option>
-      </select><br><br>
+      </select>
+
+      <div id="projectFields" style="display:none">
+        <label for="external_link">Link do Projeto <span style="font-weight:400;font-size:0.9em">(opcional)</span></label>
+        <input type="url" id="external_link" name="external_link" placeholder="https://github.com/...">
+        <label style="margin-top:12px">Tecnologias <span style="font-weight:400;font-size:0.9em">(opcional — Enter ou vírgula para adicionar)</span></label>
+        <input type="text" id="techInput" class="tech-input" placeholder="ex: Node.js, React...">
+        <div id="techTagsList" class="tech-tags-editable"></div>
+        <input type="hidden" id="technologiesData" name="technologies" value="[]">
+      </div>
+      <br>
 
       <fieldset>
         <legend>Categorias:</legend>
@@ -69,6 +79,39 @@
     <script>
   let editorInstance;
   const postId = (new URLSearchParams(window.location.search).get('id') || '').trim();
+
+  // Project fields toggle
+  document.getElementById('url').addEventListener('change', function() {
+      document.getElementById('projectFields').style.display =
+          this.value === 'sapo-imaginario.html' ? 'block' : 'none';
+  });
+
+  // Tech tag input
+  let techList = [];
+
+  document.getElementById('techInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          const val = this.value.trim();
+          if (val && !techList.includes(val)) {
+              techList.push(val);
+              renderTechTags();
+          }
+          this.value = '';
+      }
+  });
+
+  function removeTech(i) {
+      techList.splice(i, 1);
+      renderTechTags();
+  }
+
+  function renderTechTags() {
+      document.getElementById('technologiesData').value = JSON.stringify(techList);
+      document.getElementById('techTagsList').innerHTML = techList.map((t, idx) =>
+          `<span class="tech-tag">${t}<button type="button" class="tech-tag-remove" onclick="removeTech(${idx})" aria-label="Remover">×</button></span>`
+      ).join('');
+  }
 
   if (!postId || postId === 'null' || postId === 'undefined' || postId.length !== 24) {
       alert('ID de post inválido.');
@@ -121,6 +164,16 @@
                       if (checkbox) checkbox.checked = true;
                   });
               }
+
+              // Project fields
+              if (data.url === 'sapo-imaginario.html') {
+                  document.getElementById('projectFields').style.display = 'block';
+                  if (data.external_link) document.getElementById('external_link').value = data.external_link;
+                  if (data.technologies && data.technologies.length) {
+                      techList = [...data.technologies];
+                      renderTechTags();
+                  }
+              }
           })
           .catch(error => {
               console.error('Erro ao carregar o post:', error);
@@ -155,6 +208,7 @@
       const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
           .map(checkbox => checkbox.value);
       formData.append('categories', JSON.stringify(selectedCategories));
+      formData.set('technologies', JSON.stringify(techList));
 
       const btn = document.querySelector('#editPostForm button[type="submit"]');
       const errorMsg = document.getElementById('errorMessage');
