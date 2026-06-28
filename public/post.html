@@ -99,18 +99,44 @@ function fetchPost() {
             });
             const resolveImg = (p) => p.startsWith('http') ? p : `/imagens/uploads/${p}`;
             const imageHTML = data.image_path
-                ? `<img src="${resolveImg(data.image_path)}" alt="${data.title}" style="max-width:100%;height:auto;border-radius:10px;margin-bottom:20px;">`
+                ? `<img src="${resolveImg(data.image_path)}" alt="${data.title}" style="max-width:100%;height:auto;border-radius:10px;margin-bottom:24px;">`
                 : '';
             const categoriesHTML = data.categories && data.categories.length > 0
                 ? data.categories.join(', ') : 'Sem categoria';
 
-            postContainer.innerHTML = `
-                <h2>${data.title}</h2>
-                ${imageHTML}
-                <div class="content-body">${data.content}</div>
-                <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0}</p>
-                <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
-            `;
+            const isSapo = data.url === 'sapo-imaginario.html';
+
+            if (isSapo) {
+                postContainer.classList.add('sapo-post');
+
+                const techs = Array.isArray(data.technologies) ? data.technologies : [];
+                const techHtml = techs.length
+                    ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>`
+                    : '';
+                const externalLinkHtml = data.external_link
+                    ? `<a class="sapo-external-link" href="${data.external_link}" target="_blank" rel="noopener">Ver Projeto ↗</a>`
+                    : '';
+
+                postContainer.innerHTML = `
+                    <div class="sapo-post-header">
+                        <h2>${data.title}</h2>
+                        ${techHtml}
+                        ${externalLinkHtml}
+                    </div>
+                    ${imageHTML}
+                    <div class="content-body">${data.content}</div>
+                    <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0}</p>
+                    <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
+                `;
+            } else {
+                postContainer.innerHTML = `
+                    <h2>${data.title}</h2>
+                    ${imageHTML}
+                    <div class="content-body">${data.content}</div>
+                    <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0}</p>
+                    <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
+                `;
+            }
         })
         .catch(error => {
             console.error('Erro ao buscar post:', error);
