@@ -1,113 +1,86 @@
 # Roadmap — Floresta Criativa
 
-Organizado por prioridade. Correções antes de novas funcionalidades.
+---
+
+## Concluído
+
+| Fase | Descrição |
+|------|-----------|
+| 1 | Correções críticas de segurança e estrutura |
+| 2 | Bugs visuais e de UX |
+| 3 | Qualidade de código (search.js, remoção do Tailwind, centralização de auth) |
+| 4 | UX: paginação, preview de imagem, CKEditor completo, loading states |
+| 5 | Rascunhos, slugs, views, meta OG, RSS, modo escuro |
+| 6 | Cloudinary, remoção do registro público, rate limiting, roteamento Vercel |
+| 9 | Tempo de leitura, posts relacionados, botão compartilhar |
+| 10 | Sapo Imaginário: grid de projetos, preview drawer, tech badges, campos externos |
+| 11 | Layout diferenciado no post.html para posts do Sapo Imaginário |
+| 12 | Galeria de imagens: upload múltiplo, grid clicável, lightbox com teclado |
+| 13 | Sistema de comentários com moderação e rate limiting |
+| — | Redesign completo: nova paleta, sticky footer, navbar padronizada em todas as páginas, about me integrado na home, roleta integrada ao design |
 
 ---
 
-## Fase 1 — Correções Críticas ✅
+## Próximas Fases
 
-- [x] Verificação de autoria no DELETE e POST `/editPost/:id`
-- [x] `.env` removido do histórico git e adicionado ao `.gitignore`
-- [x] Apagar arquivos legados com credenciais (`index_backup.js`, scripts provisórios)
-- [x] Apagar pasta `FlorestaCriativa/` duplicada na raiz
-
----
-
-## Fase 2 — Bugs Visuais e de UX ✅
-
-- [x] Carrossel: centralizar posts quando há menos de 3
-- [x] Remover linha de borda abaixo do nav
-- [x] Alinhar título e conteúdo dentro de `post.html`
-- [x] Adicionar separador visual entre posts
-- [x] Botão de limpar busca em todas as páginas com busca
+### Fase 14 — Tipografia
+- [ ] Importar Google Fonts: `Lora` para títulos e `Inter` para corpo de texto
+- [ ] Ajustar tamanhos e line-height no CSS para leitura mais agradável
+- [ ] Aplicar em todo o site (incluindo cards de post e overlay de busca)
 
 ---
 
-## Fase 3 — Qualidade de Código ✅
-
-- [x] Eliminar código de busca duplicado → extraído para `search.js`
-- [x] Remover Tailwind CSS (não estava sendo usado)
-- [x] Centralizar verificação de autenticação com `requireAuth`
-
----
-
-## Fase 4 — Melhorias de UX ✅
-
-- [x] Toolbar completo no CKEditor
-- [x] Preview de imagem antes do upload
-- [x] Paginação com "Carregar mais" nas seções
-- [x] Feedback de loading e erro amigável
-- [x] Melhorar mobile: header e nav
+### Fase 15 — UX Pendente
+- [ ] **Paginação no managePosts** — hoje carrega todos os posts de uma vez; adicionar paginação de 20 em 20
+- [ ] **Modal de confirmação no delete** — substituir o `confirm()` nativo por modal customizado com o design do site
+- [ ] **Feedback visual no login** — destacar campos com borda e ícone de erro quando a autenticação falhar
+- [ ] **Carrossel sem posts** — quando não há posts publicados, exibir um card de placeholder amigável
 
 ---
 
-## Fase 5 — Novas Funcionalidades ✅
-
-- [x] Sistema de rascunhos
-- [x] Slug amigável na URL
-- [x] Contagem de visualizações
-- [x] Meta tags OG para SEO
-- [x] Feed RSS
-- [x] Modo escuro com tema florestal noturno
+### Fase 16 — Categorias Navegáveis
+- [ ] Clicar em uma categoria (no card ou no post) redireciona para uma listagem filtrada
+- [ ] URL amigável: `verde-inspiracao.html?categoria=Animes`
+- [ ] Breadcrumb "Categoria: Animes" no topo da listagem filtrada
 
 ---
 
-## Fase 6 — Infraestrutura e Segurança
-
-- [x] **Migrar uploads para Cloudinary** — imagens não somem mais a cada redeploy
-- [x] **Remover registro público** — `POST /register` retorna 403; cadastro via `create-user.js` local
-- [x] **Corrigir roteamento da API no Vercel** — middleware que remove prefixo `/api` antes do Express rotear; `module.exports = app` adicionado
-- [ ] **Rate limiting nas rotas de auth** — `express-rate-limit` com janela de 15 min / 10 tentativas por IP nas rotas `/login`, `/reset-password`
-
----
-
-## Fase 7 — Correções de UX Pendentes
-
-- [ ] **Feedback visual no login** — destacar campos com borda vermelha quando login falhar
-- [ ] **Paginação no managePosts** — carregar posts em lotes, não todos de uma vez
-- [ ] **Modal de confirmação antes de excluir** — substituir `confirm()` nativo por modal customizado
-- [ ] **Carrossel responsivo** — ajustar comportamento em telas muito pequenas (≤360px)
+### Fase 17 — Performance e SEO
+- [ ] `sitemap.xml` gerado dinamicamente pela API
+- [ ] `robots.txt` na raiz
+- [ ] Lazy loading no carrossel já existe — revisar outras imagens do site
+- [ ] Minificação de `styles.css` e `search.js` no build (ou via Vercel)
+- [ ] Score Lighthouse: atingir 90+ em Performance e SEO
 
 ---
 
-## Fase 8 — Design Refresh
-
-A identidade visual atual funciona mas parece genérica. Objetivo: tornar o site mais pessoal, editorial e coeso.
-
-- [ ] **Tipografia** — trocar Arial por fontes do Google Fonts (sugestão: `Lora` para títulos, `Inter` para texto)
-- [ ] **Cards de post redesenhados** — imagem em destaque, data e categoria visíveis, sombra sutil no hover
-- [ ] **Header reimaginado** — fundo com textura ou gradiente, título e subtítulo com mais presença
-- [ ] **Nav mais limpo** — remover a barra de busca do nav; busca abre como overlay ao clicar em ícone
-- [ ] **Footer com conteúdo** — links de redes sociais, RSS, e frase pessoal
-- [ ] **Página de post mais editorial** — largura máxima de leitura (65ch), tipografia maior, pull quotes estilizados
+### Fase 18 — Dashboard Aprimorado
+- [ ] Gráfico de visualizações por post (últimos 30 dias)
+- [ ] Contagem de comentários pendentes visível na entrada do dashboard
+- [ ] Exportar posts como JSON (backup simples)
+- [ ] Botão "Duplicar post" para reaproveitar estrutura
 
 ---
 
-## Fase 9 — Novas Funcionalidades
-
-Features que expandem o que o site faz.
-
-- [ ] **Página "Sobre Mim" estática** — conteúdo fixo com apresentação, foto, redes sociais e habilidades (hoje a página só carrega posts com url='about.html')
-- [ ] **Tempo estimado de leitura** — calcular e exibir "~N min de leitura" no topo de cada post e nos cards
-- [ ] **Posts relacionados** — ao final de cada post, exibir 2–3 posts da mesma categoria
-- [ ] **Botão de compartilhar** — copiar link e compartilhar no post individual
-- [ ] **Integrar a Roleta ao site** — adicionar link no nav, aplicar o design do site (`styles.css`), salvar itens por URL (não só localStorage)
-- [ ] **Pesquisa global** — disponibilizar a busca também na home (hoje só funciona nas páginas de seção)
+### Fase 19 — Acessibilidade
+- [ ] Atributos `aria-label` e `role` em todos os elementos interativos
+- [ ] Navegação completa por teclado (foco visível, trap de foco no modal de busca)
+- [ ] Contraste mínimo WCAG AA verificado nas duas paletas (claro e escuro)
+- [ ] `alt` descritivo em todas as imagens de post (hoje usa o título)
 
 ---
 
-## Fase 10 — Portfólio (Sapo Imaginário)
-
-O Sapo Imaginário é a seção de projetos, mas hoje exibe posts como lista genérica. Merece um layout próprio.
-
-- [ ] **Layout de cards de projeto** — grade visual com imagem, título, tecnologias usadas e link
-- [ ] **Campo "link externo" no post** — para projetos que vivem em outro lugar (GitHub, itch.io, etc.)
-- [ ] **Filtro por tecnologia/tipo** — filtrar projetos por tag (web, jogo, arte, etc.)
+### Fase 20 — Mobile e PWA
+- [ ] Menu hambúrguer com animação de transição suave
+- [ ] Swipe no carrossel da home (já tem toque, mas refinar a sensibilidade)
+- [ ] `manifest.json` e ícones para adicionar à tela inicial
+- [ ] Service worker para cache básico offline
 
 ---
 
 ## Notas
 
-- Bugs novos encontrados em produção entram na Fase 6 ou 7 dependendo da gravidade.
-- Fase 8 (design) pode ser feita em paralelo com qualquer outra fase — é independente.
-- A Fase 10 depende de mudanças no modelo de dados do Post (campo `external_link`).
+- Fases 14 e 15 são as mais prioritárias — impacto imediato na experiência.
+- Fase 16 (categorias) requer mudança no `search.js` e no backend — planejada mas não urgente.
+- Fase 20 (PWA) é opcional; só faz sentido se o uso mobile justificar o esforço.
+- Bugs encontrados em produção entram na Fase 15 ou ganham hotfix imediato dependendo da gravidade.

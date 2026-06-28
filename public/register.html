@@ -106,19 +106,24 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, email, password })
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.errors) {
-            // Exibir múltiplos erros se houver
-            errorMessageElement.innerHTML = data.errors.map(err => `<p>${err.msg}</p>`).join('');
-          } else {
-            alert('Registro bem-sucedido! Redirecionando para a tela de login...');
-            window.location.href = '/login';
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(data => { throw data; });
           }
+          return response.json();
+        })
+        .then(() => {
+          alert('Registro bem-sucedido! Redirecionando para a tela de login...');
+          window.location.href = '/login.html';
         })
         .catch(error => {
-          console.error('Erro no registro:', error);
-          errorMessageElement.innerHTML = 'Ocorreu um erro inesperado. Tente novamente.';
+          if (error.errors) {
+            errorMessageElement.innerHTML = error.errors.map(err => `<p>${err.msg}</p>`).join('');
+          } else if (error.message) {
+            errorMessageElement.innerHTML = `<p>${error.message}</p>`;
+          } else {
+            errorMessageElement.innerHTML = 'Ocorreu um erro inesperado. Tente novamente.';
+          }
         });
       });
     </script>

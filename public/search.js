@@ -83,13 +83,16 @@ function search() {
     const searchURL = `${API_BASE}/search?q=${encodeURIComponent(query)}&category=${selectedCategories.join(',')}&startDate=${startDate}&endDate=${endDate}`;
 
     fetch(searchURL)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Erro na busca');
+            return response.json();
+        })
         .then(data => {
             const resultContainer = document.getElementById('searchResults');
             resultContainer.innerHTML = '';
             resultContainer.style.display = 'block';
 
-            if (data.length === 0) {
+            if (!data.length) {
                 resultContainer.innerHTML = '<p>Nenhum resultado encontrado.</p>';
                 return;
             }
@@ -98,18 +101,28 @@ function search() {
                 const resultItem = document.createElement('div');
                 resultItem.className = 'search-result';
 
+                const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
                 const titleElement = document.createElement('h3');
-                titleElement.innerHTML = `<a href="post.html?id=${post._id}">${post.title}</a>`;
+                const a = document.createElement('a');
+                a.href = link;
+                a.textContent = post.title;
+                titleElement.appendChild(a);
                 resultItem.appendChild(titleElement);
 
                 if (post.categories && post.categories.length > 0) {
                     const categoryElement = document.createElement('p');
-                    categoryElement.innerHTML = `<strong>Categoria(s):</strong> ${post.categories.join(', ')}`;
+                    const strong = document.createElement('strong');
+                    strong.textContent = 'Categoria(s): ';
+                    categoryElement.appendChild(strong);
+                    categoryElement.appendChild(document.createTextNode(post.categories.join(', ')));
                     resultItem.appendChild(categoryElement);
                 }
 
+                const tmp = document.createElement('div');
+                tmp.innerHTML = post.content || '';
+                const plain = (tmp.textContent || '').trim();
                 const excerptElement = document.createElement('p');
-                excerptElement.innerHTML = post.content.substring(0, 100) + '...';
+                excerptElement.textContent = plain.length > 120 ? plain.substring(0, 120) + '...' : plain;
                 resultItem.appendChild(excerptElement);
 
                 resultContainer.appendChild(resultItem);

@@ -423,7 +423,7 @@ app.get('/search', async (req, res) => {
             if (endDate) filter.publish_date.$lte = new Date(endDate); // Data final
         }
 
-        // Busca no banco de dados
+        filter.status = { $ne: 'draft' };
         const posts = await Post.find(filter);
         res.json(posts);
     } catch (err) {
