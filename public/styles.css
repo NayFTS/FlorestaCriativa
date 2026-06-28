@@ -133,8 +133,12 @@ a:hover {
     }
 }
 
-/* Telas pequenas */
+/* Tablet e mobile (≤768px) — bloco único consolidado */
 @media (max-width: 768px) {
+    /* Header */
+    #header-image { max-width: 300px; }
+
+    /* Nav: hambúrguer */
     nav {
         height: auto;
         min-height: 52px;
@@ -149,18 +153,51 @@ a:hover {
         padding: 10px 0;
     }
 
-    .hamburger {
-        display: block;
-        font-size: 30px;
-        cursor: pointer;
-    }
-
     .menu a {
         padding: 10px;
         display: block;
         text-align: center;
         margin: 5px 0;
     }
+
+    .hamburger {
+        display: block;
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+    /* Carousel */
+    .carousel-arrow { width: 32px; height: 32px; font-size: 0.9em; }
+
+    /* Seções de listagem: padding lateral para cards não tocarem a borda */
+    section#verde-inspiracao,
+    section#sapo-imaginario,
+    section#rascunhos-da-floresta { padding: 0 12px; }
+
+    /* Footer empilhado */
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+    }
+    footer p { text-align: center; }
+
+    /* Formulários admin */
+    #postForm    { padding: 10px; }
+    #editPostForm { padding: 10px; }
+    #postForm button,
+    #editPostForm button { padding: 10px; font-size: 1em; }
+
+    /* Dashboard */
+    .dashboard-actions { flex-direction: column; align-items: center; }
+    .dashboard-actions button { width: 100%; margin-bottom: 20px; }
+    .dashboard-stats h3 { font-size: 1.3em; }
+    .dashboard-stats p  { font-size: 1em; }
+
+    /* Tabela de posts */
+    #postsTable { display: block; overflow-x: auto; font-size: 0.85em; }
+    #postsTable th, #postsTable td { padding: 10px; }
 }
 
 /* Pesquisa */
@@ -628,115 +665,11 @@ footer {
     color: var(--color-accent);
 }
 
-/* Estilos para telas menores */
 
-@media (max-width: 768px) {
-    button {
-        padding: 15px;
-        font-size: 1.1em;
-    }
-}
-
-@media (max-width: 768px) {
-    /* Ajuste o título dos posts recentes */
-    #recent-posts-title {
-        font-size: 1.8em; /* Diminui um pouco o tamanho da fonte para se adequar à tela */
-        margin-bottom: 20px;
-    }
-
-    .post-container {
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .post-container h3 {
-        font-size: 1.2em; /* Ajusta o tamanho do título para ficar mais legível */
-        text-align: center; /* Centraliza o título */
-    }
-
-    .post-container p {
-        font-size: 0.9em; /* Reduz o tamanho do texto para ficar proporcional à tela */
-    }
-
-    /* Ajuste geral para imagens nos posts */
-    .post-container img {
-        width: 100%; /* Assegura que a imagem ocupe toda a largura disponível */
-        height: auto;
-        margin-bottom: 10px;
-    }
-
-    .carousel-arrow {
-        width: 32px;
-        height: 32px;
-        font-size: 0.9em;
-    }
-
-    /* Ajustes na navegação */
-    nav {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px 0;
-    }
-
-    nav a {
-        margin: 10px 0;
-    }
-
-    .search-container {
-        flex-direction: column;
-        gap: 5px;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .section-container {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .section-container img {
-        width: 100%;
-        margin-bottom: 15px;
-    }
-
-    .post-container, .post-item {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .post-container img, .post-item img {
-        width: 100%;
-    }
-
-    /* Estilos para centralizar o rodapé em telas menores */
-    footer p {
-        text-align: center;
-    }
-}
-
-/* Estilos para as listas de posts e posts recentes */
-#post-list,
-#recent-posts-container {
-    margin-top: 30px;
-    padding: 10px;
-}
-
-#post-list div {
-    background-color: var(--color-bg);
-    border: 1px solid var(--color-accent);
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 10px;
-}
-
-#post-list h3,
-#recent-posts-container h3 {
-    margin: 0 0 10px 0;
-}
-
-#post-list p,
-#recent-posts-container p {
-    margin: 0;
+/* Lista de posts */
+#post-list {
+    margin-top: 0;
+    padding: 0;
 }
 
 /* Estilos para o formulário de postagem */
@@ -805,49 +738,14 @@ footer {
     margin: 5px 10px 5px 0;
 }
 
-/* Responsividade para o formulário */
-@media (max-width: 768px) {
-    #postForm {
-        padding: 10px;
-    }
 
-    #postForm button {
-        padding: 10px;
-        font-size: 1em;
-    }
-}
-
-/* Estilo para as imagens nos posts (index e post) */
-.post-container img, #post-content img {
-    width: 100%; /* Faz a imagem ocupar toda a largura da caixa */
-    max-height: 300px; /* Define uma altura máxima */
-    object-fit: cover; /* Faz a imagem preencher a caixa */
-    border-radius: 15px; /* Bordas arredondadas */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona uma leve sombra */
-    margin-bottom: 20px; /* Espaçamento inferior */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave */
-}
-
-
-
-/* Estilo para as imagens nos posts  */
-.post-container img {
+/* Imagens no conteúdo do post individual (post.html) */
+#post-content img {
     width: 100%;
-    height: 300px; /* Define uma altura fixa */
-    object-fit: cover; /* Faz a imagem preencher a caixa */
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 10px;
     margin-bottom: 20px;
-}
-
-
-/* Ajustes de responsividade para telas menores */
-@media (max-width: 768px) {
-    .post-container img, #post-content img {
-        max-height: 200px; /* Altura menor em telas pequenas */
-        width: 100%;
-        object-fit: cover;
-    }
 }
 
 
@@ -978,26 +876,6 @@ footer {
     text-decoration: underline;
 }
 
-/* Responsividade para o dashboard */
-@media (max-width: 768px) {
-    .dashboard-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .dashboard-actions button {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .dashboard-stats h3 {
-        font-size: 1.3em;
-    }
-
-    .dashboard-stats p {
-        font-size: 1em;
-    }
-}
 
 /* Container para gerenciar as postagens */
 .manage-posts-container {
@@ -1077,22 +955,6 @@ footer {
     transform: translateY(0);
 }
 
-/* Responsividade da tabela */
-@media (max-width: 768px) {
-    #postsTable th,
-    #postsTable td {
-        padding: 10px;
-    }
-
-    #postsTable {
-        font-size: 0.8em;
-    }
-
-    #postsTable {
-        display: block;
-        overflow-x: auto;
-    }
-}
 
 /* Estilos para o formulário de edição */
 #editPostForm {
@@ -1160,17 +1022,6 @@ footer {
     margin: 5px 10px 5px 0;
 }
 
-/* Responsividade para o formulário de edição */
-@media (max-width: 768px) {
-    #editPostForm {
-        padding: 10px;
-    }
-
-    #editPostForm button {
-        padding: 10px;
-        font-size: 1em;
-    }
-}
 
 #successMessage, #errorMessage {
     text-align: center;
@@ -1190,11 +1041,6 @@ footer {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
-}
-@media (max-width: 768px) {
-    #header-image {
-        max-width: 300px;
-    }
 }
 
 /* Seções de listagem de posts (sem .section-container) */
@@ -1681,30 +1527,17 @@ select {
     border: 1px solid var(--color-accent);
 }
 
-/* Mobile pequeno (até 480px) */
+/* Mobile pequeno (≤480px) */
 @media (max-width: 480px) {
-    .search-container input[type="text"] {
-        width: 100%;
-        margin-right: 0;
-    }
+    /* Container com menos padding */
+    .container { padding: 12px; }
 
-    .search-container {
-        flex-direction: column;
-    }
+    /* Header */
+    header { padding: 20px 12px; }
+    header h1 { font-size: 1.3em; }
+    header p  { font-size: 0.85em; }
 
-    .search-container button {
-        width: 100%;
-    }
-
-    header h1 {
-        font-size: 1.3em;
-        padding: 3px 8px;
-    }
-
-    header p {
-        font-size: 0.85em;
-    }
-
+    /* Hambúrguer: área de toque 44px mínimo */
     .hamburger {
         min-height: 44px;
         min-width: 44px;
@@ -1713,23 +1546,31 @@ select {
         justify-content: center;
     }
 
+    /* Search overlay: não descer demais em telas curtas/landscape */
+    .search-overlay { padding-top: 16px; }
+    .search-overlay-box { padding: 16px; }
+
+    /* Carousel info: reduzir padding lateral */
+    .carousel-info { padding: 12px 14px 6px; }
+
+    /* Leia mais padrão (fora do card de seção) */
     .leia-mais {
         width: 100%;
         text-align: center;
         box-sizing: border-box;
     }
+    /* No rodapé do card horizontal, mantém compacto */
+    .post-card-footer .leia-mais {
+        width: auto;
+        text-align: left;
+    }
 }
 
-/* Telas muito pequenas — carrossel */
+/* Telas muito pequenas (≤360px) */
 @media (max-width: 360px) {
-    .carousel-arrow {
-        width: 30px;
-        height: 30px;
-        font-size: 0.85em;
-    }
-
-    .carousel-prev { left: 2px; }
-    .carousel-next { right: 2px; }
-
-    .carousel-card-body { padding: 14px 16px 18px; }
+    .carousel-arrow { width: 30px; height: 30px; font-size: 0.85em; }
+    .carousel-prev  { left: 2px; }
+    .carousel-next  { right: 2px; }
+    .carousel-info  { padding: 10px 12px 4px; }
+    .post-card-body { padding: 12px 14px; }
 }
