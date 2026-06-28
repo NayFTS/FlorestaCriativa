@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const cloudinary = require('cloudinary').v2;
+const rateLimit = require('express-rate-limit');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -125,8 +126,24 @@ app.post('/register', (req, res) => {
 });
 
 
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { message: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const resetLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 3,
+    message: { message: 'Muitas tentativas de redefinição de senha. Tente novamente em 1 hora.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Rota de login
-app.post('/login', [
+app.post('/login', loginLimiter, [
     body('email').isEmail().withMessage('Email inválido'),
     body('password').notEmpty().withMessage('Senha é obrigatória')
 ], async (req, res) => {
@@ -162,7 +179,7 @@ app.post('/login', [
 
 
 // Rota de reset de senha (protegida por chave secreta)
-app.post('/reset-password', [
+app.post('/reset-password', resetLimiter, [
     body('email').isEmail().withMessage('Email inválido'),
     body('secret').notEmpty().withMessage('Chave secreta obrigatória'),
     body('newPassword').isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')

@@ -36,7 +36,7 @@
 
 if (typeof API_BASE === 'undefined') {
     // eslint-disable-next-line no-var
-    var API_BASE = location.hostname === 'localhost' ? '' : '/api';
+    var API_BASE = '/api';
 }
 
 function toggleMenu() {

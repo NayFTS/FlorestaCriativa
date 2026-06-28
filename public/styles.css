@@ -1938,3 +1938,119 @@ select {
     .project-grid { grid-template-columns: 1fr; }
     .preview-drawer { width: 100vw; }
 }
+
+/* ===================== */
+/* FASE 9 — POST.HTML    */
+/* ===================== */
+
+/* Botão compartilhar */
+.post-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: 6px;
+    font-size: 0.88em;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.share-btn:hover { background: var(--color-border); }
+
+/* Posts relacionados */
+#related-posts {
+    max-width: 800px;
+    margin: 32px auto 8px;
+    padding: 0 20px;
+}
+
+#related-posts h3 {
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.related-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.related-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    color: inherit;
+}
+
+.related-card img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.related-card-img-placeholder {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--color-surface-alt);
+}
+
+.related-card-body {
+    padding: 12px 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.related-card-body h4 {
+    margin: 0;
+    font-size: 0.9em;
+    line-height: 1.35;
+    font-family: 'Lora', Georgia, serif;
+    color: var(--color-text);
+}
+
+.related-card:hover .related-card-body h4 { color: var(--color-accent); }
+
+.related-card-body p {
+    margin: 0;
+    font-size: 0.8em;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .related-grid { grid-template-columns: 1fr; }
+    #related-posts { padding: 0 12px; }
+}

@@ -67,6 +67,56 @@
     </div>
     <script src="search.js"></script>
     <script>
+function readingTime(content) {
+    const words = content.replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.ceil(words / 200));
+}
+
+function sharePost(title) {
+    const url = window.location.href;
+    const btn = document.getElementById('shareBtn');
+    if (navigator.share) {
+        navigator.share({ title, url }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            btn.textContent = '✓ Link copiado!';
+            setTimeout(() => { btn.textContent = '↗ Compartilhar'; }, 2000);
+        }).catch(() => {});
+    }
+}
+
+function loadRelatedPosts(pageUrl, currentId) {
+    if (!pageUrl) return;
+    const section = document.getElementById('related-posts');
+    fetch(`${API_BASE}/posts?url=${encodeURIComponent(pageUrl)}&limit=4`)
+        .then(r => r.json())
+        .then(data => {
+            const posts = (Array.isArray(data) ? data : (data.posts || []))
+                .filter(p => String(p._id) !== String(currentId))
+                .slice(0, 3);
+            if (!posts.length) return;
+            const grid = document.getElementById('related-grid');
+            posts.forEach(post => {
+                const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
+                const imgSrc = post.image_path
+                    ? (post.image_path.startsWith('http') ? post.image_path : `/imagens/uploads/${post.image_path}`)
+                    : null;
+                const tmp = document.createElement('div');
+                tmp.innerHTML = post.content || '';
+                const excerpt = (tmp.textContent || '').trim();
+                const card = document.createElement('a');
+                card.className = 'related-card';
+                card.href = link;
+                card.innerHTML =
+                    (imgSrc ? `<img src="${imgSrc}" alt="${post.title}" loading="lazy">` : '<div class="related-card-img-placeholder"></div>') +
+                    `<div class="related-card-body"><h4>${post.title}</h4><p>${excerpt.length > 90 ? excerpt.substring(0, 90) + '...' : excerpt}</p></div>`;
+                grid.appendChild(card);
+            });
+            section.style.display = 'block';
+        })
+        .catch(() => {});
+}
+
 function fetchPost() {
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('slug') || urlParams.get('id');
@@ -103,12 +153,12 @@ function fetchPost() {
                 : '';
             const categoriesHTML = data.categories && data.categories.length > 0
                 ? data.categories.join(', ') : 'Sem categoria';
+            const mins = readingTime(data.content || '');
 
             const isSapo = data.url === 'sapo-imaginario.html';
 
             if (isSapo) {
                 postContainer.classList.add('sapo-post');
-
                 const techs = Array.isArray(data.technologies) ? data.technologies : [];
                 const techHtml = techs.length
                     ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>`
@@ -116,7 +166,6 @@ function fetchPost() {
                 const externalLinkHtml = data.external_link
                     ? `<a class="sapo-external-link" href="${data.external_link}" target="_blank" rel="noopener">Ver Projeto ↗</a>`
                     : '';
-
                 postContainer.innerHTML = `
                     <div class="sapo-post-header">
                         <h2>${data.title}</h2>
@@ -125,18 +174,23 @@ function fetchPost() {
                     </div>
                     ${imageHTML}
                     <div class="content-body">${data.content}</div>
-                    <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0}</p>
+                    <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                     <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
+                    <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
                 `;
             } else {
                 postContainer.innerHTML = `
                     <h2>${data.title}</h2>
                     ${imageHTML}
                     <div class="content-body">${data.content}</div>
-                    <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0}</p>
+                    <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                     <p class="post-categories"><strong>Categorias:</strong> ${categoriesHTML}</p>
+                    <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
                 `;
             }
+
+            document.getElementById('shareBtn').addEventListener('click', () => sharePost(data.title));
+            loadRelatedPosts(data.url, data._id);
         })
         .catch(error => {
             console.error('Erro ao buscar post:', error);
@@ -148,6 +202,10 @@ function goBack() { window.history.back(); }
 
 window.onload = fetchPost;
     </script>
+    <section id="related-posts" style="display:none">
+      <h3>Posts relacionados</h3>
+      <div id="related-grid" class="related-grid"></div>
+    </section>
     <div id="bottom-image"></div>
     <footer>
       <div class="footer-content">
