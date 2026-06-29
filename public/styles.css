@@ -31,6 +31,8 @@
 /* ===================== */
 /* GLOBAL STYLES */
 /* ===================== */
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
     font-family: var(--font-body);
     font-size: 1rem;
@@ -222,6 +224,31 @@ a:hover {
     /* Tabela de posts */
     #postsTable { display: block; overflow-x: auto; font-size: 0.85em; }
     #postsTable th, #postsTable td { padding: 10px; }
+
+    /* Manage posts: padding menor no mobile */
+    .manage-posts-container { padding: 12px 10px; }
+
+    /* Botões da tabela: área de toque maior e quebra automática */
+    #postsTable td:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        border-bottom: 1px solid var(--color-border);
+    }
+    #postsTable button {
+        margin-right: 0;
+        min-height: 36px;
+        padding: 6px 10px;
+    }
+
+    /* Título: não deixar ultrapassar largura razoável */
+    #postsTable td:first-child {
+        max-width: 160px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
 }
 
 /* Pesquisa */
@@ -743,7 +770,8 @@ footer {
     font-size: 1em;
 }
 
-#postForm input[type="text"] {
+#postForm input[type="text"],
+#postForm input[type="url"] {
     width: 100%;
     padding: 5px;
     background-color: var(--color-bg);
@@ -933,6 +961,87 @@ footer {
 }
 
 
+/* Container de login */
+.login-container {
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 32px 28px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--color-accent);
+}
+
+.login-container label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--color-text-secondary);
+}
+
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-size: 1em;
+    margin-bottom: 16px;
+    display: block;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(58,125,68,0.15);
+}
+
+.login-container input.input-error {
+    border-color: #c0392b !important;
+}
+
+.login-container button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 4px;
+}
+
+.login-container button[type="submit"]:hover {
+    background-color: var(--color-accent-dark);
+}
+
+.login-container > p {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 0.9em;
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        margin: 20px 16px;
+        padding: 24px 18px;
+    }
+}
+
 /* Container para gerenciar as postagens */
 .manage-posts-container {
     max-width: 1200px;
@@ -1045,7 +1154,8 @@ footer {
     font-size: 1em;
 }
 
-#editPostForm input[type="text"] {
+#editPostForm input[type="text"],
+#editPostForm input[type="url"] {
     width: 100%;
     padding: 5px;
     background-color: var(--color-bg);
@@ -1750,6 +1860,7 @@ select {
 @media (max-width: 480px) {
     /* Container com menos padding */
     .container { padding: 12px; }
+    .manage-posts-container { padding: 10px 8px; }
 
     /* Header */
     header { padding: 20px 12px; }
