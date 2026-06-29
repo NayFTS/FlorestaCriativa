@@ -128,11 +128,11 @@
           const isDraft = post.status === 'draft';
           const row = document.createElement('tr');
           row.innerHTML = `
-              <td>${post.title}</td>
-              <td><span class="badge ${isDraft ? 'badge-draft' : 'badge-published'}">${isDraft ? 'Rascunho' : 'Publicado'}</span></td>
-              <td>${new Date(post.publish_date).toLocaleDateString('pt-BR')}</td>
-              <td>${post.views || 0}</td>
-              <td></td>
+              <td data-label="Título">${post.title}</td>
+              <td data-label="Status"><span class="badge ${isDraft ? 'badge-draft' : 'badge-published'}">${isDraft ? 'Rascunho' : 'Publicado'}</span></td>
+              <td data-label="Data">${new Date(post.publish_date).toLocaleDateString('pt-BR')}</td>
+              <td data-label="Views">${post.views || 0}</td>
+              <td data-label="Ações"></td>
           `;
 
           const actionsCell = row.querySelector('td:last-child');
