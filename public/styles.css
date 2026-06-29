@@ -32,6 +32,7 @@
 /* GLOBAL STYLES */
 /* ===================== */
 *, *::before, *::after { box-sizing: border-box; }
+html { overflow-x: clip; }
 
 body {
     font-family: var(--font-body);
@@ -222,29 +223,24 @@ a:hover {
     .dashboard-stats p  { font-size: 1em; }
 
     /* Tabela de posts */
-    #postsTable { display: block; overflow-x: auto; font-size: 0.85em; }
+    .table-scroll-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+    #postsTable { font-size: 0.85em; }
     #postsTable th, #postsTable td { padding: 10px; }
 
     /* Manage posts: padding menor no mobile */
     .manage-posts-container { padding: 12px 10px; }
 
-    /* Botões da tabela: área de toque maior e quebra automática */
-    #postsTable td:last-child {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        align-items: center;
-        border-bottom: 1px solid var(--color-border);
-    }
+    /* Botões da tabela: área de toque maior */
     #postsTable button {
-        margin-right: 0;
+        margin-right: 4px;
+        margin-bottom: 4px;
         min-height: 36px;
         padding: 6px 10px;
     }
 
-    /* Título: não deixar ultrapassar largura razoável */
+    /* Título: quebra de linha para não alargar a tabela desnecessariamente */
     #postsTable td:first-child {
-        max-width: 160px;
+        max-width: 140px;
         word-break: break-word;
         overflow-wrap: break-word;
         white-space: normal;
@@ -780,6 +776,12 @@ footer {
     border: 1px solid var(--color-accent);
     font-size: 1em;
 }
+
+/* CKEditor: toolbar responsiva no mobile */
+.ck.ck-editor { max-width: 100%; }
+.ck.ck-editor__main { overflow-x: auto; }
+.ck.ck-toolbar { flex-wrap: wrap !important; }
+.ck.ck-toolbar__items { flex-wrap: wrap !important; }
 
 /* Botão de Publicar */
 #postForm button[type="submit"] {
