@@ -12,14 +12,17 @@
     <div class="site-shell">
       <div class="topbar">
         <nav class="topbar-nav" aria-label="Navegação principal">
-          <a href="index.html" data-i18n="nav.home">Home</a>
-          <a href="verde-inspiracao.html" data-i18n="nav.blog">Blog</a>
-          <a href="sapo-imaginario.html" data-i18n="nav.portfolio">Portfólio</a>
-          <a href="rascunhos-da-floresta.html" data-i18n="nav.projects">Projetos</a>
-          <a href="sobre-mim.html" data-i18n="nav.about">About</a>
+          <a href="index.html">Home</a>
+          <a href="verde-inspiracao.html">Verde Inspiração</a>
+          <a href="sapo-imaginario.html">Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
+          <a href="sobre-mim.html">Sobre Mim</a>
         </nav>
         <div class="topbar-actions theme-toggle-target">
-          <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+          <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" onclick="toggleSearch()">
+            <span class="search-bar-placeholder">Pesquisar...</span>
+            <img src="imagens/decor/icone-busca-lupa.png" alt="" class="search-bar-icon" loading="lazy">
+          </button>
         </div>
       </div>
 
@@ -29,7 +32,7 @@
           <img class="topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
         </a>
         <div class="sidebar-widgets">
-          <div>
+          <div class="currently-widget">
             <h4>🌱 Currently</h4>
             <ul class="widget-list js-currently-list">
               <li>Carregando...</li>
@@ -60,13 +63,13 @@
         </a>
         <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
           <a href="dashboard.html">📊 Dashboard</a>
-          <a href="managePosts.html">📋 Gerenciar Posts</a>
+          <a href="managePosts.html"><img src="imagens/decor/icone-portfolio-pasta.png" alt="" class="nav-icon">Gerenciar Posts</a>
           <a href="publicar.html">✍️ Publicar</a>
           <a href="index.html"><img src="imagens/decor/icone-home.png" alt="" class="nav-icon">Home</a>
           <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon">Verde Inspiração</a>
           <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon">Sapo Imaginário</a>
           <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon">Rascunhos da Floresta</a>
-          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon"><span data-i18n="drawer.about">Sobre Mim</span></a>
+          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon">Sobre Mim</a>
           <a href="#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
         </div>
         <div class="sidebar-widgets drawer-widgets">
@@ -96,7 +99,7 @@
         <a href="index.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-home.png" alt=""></span>Home</a>
         <a href="dashboard.html"><span class="bottom-nav-icon">📊</span>Dashboard</a>
         <a href="index.html" class="bottom-nav-center" aria-label="Ir para a Home"><img src="imagens/decor/bottom-button-navbar.png" alt="" class="bottom-nav-center-day"><img src="imagens/decor/bottom-button-navbar-noturno.png" alt="" class="bottom-nav-center-night"></a>
-        <a href="managePosts.html"><span class="bottom-nav-icon">📋</span>Posts</a>
+        <a href="managePosts.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-portfolio-pasta.png" alt=""></span>Posts</a>
         <a href="publicar.html"><span class="bottom-nav-icon">✍️</span>Publicar</a>
       </div>
 

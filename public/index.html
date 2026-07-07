@@ -15,11 +15,12 @@
     <div class="site-shell">
       <div class="topbar">
         <nav class="topbar-nav" aria-label="Navegação principal">
-          <a href="index.html" data-i18n="nav.home">Home</a>
-          <a href="verde-inspiracao.html" data-i18n="nav.blog">Blog</a>
-          <a href="sapo-imaginario.html" data-i18n="nav.portfolio">Portfólio</a>
-          <a href="rascunhos-da-floresta.html" data-i18n="nav.projects">Projetos</a>
-          <a href="sobre-mim.html" data-i18n="nav.about">About</a>
+          <a href="index.html">Home</a>
+          <a href="verde-inspiracao.html">Verde Inspiração</a>
+          <a href="sapo-imaginario.html">Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
+          <a href="sobre-mim.html">Sobre Mim</a>
+          <a href="login.html">Login</a>
         </nav>
         <div class="topbar-actions theme-toggle-target">
           <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" onclick="toggleSearch()">
@@ -50,7 +51,7 @@
             <p class="mood-text"></p>
           </section>        </div>
         <div class="sidebar-footer">
-          <a href="login.html" class="login-link">Login</a>
+          <div class="sidebar-social"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub">🐙</a></div>
         </div>
       </aside>
 
@@ -66,7 +67,7 @@
           <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon">Verde Inspiração</a>
           <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon">Sapo Imaginário</a>
           <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon">Rascunhos da Floresta</a>
-          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon"><span data-i18n="drawer.about">Sobre Mim</span></a>
+          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon">Sobre Mim</a>
           <a href="#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
         </div>
         <div class="sidebar-widgets drawer-widgets">
@@ -89,6 +90,7 @@
           <a href="login.html" class="login-link">Login</a>
           <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
         </div>
+        <div class="sidebar-social sidebar-social-drawer"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub">🐙</a></div>
       </div>
 
       <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
@@ -335,7 +337,10 @@
 
       <div class="home-quicklinks-col">
         <div class="widget-card sticker-card sticker-card--sm">
-          <h3>🔗 Quick Links</h3>
+          <div class="widget-window-header">
+            <h3>🔗 Quick Links</h3>
+            <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
+          </div>
           <div class="quicklink-panel">
             <a href="verde-inspiracao.html" class="quicklink-row">
               <img src="imagens/decor/icone-arte-paleta.png" alt="" class="quicklink-icon" loading="lazy">
@@ -365,7 +370,7 @@
         <div class="widget-card sticker-card sticker-card--sm widget-featured">
           <div class="widget-window-header">
             <h3>📷 Featured</h3>
-            <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
           </div>
           <div id="featuredPost">Carregando...</div>
         </div>
@@ -373,7 +378,7 @@
         <div class="widget-card sticker-card sticker-card--sm widget-nowplaying-card">
           <div class="widget-window-header">
             <h3>🎵 Now Playing</h3>
-            <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
           </div>
           <div class="widget-nowplaying">
             <div class="widget-nowplaying-main">
@@ -410,7 +415,7 @@
         <div class="widget-card sticker-card sticker-card--sm widget-gardenlog">
           <div class="widget-window-header">
             <h3>🪵 Garden Log</h3>
-            <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
           </div>
           <ul class="widget-list" id="gardenLog">
             <li>Carregando...</li>
@@ -420,15 +425,14 @@
 
       <section id="guestbook" class="container">
         <div class="guestbook-card sticker-card">
-          <img src="imagens/decor/planta-suculenta-caneca-coracao-1.png" alt="" class="guestbook-decor" aria-hidden="true" loading="lazy">
           <h2>📝 Guestbook</h2>
           <p class="guestbook-subtitle">Deixe uma mensagem pra sapinha ♡</p>
           <div class="guestbook-layout">
             <form id="guestbookForm" class="guestbook-form">
               <label for="guestbookAuthor">Seu nome:</label>
-              <input type="text" id="guestbookAuthor" name="author" maxlength="60" required>
+              <input type="text" id="guestbookAuthor" name="author" maxlength="10" required>
               <label for="guestbookMessage">Mensagem:</label>
-              <textarea id="guestbookMessage" name="message" maxlength="500" rows="1" required></textarea>
+              <textarea id="guestbookMessage" name="message" maxlength="50" rows="1" required></textarea>
               <button type="submit">Enviar</button>
               <p id="guestbookFeedback"></p>
             </form>

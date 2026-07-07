@@ -4,14 +4,6 @@
 
     const translations = {
         pt: {
-            'nav.home': 'Home',
-            'nav.blog': 'Blog',
-            'nav.portfolio': 'Portfólio',
-            'nav.projects': 'Projetos',
-            'nav.about': 'About',
-            'drawer.home': 'Home',
-            'drawer.about': 'Sobre Mim',
-            'drawer.guestbook': 'Guestbook',
             'footer.login': 'Login',
             'search.title': 'Pesquisar',
             'search.placeholder': 'Pesquise por termos...',
@@ -25,14 +17,6 @@
             'lang.toggleAria': 'Mudar para inglês'
         },
         en: {
-            'nav.home': 'Home',
-            'nav.blog': 'Blog',
-            'nav.portfolio': 'Portfolio',
-            'nav.projects': 'Projects',
-            'nav.about': 'About',
-            'drawer.home': 'Home',
-            'drawer.about': 'About Me',
-            'drawer.guestbook': 'Guestbook',
             'footer.login': 'Login',
             'search.title': 'Search',
             'search.placeholder': 'Search for terms...',
