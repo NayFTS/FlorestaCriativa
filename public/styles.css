@@ -579,7 +579,10 @@ body.page-public .site-main {
     .site-shell { display: block; }
     .topbar { display: none; }
     .site-sidebar { display: none; }
-    .site-main { padding-bottom: 68px; }
+    /* Zera a margem de 20px do .site-main no mobile — nas páginas admin (sem
+       .page-public) essa margem sobrava como espaço morto que as páginas
+       públicas já não tinham. */
+    .site-main { padding-bottom: 68px; margin: 0; }
 
     .drawer-toggle {
         display: flex;
@@ -847,6 +850,13 @@ body.page-public .site-main {
         font-size: 0.92em;
         max-width: 100%;
         word-break: break-word;
+    }
+
+    /* Sobrescreve o max-width:140px de first-child do breakpoint de 768px
+       (que ganharia por especificidade mesmo vindo antes) — no layout em
+       card, a linha de Título deve ocupar a largura toda como as outras. */
+    #postsTable td:first-child {
+        max-width: 100%;
     }
 
     #postsTable td:last-child {
@@ -2159,7 +2169,9 @@ footer {
         z-index: 120;
         background: var(--color-surface);
         border-bottom: var(--border-card-width) solid var(--color-border);
-        padding: 10px 14px;
+        /* padding-left reserva espaço pro .drawer-toggle fixo (42px + 12px de offset + gap),
+           que senão fica sobreposto ao botão "Voltar" neste mesmo canto */
+        padding: 10px 14px 10px 62px;
         margin: 0 0 12px;
     }
 
