@@ -463,7 +463,7 @@ function _renderPostCard(post) {
             <p>${_escapeHtmlGlobal(excerpt)}</p>
             <div class="post-card-stats">
                 <button type="button" class="like-btn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
-                <span class="comment-count">💬 ${post.commentsCount || 0}</span>
+                <span class="comment-count"><img src="imagens/decor/icone-comentario-balao.png" alt="" class="comment-icon"> ${post.commentsCount || 0}</span>
             </div>
             <div class="post-card-footer">
                 <a href="${link}" class="leia-mais">Leia mais</a>

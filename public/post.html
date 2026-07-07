@@ -70,12 +70,12 @@
           <span>Floresta Criativa</span>
         </a>
         <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
-          <a href="index.html">🏠 Home</a>
-          <a href="verde-inspiracao.html">🌿 Verde Inspiração</a>
-          <a href="sapo-imaginario.html">🐸 Sapo Imaginário</a>
-          <a href="rascunhos-da-floresta.html">📝 Rascunhos da Floresta</a>
-          <a href="sobre-mim.html">🐸 Sobre Mim</a>
-          <a href="#guestbook">📝 Guestbook</a>
+          <a href="index.html"><img src="imagens/decor/icone-home.png" alt="" class="nav-icon">Home</a>
+          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon">Verde Inspiração</a>
+          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon">Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon">Rascunhos da Floresta</a>
+          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon">Sobre Mim</a>
+          <a href="#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
         </div>
         <div class="sidebar-widgets drawer-widgets">
           <div class="currently-widget">
@@ -96,16 +96,16 @@
         </div>
         <div class="sidebar-footer theme-toggle-target">
           <a href="login.html" class="login-link">Login</a>
-          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
         </div>
       </div>
 
       <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
-        <a href="index.html"><span class="bottom-nav-icon">🏠</span>Home</a>
-        <a href="verde-inspiracao.html"><span class="bottom-nav-icon">🌿</span>Verde</a>
-        <button type="button" class="bottom-nav-center" onclick="toggleDrawer()" aria-label="Abrir menu">🐸</button>
-        <a href="sapo-imaginario.html"><span class="bottom-nav-icon">🐸</span>Sapo</a>
-        <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon">📝</span>Rascunhos</a>
+        <a href="index.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-home.png" alt=""></span>Home</a>
+        <a href="verde-inspiracao.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-arte-paleta.png" alt=""></span>Verde</a>
+        <a href="index.html" class="bottom-nav-center" aria-label="Ir para a Home"><img src="imagens/decor/sapo-espiando-agua-2.png" alt=""></a>
+        <a href="sapo-imaginario.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-projetos-codigo.png" alt=""></span>Sapo</a>
+        <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-blog-livro.png" alt=""></span>Rascunhos</a>
       </div>
 
       <main class="site-main">
@@ -459,7 +459,7 @@ function fetchPost() {
                     <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                     <div class="post-header-stats">
                         <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${data.likes || 0}</span></button>
-                        <a href="#comments-section" class="comment-count">💬 ${data.commentsCount || 0}</a>
+                        <a href="#comments-section" class="comment-count"><img src="imagens/decor/icone-comentario-balao.png" alt="" class="comment-icon"> ${data.commentsCount || 0}</a>
                     </div>
                     <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
                 `;
@@ -474,7 +474,7 @@ function fetchPost() {
                         <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                         <div class="post-header-stats">
                             <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${data.likes || 0}</span></button>
-                            <a href="#comments-section" class="comment-count">💬 ${data.commentsCount || 0}</a>
+                            <a href="#comments-section" class="comment-count"><img src="imagens/decor/icone-comentario-balao.png" alt="" class="comment-icon"> ${data.commentsCount || 0}</a>
                         </div>
                     </div>
                     ${imageHTML}
