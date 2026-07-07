@@ -188,11 +188,10 @@ function _wireLikeButton(btn, postId, initialLikes) {
 
 function loadSiteSettings() {
     const currentlyLists = document.querySelectorAll('.js-currently-list');
-    const moodWidgets = document.querySelectorAll('.js-mood-widget');
     const nowPlayingTrack = document.getElementById('nowPlayingTrack');
     const nowPlayingArtist = document.getElementById('nowPlayingArtist');
     const featuredCaption = document.getElementById('featuredCaption');
-    if (!currentlyLists.length && !moodWidgets.length && !nowPlayingTrack && !featuredCaption) return;
+    if (!currentlyLists.length && !nowPlayingTrack && !featuredCaption) return;
 
     fetch(`${API_BASE}/settings`)
         .then(r => r.json())
@@ -201,12 +200,6 @@ function loadSiteSettings() {
                 list.innerHTML = (s.currently && s.currently.length)
                     ? s.currently.map(c => `<li>${_escapeHtmlGlobal(c)}</li>`).join('')
                     : '<li>Nada por aqui no momento.</li>';
-            });
-            moodWidgets.forEach(widget => {
-                const emoji = widget.querySelector('.widget-mood-emoji');
-                const label = widget.querySelector('.widget-mood-label');
-                if (emoji) emoji.textContent = s.moodEmoji || '🐸';
-                if (label) label.textContent = s.moodLabel || '';
             });
             if (nowPlayingTrack) nowPlayingTrack.textContent = s.nowPlayingTrack || '';
             if (nowPlayingArtist) nowPlayingArtist.textContent = s.nowPlayingArtist || '';

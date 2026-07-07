@@ -101,8 +101,6 @@ const SiteSettings = mongoose.model('SiteSettings', new mongoose.Schema({
         type: [String],
         default: ['✍️ Escrevendo uma história nova', '🎨 Desenhando bobagens fofas', '📖 Aprendendo algo novo']
     },
-    moodEmoji: { type: String, default: '🐸' },
-    moodLabel: { type: String, default: 'tranquila' },
     nowPlayingTrack: { type: String, default: 'lofi in the swamp' },
     nowPlayingArtist: { type: String, default: 'frog beats' },
     featuredCaption: { type: String, default: 'tempo perfeito pra programar ☂️' },
@@ -767,8 +765,6 @@ app.get('/settings', async (req, res) => {
 
 app.put('/admin/settings', requireAuth, [
     body('currently').optional({ nullable: true }).isArray().withMessage('Currently deve ser uma lista'),
-    body('moodEmoji').optional({ nullable: true }).trim().isLength({ max: 10 }).withMessage('Emoji muito longo'),
-    body('moodLabel').optional({ nullable: true }).trim().isLength({ max: 60 }).withMessage('Humor muito longo'),
     body('nowPlayingTrack').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome da música muito longo'),
     body('nowPlayingArtist').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome do artista muito longo'),
     body('featuredCaption').optional({ nullable: true }).trim().isLength({ max: 120 }).withMessage('Legenda muito longa'),
@@ -778,12 +774,10 @@ app.put('/admin/settings', requireAuth, [
 
     try {
         const settings = await getOrCreateSettings();
-        const { currently, moodEmoji, moodLabel, nowPlayingTrack, nowPlayingArtist, featuredCaption } = req.body;
+        const { currently, nowPlayingTrack, nowPlayingArtist, featuredCaption } = req.body;
         if (currently !== undefined) {
             settings.currently = currently.map(c => String(c).trim()).filter(Boolean).slice(0, 10);
         }
-        if (moodEmoji !== undefined) settings.moodEmoji = moodEmoji;
-        if (moodLabel !== undefined) settings.moodLabel = moodLabel;
         if (nowPlayingTrack !== undefined) settings.nowPlayingTrack = nowPlayingTrack;
         if (nowPlayingArtist !== undefined) settings.nowPlayingArtist = nowPlayingArtist;
         if (featuredCaption !== undefined) settings.featuredCaption = featuredCaption;
