@@ -348,7 +348,7 @@ function search() {
                     const strong = document.createElement('strong');
                     strong.textContent = 'Categoria(s): ';
                     categoryElement.appendChild(strong);
-                    categoryElement.appendChild(document.createTextNode(post.categories.join(', ')));
+                    categoryElement.appendChild(document.createTextNode([...new Set(post.categories)].join(', ')));
                     resultItem.appendChild(categoryElement);
                 }
 

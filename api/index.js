@@ -12,6 +12,7 @@ const path = require('path');
 const cloudinary = require('cloudinary').v2;
 const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
+const { body, validationResult } = require('express-validator');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -193,8 +194,6 @@ function requireAuth(req, res, next) {
     next();
 }
 
-const { body, validationResult } = require('express-validator');
-
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
@@ -270,10 +269,10 @@ app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
             console.error('Erro ao encerrar sessão:', err);
-            return res.status(500).send('Erro ao fazer logout');
+            return res.status(500).json({ message: 'Erro ao fazer logout' });
         }
         res.clearCookie('connect.sid'); // Remove o cookie da sessão
-        res.status(200).send('Logout bem-sucedido');
+        res.json({ message: 'Logout bem-sucedido' });
     });
 });
 
@@ -314,7 +313,7 @@ app.post('/editPost/:id', requireAuth, galleryUpload, async (req, res) => {
             return res.status(400).json({ success: false, message: 'ID de post inválido' });
         }
 
-        const { title, content, url, external_link, preview_link } = req.body;
+        const { title, content, url, status, external_link, preview_link } = req.body;
         const categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         const technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
         const post = await Post.findById(postId);
@@ -331,6 +330,7 @@ app.post('/editPost/:id', requireAuth, galleryUpload, async (req, res) => {
         post.technologies = technologies;
         post.external_link = external_link || '';
         post.preview_link = preview_link || '';
+        if (status === 'published' || status === 'draft') post.status = status;
 
         const imageFile = req.files?.['image']?.[0];
         if (imageFile) {
@@ -374,7 +374,7 @@ app.get('/posts', async (req, res) => {
         res.json(posts);
     } catch (err) {
         console.error('Erro ao buscar posts:', err);
-        res.status(500).send('Erro no servidor');
+        res.status(500).json({ message: 'Erro no servidor' });
     }
 });
 
@@ -400,6 +400,7 @@ app.get('/post/:id', async (req, res) => {
 app.post('/posts/:id/like', likeLimiter, async (req, res) => {
     try {
         const postId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(postId)) return res.status(400).json({ message: 'Post inválido' });
         const likedPosts = req.session.likedPosts || [];
         if (likedPosts.includes(postId)) {
             const post = await Post.findById(postId);
@@ -419,6 +420,7 @@ app.post('/posts/:id/like', likeLimiter, async (req, res) => {
 app.post('/posts/:id/unlike', likeLimiter, async (req, res) => {
     try {
         const postId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(postId)) return res.status(400).json({ message: 'Post inválido' });
         const likedPosts = req.session.likedPosts || [];
         if (!likedPosts.includes(postId)) {
             const post = await Post.findById(postId);
@@ -440,12 +442,13 @@ app.post('/posts/:id/unlike', likeLimiter, async (req, res) => {
 // Rota para deletar posts
 app.delete('/posts/:id', requireAuth, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Post inválido' });
         const post = await Post.findById(req.params.id);
-        if (!post) return res.status(404).send('Post não encontrado');
+        if (!post) return res.status(404).json({ message: 'Post não encontrado' });
         await Post.findByIdAndDelete(req.params.id);
-        res.status(200).send('Postagem excluída com sucesso');
+        res.json({ message: 'Postagem excluída com sucesso' });
     } catch (err) {
-        res.status(500).send('Erro no servidor');
+        res.status(500).json({ message: 'Erro no servidor' });
     }
 });
 
@@ -455,7 +458,7 @@ app.get('/recent-posts', async (req, res) => {
         const posts = await Post.find({ status: { $ne: 'draft' } }).sort({ publish_date: -1 }).limit(5);
         res.json(posts);
     } catch (err) {
-        res.status(500).send('Erro ao buscar posts');
+        res.status(500).json({ message: 'Erro ao buscar posts' });
     }
 });
 
@@ -486,7 +489,7 @@ app.get('/search', async (req, res) => {
         res.json(posts);
     } catch (err) {
         console.error('Erro na pesquisa:', err);
-        res.status(500).send('Erro no servidor');
+        res.status(500).json({ message: 'Erro no servidor' });
     }
 });
 
@@ -496,7 +499,7 @@ app.get('/user-posts', requireAuth, async (req, res) => {
         res.json(posts);
     } catch (err) {
         console.error('Erro ao buscar postagens do usuário:', err);
-        res.status(500).send('Erro no servidor');
+        res.status(500).json({ message: 'Erro no servidor' });
     }
 });
 
@@ -530,6 +533,7 @@ app.get('/dashboard-stats', requireAuth, async (req, res) => {
 // Publicar rascunho
 app.patch('/posts/:id/publish', requireAuth, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Post inválido' });
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
         post.status = 'published';

@@ -161,6 +161,12 @@
         <option value="rascunhos-da-floresta.html">eu que escrevi</option>
       </select>
 
+      <label for="status">Status:</label>
+      <select id="status" name="status">
+        <option value="published">Publicado</option>
+        <option value="draft">Rascunho</option>
+      </select>
+
       <div id="projectFields" style="display:none">
         <label for="external_link">Link do Repositório <span style="font-weight:400;font-size:0.9em">(opcional — GitHub, etc.)</span></label>
         <input type="url" id="external_link" name="external_link" placeholder="https://github.com/...">
@@ -253,6 +259,7 @@
               document.getElementById('title').value = data.title || '';
               const urlSelect = document.getElementById('url');
               if (data.url) urlSelect.value = data.url;
+              document.getElementById('status').value = data.status || 'published';
 
               ClassicEditor
                   .create(document.querySelector('#editor'), {

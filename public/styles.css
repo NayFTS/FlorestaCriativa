@@ -107,16 +107,6 @@ body::before {
     border-radius: var(--radius-card-sm);
 }
 
-.sticker-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border-radius: var(--radius-pill);
-    padding: 8px 18px;
-    font-family: var(--font-body);
-    font-weight: 600;
-}
-
 /* ===================== */
 /* GLOBAL STYLES */
 /* ===================== */
@@ -151,40 +141,6 @@ h4 { font-size: 1.1rem; }
 p {
     margin-top: 0;
     margin-bottom: 0.9em;
-}
-
-/* Imagem do cabeçalho */
-#top-image, #bottom-image {
-    width: 100%;
-    height: 30px; /* Define a altura desejada */
-    background-size: auto 30px; /* Mantém a proporção original da imagem e ajusta a altura para 30px */
-    background-repeat: repeat-x; /* Repete horizontalmente */
-    background-position: center; /* Centraliza a imagem na tela */
-    margin: 0 auto;
-    display: block;
-}
-
-#top-image {
-    background-image: url('imagens/nayfts-header-up.png');
-}
-
-#bottom-image {
-    background-image: url('imagens/nayfts-header-bottom.png');
-}
-/* ===================== */
-/* HEADER AND NAVIGATION */
-/* ===================== */
-header {
-    background: linear-gradient(135deg, var(--color-accent-dark) 0%, var(--color-accent) 100%);
-    color: white;
-    padding: 28px 20px;
-    text-align: center;
-}
-
-header h1, header p {
-    max-width: 1000px;
-    margin: 0 auto;  /* Centraliza o texto */
-    padding: 5px 0;  /* Ajusta o espaçamento */
 }
 
 a {
@@ -710,66 +666,8 @@ body.page-public .site-main {
     [data-theme="dark"] .bottom-nav a.active { color: var(--color-accent-light); }
 }
 
-/* Esconde o menu padrão e mostra o ícone de hambúrguer */
-.hamburger {
-    display: none;
-    font-size: 30px;
-    cursor: pointer;
-}
-
-/* Estilo para telas grandes */
-@media (min-width: 769px) {
-    .menu {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        margin-left: auto;
-    }
-
-    .search-container {
-        display: flex;
-        justify-content: flex-end; /* Mantém a barra de pesquisa à direita */
-        width: auto;
-    }
-
-    .hamburger {
-        display: none; /* Esconde o ícone de hambúrguer em telas grandes */
-    }
-}
-
 /* Tablet e mobile (≤768px) — bloco único consolidado */
 @media (max-width: 768px) {
-    /* Header */
-    #header-image { max-width: 300px; }
-
-    /* Nav: hambúrguer */
-    nav {
-        height: auto;
-        min-height: 52px;
-        padding: 8px 16px;
-    }
-
-    .menu {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        background-color: var(--color-bg);
-        padding: 10px 0;
-    }
-
-    .menu a {
-        padding: 10px;
-        display: block;
-        text-align: center;
-        margin: 5px 0;
-    }
-
-    .hamburger {
-        display: block;
-        font-size: 30px;
-        cursor: pointer;
-    }
-
     /* Carousel */
     .carousel-arrow { width: 32px; height: 32px; font-size: 0.9em; }
 
@@ -777,15 +675,6 @@ body.page-public .site-main {
     section#verde-inspiracao,
     section#sapo-imaginario,
     section#rascunhos-da-floresta { padding: 0 12px; }
-
-    /* Footer empilhado */
-    .footer-content {
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        text-align: center;
-    }
-    footer p { text-align: center; }
 
     /* Formulários admin */
     #postForm    { padding: 10px; }
@@ -883,45 +772,6 @@ body.page-public .site-main {
         margin: 0;
         font-size: 0.88em;
     }
-}
-
-/* Pesquisa */
-.search-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 10px auto;
-}
-
-.search-container input[type="text"] {
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid var(--color-accent);
-    width: 150px; /* Define um tamanho menor para a barra de pesquisa */
-    margin-right: 10px;
-}
-
-.search-container button {
-    background-color: var(--color-accent);
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.search-container button:hover {
-    background-color: var(--color-accent-dark);
-}
-
-/* Imagem do cabeçalho (páginas de conteúdo: logo pequeno + título) */
-#header-image {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    margin: 0 auto;
-    border-radius: 20px;
 }
 
 /* Imagem do cabeçalho da home (banner dia/noite) */
@@ -1058,69 +908,6 @@ input.input-error, input.input-error:focus {
 }
 
 .pagination-controls span { color: var(--color-text-secondary); }
-
-/* Rodapé */
-footer {
-    background-color: var(--color-accent);
-    color: white;
-    padding: 18px 20px;
-    text-align: center;
-    margin-top: auto;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Quando #bottom-image existe, ele absorve o espaço e o footer fica colado abaixo */
-#bottom-image {
-    margin-top: auto;
-}
-#bottom-image + footer {
-    margin-top: 0;
-}
-
-.footer-content {
-    font-size: 0.88em;
-    opacity: 0.92;
-}
-
-.footer-content p { margin: 0; }
-
-
-/* Flexbox geral para seções */
-.section-container {
-    display: flex;
-    justify-content: flex-start; /* Garante que o conteúdo comece da esquerda */
-    align-items: center; /* Centraliza verticalmente */
-    margin-bottom: 30px;
-    padding: 10px;
-    border: 1px solid var(--color-accent);
-    border-radius: 10px;
-    text-align: left;
-}
-
-.section-container img {
-    width: 30%; /* Ajusta o tamanho da imagem */
-    max-width: 250px;
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 15px;
-}
-
-.section-container div {
-    margin-left: 20px; /* Adiciona espaço entre a imagem e o texto */
-}
-
-.section-container h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-}
-
-.section-container p {
-    width: 60%; /* Define a largura do texto */
-    margin-left: 20px;
-    line-height: 1.5em;
-    text-align: justify;
-}
 
 /* ===================== */
 /* CARROSSEL             */
@@ -1403,27 +1190,6 @@ footer {
 }
 
 .widget-list a { color: var(--color-link); font-weight: 600; }
-
-.widget-quicklinks {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.widget-quicklinks a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: var(--radius-pill);
-    color: var(--color-text);
-    font-weight: 600;
-    font-size: 0.92rem;
-    text-decoration: none;
-    transition: background-color 0.2s;
-}
-
-.widget-quicklinks a:hover { background: var(--color-surface-hover); }
 
 .widget-mood {
     display: flex;
@@ -1788,17 +1554,6 @@ footer {
 
 @media (max-width: 700px) {
     .guestbook-decor { display: none; }
-}
-
-.section-divider {
-    height: 40px;
-    margin: 4px auto;
-    max-width: 600px;
-    background-image: url('imagens/decor/divisor-tracejado-folhas.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.85;
 }
 
 .guestbook-subtitle {
