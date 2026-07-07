@@ -484,10 +484,25 @@ body.page-public .site-main {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 14px 4px;
-    border-top: var(--border-card-width) solid var(--color-border);
-    border-bottom: var(--border-card-width) solid var(--color-border);
+    padding: 26px 4px;
 }
+
+.sidebar-widgets::before,
+.sidebar-widgets::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88%;
+    height: 20px;
+    background-image: url('imagens/decor/divisor-coracao-setas-folha.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.sidebar-widgets::before { top: 0; }
+.sidebar-widgets::after { bottom: 0; }
 
 .sidebar-widgets h4 {
     margin: 0 0 8px;
@@ -614,11 +629,25 @@ body.page-public .site-main {
 
 .sidebar-footer {
     margin-top: auto;
+    position: relative;
     display: flex;
     align-items: center;
     gap: 6px;
-    padding-top: 12px;
-    border-top: var(--border-card-width) solid var(--color-border);
+    padding-top: 24px;
+}
+
+.sidebar-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88%;
+    height: 20px;
+    background-image: url('imagens/decor/divisor-coracao-setas-folha.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .sidebar-footer .login-link {
