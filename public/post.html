@@ -267,7 +267,7 @@ function loadComments(postId) {
             const list = document.getElementById('comments-list');
 
             if (!comments.length) {
-                list.innerHTML = '<p class="no-comments">Nenhum comentário ainda. Seja a primeira!</p>';
+                list.innerHTML = _emptyStateHtml('imagens/decor/sapo-abracando-barriga.png', 'Nenhum comentário ainda. Seja a primeira!');
                 return;
             }
 

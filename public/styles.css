@@ -322,6 +322,14 @@ a:hover {
     border-radius: var(--radius-card);
 }
 
+/* Evita que o flexbox encolha o conteúdo abaixo do seu tamanho real quando
+   .site-main vira um container de altura travada (ver regra de scroll
+   interno no desktop) — sem isso, blocos com min-height explícito (como
+   .container) eram espremidos e os irmãos seguintes sobrepunham o texto. */
+.site-main > * {
+    flex-shrink: 0;
+}
+
 .site-sidebar {
     grid-area: sidebar;
     width: var(--sidebar-width);
@@ -1581,6 +1589,43 @@ input.input-error, input.input-error:focus {
     font-style: italic;
     margin: 0;
 }
+
+/* Estados vazios com sapinho — busca sem resultado, listas/comentários/guestbook vazios */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 28px 16px;
+    text-align: center;
+}
+
+.empty-state img {
+    width: 84px;
+    height: auto;
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    font-size: 0.92em;
+}
+
+/* Variante maior — busca sem resultado, mais espaço disponível no overlay */
+.empty-state--lg img { width: 140px; }
+
+/* Variante compacta pra slots pequenos (ex: preview do guestbook na home) */
+.empty-state--sm {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 4px;
+    text-align: left;
+}
+
+.empty-state--sm img { width: 44px; flex-shrink: 0; }
+.empty-state--sm p { font-size: 0.85em; }
 
 /* ===================== */
 /* GUESTBOOK (Fase 24) */

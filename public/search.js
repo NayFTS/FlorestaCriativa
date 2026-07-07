@@ -118,6 +118,12 @@ if (document.readyState === 'loading') {
     markActiveNavLinks();
 }
 
+function _emptyStateHtml(imgSrc, text, extraStyle, modifierClass) {
+    const style = extraStyle ? ` style="${extraStyle}"` : '';
+    const cls = 'empty-state' + (modifierClass ? ' ' + modifierClass : '');
+    return `<div class="${cls}"${style}><img src="${imgSrc}" alt="" loading="lazy"><p>${text}</p></div>`;
+}
+
 function _escapeHtmlGlobal(str) {
     const div = document.createElement('div');
     div.appendChild(document.createTextNode(String(str)));
@@ -368,7 +374,7 @@ function search() {
             resultContainer.style.display = 'block';
 
             if (!data.length) {
-                resultContainer.innerHTML = '<p>Nenhum resultado encontrado.</p>';
+                resultContainer.innerHTML = _emptyStateHtml('imagens/decor/sapo-espiando-agua-1.png', 'Nenhum resultado encontrado.', null, 'empty-state--lg');
                 return;
             }
 
@@ -534,7 +540,7 @@ function initPostListing(pageUrl, containerId) {
                 container.innerHTML = '';
 
                 if (posts.length === 0) {
-                    container.innerHTML = '<p>Nenhum post encontrado.</p>';
+                    container.innerHTML = _emptyStateHtml('imagens/decor/sapo-lendo-livro.png', 'Nenhum post encontrado.');
                 } else {
                     posts.forEach(post => container.appendChild(_renderPostCard(post)));
                 }

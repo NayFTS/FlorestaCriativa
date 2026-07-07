@@ -241,7 +241,7 @@
               .then(entries => {
                   const wrap = document.getElementById('guestbookEntries');
                   if (!entries.length) {
-                      wrap.innerHTML = '<p class="widget-hint">Nenhuma mensagem ainda — seja a primeira!</p>';
+                      wrap.innerHTML = _emptyStateHtml('imagens/decor/sapo-dormindo-lago.png', 'Nenhuma mensagem ainda — seja a primeira!', null, 'empty-state--sm');
                       return;
                   }
                   wrap.innerHTML = entries.map(e => {

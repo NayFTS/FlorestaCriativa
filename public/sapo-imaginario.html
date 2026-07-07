@@ -244,7 +244,7 @@
                       const total = data.total || 0;
                       grid.innerHTML = '';
                       if (!posts.length) {
-                          grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:32px 0; color:var(--color-text-secondary)">Nenhum projeto ainda. Em breve!</p>';
+                          grid.innerHTML = _emptyStateHtml('imagens/decor/sapo-de-costas-manchas.png', 'Nenhum projeto ainda. Em breve!', 'grid-column:1/-1');
                       } else {
                           posts.forEach(post => grid.appendChild(buildCard(post)));
                       }
