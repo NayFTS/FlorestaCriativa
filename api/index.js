@@ -61,12 +61,6 @@ app.use(session({
 }));
 
 // Definir modelos do MongoDB
-const User = mongoose.model('User', new mongoose.Schema({
-    username: String,
-    email: { type: String, unique: true },
-    password: String
-}));
-
 const Post = mongoose.model('Post', new mongoose.Schema({
     title: String,
     content: String,
@@ -74,7 +68,6 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     image_path: String,
     publish_date: { type: Date, default: Date.now },
     categories: [String],
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     slug: { type: String, sparse: true },
     views: { type: Number, default: 0 },
     status: { type: String, enum: ['published', 'draft'], default: 'published' },
@@ -91,6 +84,32 @@ const Comment = mongoose.model('Comment', new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     approved: { type: Boolean, default: false }
 }));
+
+const GuestbookEntry = mongoose.model('GuestbookEntry', new mongoose.Schema({
+    author: { type: String, required: true, maxlength: 60 },
+    message: { type: String, required: true, maxlength: 500 },
+    createdAt: { type: Date, default: Date.now },
+    approved: { type: Boolean, default: false }
+}));
+
+const SiteSettings = mongoose.model('SiteSettings', new mongoose.Schema({
+    currently: {
+        type: [String],
+        default: ['✍️ Escrevendo uma história nova', '🎨 Desenhando bobagens fofas', '📖 Aprendendo algo novo']
+    },
+    moodEmoji: { type: String, default: '🐸' },
+    moodLabel: { type: String, default: 'tranquila' },
+    nowPlayingTrack: { type: String, default: 'lofi in the swamp' },
+    nowPlayingArtist: { type: String, default: 'frog beats' },
+    featuredCaption: { type: String, default: 'tempo perfeito pra programar ☂️' },
+    updatedAt: { type: Date, default: Date.now }
+}));
+
+async function getOrCreateSettings() {
+    let settings = await SiteSettings.findOne();
+    if (!settings) settings = await SiteSettings.create({});
+    return settings;
+}
 
 function slugify(text) {
     return text.toString().toLowerCase()
@@ -126,32 +145,18 @@ const galleryUpload = upload.fields([
 ]);
 
 function requireAuth(req, res, next) {
-    if (!req.session.userId) {
+    if (!req.session.isAdmin) {
         return res.status(401).json({ message: 'Usuário não autenticado' });
     }
     next();
 }
 
-// Rota de registro
 const { body, validationResult } = require('express-validator');
-
-app.post('/register', (req, res) => {
-    res.status(403).json({ message: 'Registro desativado.' });
-});
-
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
     message: { message: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
-const resetLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 3,
-    message: { message: 'Muitas tentativas de redefinição de senha. Tente novamente em 1 hora.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -164,9 +169,17 @@ const commentLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+const guestbookLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: { message: 'Muitas mensagens no guestbook. Tente novamente em 1 hora.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Rota de login
 app.post('/login', loginLimiter, [
-    body('email').isEmail().withMessage('Email inválido'),
+    body('username').notEmpty().withMessage('Usuário é obrigatório'),
     body('password').notEmpty().withMessage('Senha é obrigatória')
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -175,9 +188,10 @@ app.post('/login', loginLimiter, [
     }
 
     try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user || !bcrypt.compareSync(password, user.password)) {
+        const { username, password } = req.body;
+        const validUsername = username === process.env.ADMIN_USERNAME;
+        const validPassword = bcrypt.compareSync(password, process.env.ADMIN_PASSWORD_HASH || '');
+        if (!validUsername || !validPassword) {
             return res.status(400).json({ message: 'Usuário ou senha incorretos' });
         }
 
@@ -186,8 +200,8 @@ app.post('/login', loginLimiter, [
                 console.error('Erro ao regenerar sessão:', err);
                 return res.status(500).json({ message: 'Erro no servidor' });
             }
-            req.session.userId = user._id;
-            req.session.username = user.username;
+            req.session.isAdmin = true;
+            req.session.username = process.env.ADMIN_USERNAME;
             res.status(200).json({ message: 'Login bem-sucedido' });
         });
 
@@ -197,47 +211,9 @@ app.post('/login', loginLimiter, [
     }
 });
 
-
-
-
-// Rota de reset de senha (protegida por chave secreta)
-app.post('/reset-password', resetLimiter, [
-    body('email').isEmail().withMessage('Email inválido'),
-    body('secret').notEmpty().withMessage('Chave secreta obrigatória'),
-    body('newPassword').isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, secret, newPassword } = req.body;
-
-    if (secret !== process.env.RESET_SECRET) {
-        return res.status(403).json({ message: 'Chave secreta inválida' });
-    }
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
-
-        user.password = bcrypt.hashSync(newPassword, 10);
-        await user.save();
-        res.status(200).json({ message: 'Senha atualizada com sucesso' });
-    } catch (err) {
-        console.error('Erro no reset de senha:', err);
-        res.status(500).json({ message: 'Erro no servidor' });
-    }
-});
-
 // Rota para buscar informações do usuário
-app.get('/user-info', requireAuth, async (req, res) => {
-    try {
-        const user = await User.findById(req.session.userId);
-        res.json({ username: user.username });
-    } catch (err) {
-        res.status(500).send('Erro ao buscar usuário');
-    }
+app.get('/user-info', requireAuth, (req, res) => {
+    res.json({ username: req.session.username });
 });
 
 app.get('/logout', (req, res) => {
@@ -265,7 +241,6 @@ app.post('/addPost', requireAuth, galleryUpload, async (req, res) => {
 
         const newPost = new Post({
             title, content, url, image_path, categories, technologies, gallery,
-            author: req.session.userId,
             slug,
             external_link: external_link || '',
             preview_link: preview_link || '',
@@ -296,10 +271,6 @@ app.post('/editPost/:id', requireAuth, galleryUpload, async (req, res) => {
 
         if (!post) {
             return res.status(404).json({ success: false, message: 'Post não encontrado' });
-        }
-
-        if (post.author && post.author.toString() !== req.session.userId.toString()) {
-            return res.status(403).json({ success: false, message: 'Sem permissão para editar este post' });
         }
 
         // Atualiza os campos
@@ -381,9 +352,6 @@ app.delete('/posts/:id', requireAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).send('Post não encontrado');
-        if (post.author.toString() !== req.session.userId.toString()) {
-            return res.status(403).send('Sem permissão para excluir este post');
-        }
         await Post.findByIdAndDelete(req.params.id);
         res.status(200).send('Postagem excluída com sucesso');
     } catch (err) {
@@ -434,7 +402,7 @@ app.get('/search', async (req, res) => {
 
 app.get('/user-posts', requireAuth, async (req, res) => {
     try {
-        const posts = await Post.find({ author: req.session.userId }).sort({ publish_date: -1 });
+        const posts = await Post.find({}).sort({ publish_date: -1 });
         res.json(posts);
     } catch (err) {
         console.error('Erro ao buscar postagens do usuário:', err);
@@ -444,10 +412,9 @@ app.get('/user-posts', requireAuth, async (req, res) => {
 
 app.get('/dashboard-stats', requireAuth, async (req, res) => {
     try {
-        const authorId = req.session.userId;
         const [allPosts, recentPosts] = await Promise.all([
-            Post.find({ author: authorId }),
-            Post.find({ author: authorId }).sort({ publish_date: -1 }).limit(3)
+            Post.find({}),
+            Post.find({}).sort({ publish_date: -1 }).limit(3)
         ]);
         const totalPosts = allPosts.length;
         const draftCount = allPosts.filter(p => p.status === 'draft').length;
@@ -475,9 +442,6 @@ app.patch('/posts/:id/publish', requireAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
-        if (post.author.toString() !== req.session.userId.toString()) {
-            return res.status(403).json({ message: 'Sem permissão' });
-        }
         post.status = 'published';
         await post.save();
         res.json({ success: true });
@@ -533,9 +497,6 @@ app.get('/posts/:id/data', requireAuth, async (req, res) => {
         }
         const post = await Post.findById(id);
         if (!post) return res.status(404).json({ success: false, message: 'Post não encontrado' });
-        if (post.author && post.author.toString() !== req.session.userId.toString()) {
-            return res.status(403).json({ success: false, message: 'Sem permissão' });
-        }
         res.json(post);
     } catch (err) {
         res.status(500).json({ success: false, message: 'Erro no servidor' });
@@ -601,6 +562,103 @@ app.delete('/admin/comments/:id', requireAuth, async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao deletar comentário' });
+    }
+});
+
+// ── Guestbook ────────────────────────────────────────────
+
+app.post('/guestbook', guestbookLimiter, [
+    body('author').trim().notEmpty().isLength({ max: 60 }).withMessage('Nome inválido'),
+    body('message').trim().notEmpty().isLength({ max: 500 }).withMessage('Mensagem inválida')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    const { author, message } = req.body;
+    try {
+        const entry = new GuestbookEntry({ author: author.trim(), message: message.trim() });
+        await entry.save();
+        res.json({ success: true, message: 'Mensagem enviada para moderação!' });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao salvar mensagem' });
+    }
+});
+
+app.get('/guestbook', async (req, res) => {
+    try {
+        const entries = await GuestbookEntry.find({ approved: true }).sort({ createdAt: -1 }).limit(20);
+        res.json(entries);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar guestbook' });
+    }
+});
+
+app.get('/admin/guestbook/pending', requireAuth, async (req, res) => {
+    try {
+        const entries = await GuestbookEntry.find({ approved: false }).sort({ createdAt: -1 });
+        res.json(entries);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar mensagens pendentes' });
+    }
+});
+
+app.patch('/admin/guestbook/:id/approve', requireAuth, async (req, res) => {
+    try {
+        const entry = await GuestbookEntry.findByIdAndUpdate(req.params.id, { approved: true }, { new: true });
+        if (!entry) return res.status(404).json({ message: 'Mensagem não encontrada' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao aprovar mensagem' });
+    }
+});
+
+app.delete('/admin/guestbook/:id', requireAuth, async (req, res) => {
+    try {
+        const entry = await GuestbookEntry.findByIdAndDelete(req.params.id);
+        if (!entry) return res.status(404).json({ message: 'Mensagem não encontrada' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao deletar mensagem' });
+    }
+});
+
+// ── Configurações do site (widgets: currently / mood / now playing) ──────
+
+app.get('/settings', async (req, res) => {
+    try {
+        const settings = await getOrCreateSettings();
+        res.json(settings);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar configurações' });
+    }
+});
+
+app.put('/admin/settings', requireAuth, [
+    body('currently').optional({ nullable: true }).isArray().withMessage('Currently deve ser uma lista'),
+    body('moodEmoji').optional({ nullable: true }).trim().isLength({ max: 10 }).withMessage('Emoji muito longo'),
+    body('moodLabel').optional({ nullable: true }).trim().isLength({ max: 60 }).withMessage('Humor muito longo'),
+    body('nowPlayingTrack').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome da música muito longo'),
+    body('nowPlayingArtist').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome do artista muito longo'),
+    body('featuredCaption').optional({ nullable: true }).trim().isLength({ max: 120 }).withMessage('Legenda muito longa'),
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    try {
+        const settings = await getOrCreateSettings();
+        const { currently, moodEmoji, moodLabel, nowPlayingTrack, nowPlayingArtist, featuredCaption } = req.body;
+        if (currently !== undefined) {
+            settings.currently = currently.map(c => String(c).trim()).filter(Boolean).slice(0, 10);
+        }
+        if (moodEmoji !== undefined) settings.moodEmoji = moodEmoji;
+        if (moodLabel !== undefined) settings.moodLabel = moodLabel;
+        if (nowPlayingTrack !== undefined) settings.nowPlayingTrack = nowPlayingTrack;
+        if (nowPlayingArtist !== undefined) settings.nowPlayingArtist = nowPlayingArtist;
+        if (featuredCaption !== undefined) settings.featuredCaption = featuredCaption;
+        settings.updatedAt = new Date();
+        await settings.save();
+        res.json({ success: true, settings });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao salvar configurações' });
     }
 });
 

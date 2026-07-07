@@ -16,7 +16,6 @@ A Floresta Criativa é um site com backend próprio que funciona como blog e vit
 | **Verde Inspiração** | Hobbies, animes, jogos e leituras |
 | **Sapo Imaginário** | Portfólio e projetos (grid com preview drawer) |
 | **Rascunhos da Floresta** | Escritas, crônicas e textos pessoais |
-| **Roleta** | Ferramenta de sorteio em `/roleta.html` |
 
 ---
 
@@ -54,10 +53,7 @@ Floresta Criativa/
 │   ├── sapo-imaginario.html      # Portfólio com grid e preview drawer
 │   ├── rascunhos-da-floresta.html
 │   ├── post.html                 # Post individual
-│   ├── roleta.html               # Mini-app de sorteio
-│   ├── login.html
-│   ├── register.html             # Desativado (rota retorna 403)
-│   ├── reset-password.html
+│   ├── login.html                # Login do admin (usuário/senha fixos)
 │   ├── dashboard.html            # Painel da autora
 │   ├── publicar.html             # Criar novo post
 │   ├── managePosts.html          # Gerenciar posts
@@ -67,8 +63,6 @@ Floresta Criativa/
 │   └── imagens/
 │       ├── uploads/              # Imagens legadas (locais)
 │       └── favicon_io/
-├── create-user.js                # Script local para criar usuário
-├── reset-password.js             # Script local para resetar senha
 ├── .env                          # Variáveis de ambiente (não commitar)
 ├── vercel.json
 └── package.json
@@ -80,9 +74,8 @@ Floresta Criativa/
 
 | Método | Rota | Auth | Descrição |
 |--------|------|------|-----------|
-| POST | `/login` | — | Autenticar (rate limit: 5/15min) |
+| POST | `/login` | — | Autenticar com usuário/senha fixos (rate limit: 5/15min) |
 | GET | `/logout` | Sim | Encerrar sessão |
-| POST | `/reset-password` | — | Redefinir senha via `RESET_SECRET` (rate limit: 3/h) |
 | GET | `/user-info` | Sim | Dados da usuária logada |
 | GET | `/posts?url=X&page=N&limit=N` | — | Posts por página (exclui rascunhos) |
 | GET | `/post/:id` | — | Post individual (aceita slug ou ObjectId) |
@@ -101,16 +94,11 @@ Floresta Criativa/
 | PATCH | `/admin/comments/:id/approve` | Sim | Aprovar comentário |
 | DELETE | `/admin/comments/:id` | Sim | Excluir comentário |
 
-> **Nota:** `POST /register` está desativado (retorna 403). Cadastro feito via `node create-user.js`.
+> **Nota:** o site tem um único usuário administrador, com usuário/senha fixos definidos em `ADMIN_USERNAME`/`ADMIN_PASSWORD_HASH` no `.env` — não há cadastro nem recuperação de senha.
 
 ---
 
 ## Modelos de Dados
-
-**User**
-```js
-{ username: String, email: String (único), password: String (bcrypt) }
-```
 
 **Post**
 ```js
@@ -123,7 +111,6 @@ Floresta Criativa/
   slug: String,            // gerado do título
   publish_date: Date,
   categories: [String],    // "Escrita" | "Projetos" | "Animes" | "Jogos" | "Slice of Life"
-  author: ObjectId,
   status: String,          // "published" | "draft"
   views: Number,
   technologies: [String],  // para posts do Sapo Imaginário
@@ -164,18 +151,19 @@ Crie `.env` na raiz:
 ```env
 SESSION_SECRET=seu_segredo_aqui
 MONGO_ATLAS=mongodb+srv://usuario:senha@cluster.mongodb.net/dbname
-RESET_SECRET=chave_para_reset_de_senha
+ADMIN_USERNAME=seu_usuario
+ADMIN_PASSWORD_HASH=hash_bcrypt_da_sua_senha
 CLOUDINARY_CLOUD_NAME=seu_cloud_name
 CLOUDINARY_API_KEY=sua_api_key
 CLOUDINARY_API_SECRET=seu_api_secret
 ```
 
-### 3. Crie o usuário inicial
+Gere o hash bcrypt da senha com:
 ```bash
-node create-user.js
+node -e "console.log(require('bcryptjs').hashSync('sua_senha', 10))"
 ```
 
-### 4. Instale e inicie
+### 3. Instale e inicie
 ```bash
 npm install
 npm start   # executa "vercel dev"
@@ -193,7 +181,8 @@ Configure em **Settings → Environment Variables**:
 |----------|-----------|
 | `SESSION_SECRET` | Segredo da sessão |
 | `MONGO_ATLAS` | URI do MongoDB Atlas |
-| `RESET_SECRET` | Chave para reset de senha |
+| `ADMIN_USERNAME` | Usuário fixo do admin |
+| `ADMIN_PASSWORD_HASH` | Hash bcrypt da senha fixa do admin |
 | `CLOUDINARY_CLOUD_NAME` | Cloud name do Cloudinary |
 | `CLOUDINARY_API_KEY` | API key do Cloudinary |
 | `CLOUDINARY_API_SECRET` | API secret do Cloudinary |
