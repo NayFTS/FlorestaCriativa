@@ -114,6 +114,7 @@ body::before {
 html { overflow-x: clip; }
 
 body {
+    position: relative;
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.65;
@@ -188,6 +189,36 @@ a:hover {
 
 [data-theme="dark"] .topbar-sign img.topbar-sign-day { display: none; }
 [data-theme="dark"] .topbar-sign img.topbar-sign-night { display: block; }
+
+.corner-vine {
+    position: absolute;
+    width: 110px;
+    height: auto;
+    pointer-events: none;
+    z-index: 16;
+    opacity: 0.9;
+}
+
+.corner-vine-tr { top: -10px; right: 10px; transform: scaleX(-1); }
+.corner-vine-bl { bottom: -10px; left: -25px; }
+.corner-vine-br { bottom: -10px; right: 10px; transform: scaleX(-1); }
+
+.corner-signpost-br {
+    width: 90px;
+    bottom: 0;
+    right: 85px;
+    transform: scaleX(-1);
+}
+
+@media (max-width: 900px) {
+    .corner-vine { width: 70px; opacity: 0.75; }
+    .corner-signpost-br { width: 60px; right: 55px; }
+}
+
+@media (max-width: 520px) {
+    .corner-vine-bl, .corner-vine-br, .corner-signpost-br { display: none; }
+    .corner-vine-tr { width: 56px; }
+}
 
 .topbar {
     grid-area: topbar;
@@ -320,6 +351,7 @@ body.page-public .topbar {
     border: none;
     border-radius: var(--radius-card);
     box-shadow: none;
+    padding-right: 90px;
 }
 
 body.page-public .site-sidebar {

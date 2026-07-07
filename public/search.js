@@ -56,6 +56,34 @@
     }
 })();
 
+(function () {
+    function injectCornerVines() {
+        if (!document.body.classList.contains('page-public')) return;
+        if (document.querySelector('.corner-vine')) return;
+        const corners = [
+            ['corner-vine-tr', 'imagens/decor/planta-pendente-folhas-2.png'],
+            ['corner-vine-bl', 'imagens/decor/planta-galho-vertical-folhas.png'],
+            ['corner-vine-br', 'imagens/decor/planta-galho-vertical-folhas-2.png'],
+            ['corner-signpost-br', 'imagens/decor/placa-madeira-seta-direcao.png'],
+        ];
+        corners.forEach(([cls, src]) => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = '';
+            img.setAttribute('aria-hidden', 'true');
+            img.loading = 'lazy';
+            img.className = 'corner-vine ' + cls;
+            document.body.appendChild(img);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectCornerVines);
+    } else {
+        injectCornerVines();
+    }
+})();
+
 if (typeof window.API_BASE === 'undefined') {
     window.API_BASE = '/api';
 }
