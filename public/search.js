@@ -115,22 +115,35 @@ function _setPostLiked(id, liked) {
     localStorage.setItem('likedPosts', JSON.stringify(next));
 }
 
+const LIKE_ICON_SAD = 'imagens/decor/icon-sapo-triste.png';
+const LIKE_ICON_HEART = 'imagens/decor/icon-sapo-heart.png';
+
+function _setLikeIcon(btn, liked) {
+    const iconEl = btn.querySelector('.like-icon');
+    if (iconEl) iconEl.src = liked ? LIKE_ICON_HEART : LIKE_ICON_SAD;
+}
+
 function _wireLikeButton(btn, postId, initialLikes) {
     const countEl = btn.querySelector('.like-count');
     let likes = initialLikes || 0;
     let liked = _isPostLiked(postId);
     btn.classList.toggle('liked', liked);
+    _setLikeIcon(btn, liked);
 
     btn.addEventListener('click', () => {
         const nextLiked = !liked;
         const endpoint = nextLiked ? 'like' : 'unlike';
         btn.disabled = true;
         fetch(`${API_BASE}/posts/${postId}/${endpoint}`, { method: 'POST' })
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('like request failed');
+                return r.json();
+            })
             .then(data => {
                 liked = nextLiked;
                 _setPostLiked(postId, liked);
                 btn.classList.toggle('liked', liked);
+                _setLikeIcon(btn, liked);
                 likes = typeof data.likes === 'number' ? data.likes : likes;
                 if (countEl) countEl.textContent = likes;
             })
@@ -440,7 +453,7 @@ function loadPosts(pageUrl, containerId, page, limit) {
                         <h3><a href="${link}">${_escapeHtmlGlobal(post.title)}</a></h3>
                         <p>${_escapeHtmlGlobal(excerpt)}</p>
                         <div class="post-card-stats">
-                            <button type="button" class="like-btn" aria-label="Curtir post">🐸 <span class="like-count">${post.likes || 0}</span></button>
+                            <button type="button" class="like-btn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
                             <span class="comment-count">💬 ${post.commentsCount || 0}</span>
                         </div>
                         <div class="post-card-footer">

@@ -2610,6 +2610,20 @@ section#rascunhos-da-floresta {
 .like-btn.liked { color: var(--color-accent-dark); font-weight: 700; }
 .like-btn:disabled { opacity: 0.6; cursor: default; }
 
+.like-icon {
+    width: 1.3em !important;
+    height: 1.3em !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    vertical-align: middle;
+    transition: transform 0.2s;
+}
+
+.like-btn.liked .like-icon { transform: scale(1.15); }
+
 .comment-count {
     display: inline-flex;
     align-items: center;

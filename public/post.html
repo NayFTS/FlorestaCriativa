@@ -458,7 +458,7 @@ function fetchPost() {
                     <div class="content-body">${data.content}</div>
                     <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                     <div class="post-header-stats">
-                        <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post">🐸 <span class="like-count">${data.likes || 0}</span></button>
+                        <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${data.likes || 0}</span></button>
                         <a href="#comments-section" class="comment-count">💬 ${data.commentsCount || 0}</a>
                     </div>
                     <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
@@ -473,7 +473,7 @@ function fetchPost() {
                         <h2>${escapeHtml(data.title)}</h2>
                         <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                         <div class="post-header-stats">
-                            <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post">🐸 <span class="like-count">${data.likes || 0}</span></button>
+                            <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${data.likes || 0}</span></button>
                             <a href="#comments-section" class="comment-count">💬 ${data.commentsCount || 0}</a>
                         </div>
                     </div>
