@@ -632,6 +632,30 @@ body.page-public .site-main {
 
     .nav-drawer.open { transform: translateX(0); }
 
+    /* Currently/Mood também aparecem no drawer mobile (no desktop ficam só na .site-sidebar) */
+    .nav-drawer .drawer-widgets .currently-widget,
+    .nav-drawer .drawer-widgets .mood-widget {
+        margin: 0 -20px;
+    }
+
+    .nav-drawer .sidebar-footer {
+        gap: 10px;
+    }
+
+    .nav-drawer .sidebar-footer .icon-btn,
+    .nav-drawer .sidebar-footer .theme-toggle {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--color-surface-alt);
+        border: var(--border-card-width) solid var(--color-border);
+    }
+
     .bottom-nav {
         display: flex;
         justify-content: space-around;
@@ -658,6 +682,25 @@ body.page-public .site-main {
         color: var(--color-text-soft);
         text-decoration: none;
     }
+
+    .bottom-nav-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 52px;
+        height: 52px;
+        margin-top: -26px;
+        border-radius: 50%;
+        background: var(--color-accent);
+        border: 3px solid var(--color-surface);
+        box-shadow: var(--shadow-card);
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .bottom-nav-center:hover { background: var(--color-accent-dark); }
 
     .bottom-nav a .bottom-nav-icon { font-size: 20px; }
     .bottom-nav a.active { color: var(--color-accent-dark); }
@@ -1683,20 +1726,24 @@ footer {
             "guestbook";
     }
 
-    .home-quicklinks-col,
-    .home-widgets {
-        flex-direction: row;
-        overflow-x: auto;
-        gap: 14px;
-        padding-bottom: 8px;
-        scroll-snap-type: x mandatory;
+    /* Quick Links vira grid 2x2 fixo (sem scroll horizontal) */
+    .home-quicklinks-col .quicklink-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
     }
 
-    .home-quicklinks-col .widget-card,
-    .home-widgets .widget-card {
-        width: 250px;
-        flex: 0 0 250px;
-        scroll-snap-align: start;
+    .home-quicklinks-col .quicklink-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 6px;
+        padding: 12px 6px;
+    }
+
+    /* Featured e Garden Log só aparecem no desktop; Now Playing fica sozinho, full-width */
+    .widget-featured,
+    .widget-gardenlog {
+        display: none;
     }
 }
 
@@ -2096,6 +2143,46 @@ footer {
 .back-button-container {
     text-align: center; /* Centraliza o botão horizontalmente */
     margin: 20px 0; /* Espaçamento em cima e embaixo do botão */
+}
+
+.post-mobile-topbar { display: none; }
+
+@media (max-width: 768px) {
+    .back-button-container { display: none; }
+
+    .post-mobile-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 120;
+        background: var(--color-surface);
+        border-bottom: var(--border-card-width) solid var(--color-border);
+        padding: 10px 14px;
+        margin: 0 0 12px;
+    }
+
+    .post-mobile-back {
+        background: none;
+        border: none;
+        color: var(--color-text);
+        font-weight: 600;
+        font-size: 0.95em;
+        padding: 6px 4px;
+        cursor: pointer;
+    }
+
+    .post-mobile-share {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--color-surface-alt);
+        border: var(--border-card-width) solid var(--color-border);
+        font-size: 1.1em;
+        line-height: 1;
+        cursor: pointer;
+    }
 }
 
 .back-button-container button {
@@ -2727,6 +2814,38 @@ section#rascunhos-da-floresta {
     flex-shrink: 0;
 }
 
+.post-card-stats {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 8px;
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+}
+
+.like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 2px 0;
+    font-size: 1em;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.like-btn:hover { color: var(--color-accent-dark); }
+.like-btn.liked { color: var(--color-accent-dark); font-weight: 700; }
+.like-btn:disabled { opacity: 0.6; cursor: default; }
+
+.comment-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
 /* Mobile: empilha verticalmente */
 @media (max-width: 520px) {
     #post-list .post-container {
@@ -3149,6 +3268,23 @@ select {
     color: var(--color-text-secondary);
     margin: 6px 0;
 }
+
+.post-header-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 4px 0 10px;
+    font-size: 0.95em;
+}
+
+.post-header-stats .like-btn { font-size: 1.05em; }
+
+.post-header-stats .comment-count {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+}
+
+.post-header-stats .comment-count:hover { color: var(--color-accent-dark); }
 
 /* Badges de status */
 .badge {

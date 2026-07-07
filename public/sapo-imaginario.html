@@ -37,13 +37,13 @@
         <div class="sidebar-widgets">
           <div class="currently-widget">
             <h4>🌱 Currently</h4>
-            <ul class="widget-list" id="currentlyList">
+            <ul class="widget-list js-currently-list">
               <li>Carregando...</li>
             </ul>
           </div>
           <div class="mood-widget">
             <h4>Mood</h4>
-            <div class="widget-mood" id="moodWidget">
+            <div class="widget-mood js-mood-widget">
               <div class="mood-carousel">
                 <img src="imagens/decor/sapo-sentado.png" alt="" class="mood-carousel-img">
               </div>
@@ -71,6 +71,23 @@
           <a href="sobre-mim.html">🐸 Sobre Mim</a>
           <a href="#guestbook">📝 Guestbook</a>
         </div>
+        <div class="sidebar-widgets drawer-widgets">
+          <div class="currently-widget">
+            <h4>🌱 Currently</h4>
+            <ul class="widget-list js-currently-list">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+          <div class="mood-widget">
+            <h4>Mood</h4>
+            <div class="widget-mood js-mood-widget">
+              <div class="mood-carousel">
+                <img src="imagens/decor/sapo-sentado.png" alt="" class="mood-carousel-img">
+              </div>
+              <span class="widget-mood-label">Carregando...</span>
+            </div>
+          </div>
+        </div>
         <div class="sidebar-footer theme-toggle-target">
           <a href="login.html" class="login-link">Login</a>
           <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
@@ -80,6 +97,7 @@
       <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
         <a href="index.html"><span class="bottom-nav-icon">🏠</span>Home</a>
         <a href="verde-inspiracao.html"><span class="bottom-nav-icon">🌿</span>Verde</a>
+        <button type="button" class="bottom-nav-center" onclick="toggleDrawer()" aria-label="Abrir menu">🐸</button>
         <a href="sapo-imaginario.html"><span class="bottom-nav-icon">🐸</span>Sapo</a>
         <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon">📝</span>Rascunhos</a>
       </div>

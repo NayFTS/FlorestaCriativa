@@ -71,6 +71,8 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     categories: [String],
     slug: { type: String, sparse: true },
     views: { type: Number, default: 0 },
+    likes: { type: Number, default: 0 },
+    commentsCount: { type: Number, default: 0 },
     status: { type: String, enum: ['published', 'draft'], default: 'published' },
     external_link: { type: String, default: '' },
     preview_link: { type: String, default: '' },
@@ -213,6 +215,14 @@ const guestbookLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 5,
     message: { message: 'Muitas mensagens no guestbook. Tente novamente em 1 hora.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const likeLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 30,
+    message: { message: 'Muitas curtidas. Tente novamente em 1 hora.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -386,6 +396,28 @@ app.get('/post/:id', async (req, res) => {
 });
 
 
+
+app.post('/posts/:id/like', likeLimiter, async (req, res) => {
+    try {
+        const post = await Post.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } }, { new: true });
+        if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+        res.json({ likes: post.likes });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao curtir post' });
+    }
+});
+
+app.post('/posts/:id/unlike', likeLimiter, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+        post.likes = Math.max(0, post.likes - 1);
+        await post.save();
+        res.json({ likes: post.likes });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao descurtir post' });
+    }
+});
 
 // Rota para deletar posts
 app.delete('/posts/:id', requireAuth, async (req, res) => {
@@ -589,6 +621,7 @@ app.patch('/admin/comments/:id/approve', requireAuth, async (req, res) => {
     try {
         const comment = await Comment.findByIdAndUpdate(req.params.id, { approved: true }, { new: true });
         if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
+        await Post.findByIdAndUpdate(comment.post, { $inc: { commentsCount: 1 } });
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao aprovar comentário' });
@@ -599,6 +632,13 @@ app.delete('/admin/comments/:id', requireAuth, async (req, res) => {
     try {
         const comment = await Comment.findByIdAndDelete(req.params.id);
         if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
+        if (comment.approved) {
+            const post = await Post.findById(comment.post);
+            if (post) {
+                post.commentsCount = Math.max(0, post.commentsCount - 1);
+                await post.save();
+            }
+        }
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao deletar comentário' });

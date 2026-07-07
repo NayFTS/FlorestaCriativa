@@ -90,25 +90,71 @@ function _escapeHtmlGlobal(str) {
     return div.innerHTML;
 }
 
+// ── Curtidas (persistidas no navegador via localStorage, sem precisar de login) ──
+function _getLikedPostIds() {
+    try {
+        return JSON.parse(localStorage.getItem('likedPosts') || '[]');
+    } catch (e) {
+        return [];
+    }
+}
+
+function _isPostLiked(id) {
+    return _getLikedPostIds().includes(id);
+}
+
+function _setPostLiked(id, liked) {
+    const ids = _getLikedPostIds();
+    const next = liked ? [...new Set([...ids, id])] : ids.filter(x => x !== id);
+    localStorage.setItem('likedPosts', JSON.stringify(next));
+}
+
+function _wireLikeButton(btn, postId, initialLikes) {
+    const countEl = btn.querySelector('.like-count');
+    let likes = initialLikes || 0;
+    let liked = _isPostLiked(postId);
+    btn.classList.toggle('liked', liked);
+
+    btn.addEventListener('click', () => {
+        const nextLiked = !liked;
+        const endpoint = nextLiked ? 'like' : 'unlike';
+        btn.disabled = true;
+        fetch(`${API_BASE}/posts/${postId}/${endpoint}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                liked = nextLiked;
+                _setPostLiked(postId, liked);
+                btn.classList.toggle('liked', liked);
+                likes = typeof data.likes === 'number' ? data.likes : likes;
+                if (countEl) countEl.textContent = likes;
+            })
+            .catch(() => {})
+            .finally(() => { btn.disabled = false; });
+    });
+}
+
 function loadSiteSettings() {
-    const currentlyList = document.getElementById('currentlyList');
-    const moodEmoji = document.querySelector('#moodWidget .widget-mood-emoji');
-    const moodLabel = document.querySelector('#moodWidget .widget-mood-label');
+    const currentlyLists = document.querySelectorAll('.js-currently-list');
+    const moodWidgets = document.querySelectorAll('.js-mood-widget');
     const nowPlayingTrack = document.getElementById('nowPlayingTrack');
     const nowPlayingArtist = document.getElementById('nowPlayingArtist');
     const featuredCaption = document.getElementById('featuredCaption');
-    if (!currentlyList && !moodEmoji && !nowPlayingTrack && !featuredCaption) return;
+    if (!currentlyLists.length && !moodWidgets.length && !nowPlayingTrack && !featuredCaption) return;
 
     fetch(`${API_BASE}/settings`)
         .then(r => r.json())
         .then(s => {
-            if (currentlyList) {
-                currentlyList.innerHTML = (s.currently && s.currently.length)
+            currentlyLists.forEach(list => {
+                list.innerHTML = (s.currently && s.currently.length)
                     ? s.currently.map(c => `<li>${_escapeHtmlGlobal(c)}</li>`).join('')
                     : '<li>Nada por aqui no momento.</li>';
-            }
-            if (moodEmoji) moodEmoji.textContent = s.moodEmoji || '🐸';
-            if (moodLabel) moodLabel.textContent = s.moodLabel || '';
+            });
+            moodWidgets.forEach(widget => {
+                const emoji = widget.querySelector('.widget-mood-emoji');
+                const label = widget.querySelector('.widget-mood-label');
+                if (emoji) emoji.textContent = s.moodEmoji || '🐸';
+                if (label) label.textContent = s.moodLabel || '';
+            });
             if (nowPlayingTrack) nowPlayingTrack.textContent = s.nowPlayingTrack || '';
             if (nowPlayingArtist) nowPlayingArtist.textContent = s.nowPlayingArtist || '';
             if (featuredCaption) featuredCaption.textContent = s.featuredCaption || '';
@@ -383,12 +429,17 @@ function loadPosts(pageUrl, containerId, page, limit) {
                     `<div class="post-card-body">
                         <h3><a href="${link}">${post.title}</a></h3>
                         <p>${excerpt}</p>
+                        <div class="post-card-stats">
+                            <button type="button" class="like-btn" aria-label="Curtir post">🐸 <span class="like-count">${post.likes || 0}</span></button>
+                            <span class="comment-count">💬 ${post.commentsCount || 0}</span>
+                        </div>
                         <div class="post-card-footer">
                             <a href="${link}" class="leia-mais">Leia mais</a>
                             ${dateStr ? `<time class="post-date">${dateStr}</time>` : ''}
                         </div>
                     </div>`;
                 container.appendChild(postItem);
+                _wireLikeButton(postItem.querySelector('.like-btn'), post._id, post.likes);
             });
 
             const loaded = (page - 1) * limit + posts.length;
