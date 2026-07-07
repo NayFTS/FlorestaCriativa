@@ -379,9 +379,10 @@ function loadRelatedPosts(pageUrl, currentId) {
                 const card = document.createElement('a');
                 card.className = 'related-card';
                 card.href = link;
+                const excerptText = excerpt.length > 90 ? excerpt.substring(0, 90) + '...' : excerpt;
                 card.innerHTML =
-                    (imgSrc ? `<img src="${imgSrc}" alt="${post.title}" loading="lazy">` : '<div class="related-card-img-placeholder"></div>') +
-                    `<div class="related-card-body"><h4>${post.title}</h4><p>${excerpt.length > 90 ? excerpt.substring(0, 90) + '...' : excerpt}</p></div>`;
+                    (imgSrc ? `<img src="${imgSrc}" alt="${escapeHtml(post.title)}" loading="lazy">` : '<div class="related-card-img-placeholder"></div>') +
+                    `<div class="related-card-body"><h4>${escapeHtml(post.title)}</h4><p>${escapeHtml(excerptText)}</p></div>`;
                 grid.appendChild(card);
             });
             section.style.display = 'block';
@@ -423,7 +424,7 @@ function fetchPost() {
             });
             const resolveImg = (p) => p.startsWith('http') ? p : `/imagens/uploads/${p}`;
             const imageHTML = data.image_path
-                ? `<img class="post-cover-img" src="${resolveImg(data.image_path)}" alt="${data.title}">`
+                ? `<img class="post-cover-img" src="${resolveImg(data.image_path)}" alt="${escapeHtml(data.title)}">`
                 : '';
             const categories = data.categories ? [...new Set(data.categories)] : [];
             const categoryChipsHtml = categories.length
@@ -438,7 +439,7 @@ function fetchPost() {
                 postContainer.classList.add('sapo-post');
                 const techs = Array.isArray(data.technologies) ? data.technologies : [];
                 const techHtml = techs.length
-                    ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>`
+                    ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`).join('')}</div>`
                     : '';
                 const previewLink = data.preview_link || '';
                 const externalLinkHtml = data.external_link
@@ -446,7 +447,7 @@ function fetchPost() {
                     : '';
                 postContainer.innerHTML = `
                     <div class="sapo-post-header">
-                        <h2>${data.title}</h2>
+                        <h2>${escapeHtml(data.title)}</h2>
                         ${techHtml}
                         <div class="project-card-actions">
                             <button id="previewBtn" class="btn-preview">◈ Preview</button>
@@ -469,7 +470,7 @@ function fetchPost() {
                 postContainer.innerHTML = `
                     <div class="post-header-card">
                         ${categoryChipsHtml}
-                        <h2>${data.title}</h2>
+                        <h2>${escapeHtml(data.title)}</h2>
                         <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                         <div class="post-header-stats">
                             <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post">🐸 <span class="like-count">${data.likes || 0}</span></button>

@@ -197,11 +197,11 @@
           card.className = 'project-card';
 
           const imgHtml = imgSrc
-              ? `<a href="${link}"><img src="${imgSrc}" alt="${post.title}" loading="lazy"></a>`
+              ? `<a href="${link}"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy"></a>`
               : '<div class="project-card-img-placeholder">🌿</div>';
 
           const techHtml = techs.length
-              ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>`
+              ? `<div class="tech-tags">${techs.map(t => `<span class="tech-tag">${_escapeHtmlGlobal(t)}</span>`).join('')}</div>`
               : '';
 
           const verHtml = extLink
@@ -211,8 +211,8 @@
           card.innerHTML = `
               <div class="project-card-img">${imgHtml}</div>
               <div class="project-card-body">
-                  <h3><a href="${link}">${post.title}</a></h3>
-                  <p>${excerpt}</p>
+                  <h3><a href="${link}">${_escapeHtmlGlobal(post.title)}</a></h3>
+                  <p>${_escapeHtmlGlobal(excerpt)}</p>
                   ${techHtml}
                   <div class="project-card-actions">
                       <button class="btn-preview">◈ Preview</button>

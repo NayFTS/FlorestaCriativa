@@ -424,11 +424,11 @@ function loadPosts(pageUrl, containerId, page, limit) {
                 postItem.className = 'post-container';
                 postItem.innerHTML =
                     (imgSrc
-                        ? `<a href="${link}" class="post-img-link" tabindex="-1" aria-hidden="true"><img src="${imgSrc}" alt="${post.title}" loading="lazy"></a>`
+                        ? `<a href="${link}" class="post-img-link" tabindex="-1" aria-hidden="true"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy"></a>`
                         : '<div class="post-img-placeholder"></div>') +
                     `<div class="post-card-body">
-                        <h3><a href="${link}">${post.title}</a></h3>
-                        <p>${excerpt}</p>
+                        <h3><a href="${link}">${_escapeHtmlGlobal(post.title)}</a></h3>
+                        <p>${_escapeHtmlGlobal(excerpt)}</p>
                         <div class="post-card-stats">
                             <button type="button" class="like-btn" aria-label="Curtir post">🐸 <span class="like-count">${post.likes || 0}</span></button>
                             <span class="comment-count">💬 ${post.commentsCount || 0}</span>

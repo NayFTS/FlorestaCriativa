@@ -399,8 +399,17 @@ app.get('/post/:id', async (req, res) => {
 
 app.post('/posts/:id/like', likeLimiter, async (req, res) => {
     try {
-        const post = await Post.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } }, { new: true });
+        const postId = req.params.id;
+        const likedPosts = req.session.likedPosts || [];
+        if (likedPosts.includes(postId)) {
+            const post = await Post.findById(postId);
+            if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+            return res.json({ likes: post.likes });
+        }
+
+        const post = await Post.findByIdAndUpdate(postId, { $inc: { likes: 1 } }, { new: true });
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+        req.session.likedPosts = [...likedPosts, postId];
         res.json({ likes: post.likes });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao curtir post' });
@@ -409,10 +418,19 @@ app.post('/posts/:id/like', likeLimiter, async (req, res) => {
 
 app.post('/posts/:id/unlike', likeLimiter, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const postId = req.params.id;
+        const likedPosts = req.session.likedPosts || [];
+        if (!likedPosts.includes(postId)) {
+            const post = await Post.findById(postId);
+            if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+            return res.json({ likes: post.likes });
+        }
+
+        const post = await Post.findById(postId);
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
         post.likes = Math.max(0, post.likes - 1);
         await post.save();
+        req.session.likedPosts = likedPosts.filter(id => id !== postId);
         res.json({ likes: post.likes });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao descurtir post' });
@@ -619,9 +637,13 @@ app.get('/admin/comments/pending', requireAuth, async (req, res) => {
 
 app.patch('/admin/comments/:id/approve', requireAuth, async (req, res) => {
     try {
-        const comment = await Comment.findByIdAndUpdate(req.params.id, { approved: true }, { new: true });
+        const comment = await Comment.findById(req.params.id);
         if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
-        await Post.findByIdAndUpdate(comment.post, { $inc: { commentsCount: 1 } });
+        if (!comment.approved) {
+            comment.approved = true;
+            await comment.save();
+            await Post.findByIdAndUpdate(comment.post, { $inc: { commentsCount: 1 } });
+        }
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao aprovar comentário' });

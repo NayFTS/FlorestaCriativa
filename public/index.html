@@ -139,7 +139,7 @@
           }
           const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
           log.innerHTML = data.slice(0, 4).map(post =>
-              `<li>🌱 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${post.title}</a>"</li>`
+              `<li>🌱 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(post.title)}</a>"</li>`
           ).join('');
       }
 
@@ -163,16 +163,16 @@
 
               const slide = document.createElement('div');
               slide.className = 'carousel-slide';
-              slide.innerHTML = `<a href="${link}" aria-label="${post.title}">
-                  <img src="${img}" alt="${post.title}" loading="${i === 0 ? 'eager' : 'lazy'}">
+              slide.innerHTML = `<a href="${link}" aria-label="${_escapeHtmlGlobal(post.title)}">
+                  <img src="${img}" alt="${_escapeHtmlGlobal(post.title)}" loading="${i === 0 ? 'eager' : 'lazy'}">
               </a>`;
               track.appendChild(slide);
 
               const card = document.createElement('div');
               card.className = 'carousel-info-card' + (i === 0 ? ' active' : '');
               card.innerHTML = `<a href="${link}" class="carousel-card-body">
-                  <h3>${post.title}</h3>
-                  <p>${excerpt}</p>
+                  <h3>${_escapeHtmlGlobal(post.title)}</h3>
+                  <p>${_escapeHtmlGlobal(excerpt)}</p>
                   <span class="leia-mais">Leia mais →</span>
               </a>`;
               info.appendChild(card);
