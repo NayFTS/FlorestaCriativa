@@ -93,6 +93,10 @@ Floresta Criativa/
 | GET | `/admin/comments/pending` | Sim | Comentários aguardando moderação |
 | PATCH | `/admin/comments/:id/approve` | Sim | Aprovar comentário |
 | DELETE | `/admin/comments/:id` | Sim | Excluir comentário |
+| GET | `/admin/spotify/connect` | Sim | Inicia o fluxo OAuth do Spotify (redireciona) |
+| GET | `/spotify/callback` | — | Callback do OAuth (chamado pelo Spotify, valida `state`) |
+| DELETE | `/admin/spotify/disconnect` | Sim | Desconecta a conta do Spotify |
+| GET | `/spotify/now-playing` | — | Música tocando agora (`{connected:false}` se não conectado) |
 
 > **Nota:** o site tem um único usuário administrador, com usuário/senha fixos definidos em `ADMIN_USERNAME`/`ADMIN_PASSWORD_HASH` no `.env` — não há cadastro nem recuperação de senha.
 
@@ -156,7 +160,12 @@ ADMIN_PASSWORD_HASH=hash_bcrypt_da_sua_senha
 CLOUDINARY_CLOUD_NAME=seu_cloud_name
 CLOUDINARY_API_KEY=sua_api_key
 CLOUDINARY_API_SECRET=seu_api_secret
+SPOTIFY_CLIENT_ID=id_do_app_spotify
+SPOTIFY_CLIENT_SECRET=secret_do_app_spotify
+SPOTIFY_REDIRECT_URI=http://127.0.0.1:3000/api/spotify/callback
 ```
+
+`SPOTIFY_*` são opcionais — sem elas, o widget "Now Playing" simplesmente usa o fallback manual configurado no dashboard. Para conectar de verdade, crie um app em [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard), registre os Redirect URIs (`.../api/spotify/callback` para cada ambiente) e cole o Client ID/Secret aqui.
 
 Gere o hash bcrypt da senha com:
 ```bash
@@ -186,6 +195,9 @@ Configure em **Settings → Environment Variables**:
 | `CLOUDINARY_CLOUD_NAME` | Cloud name do Cloudinary |
 | `CLOUDINARY_API_KEY` | API key do Cloudinary |
 | `CLOUDINARY_API_SECRET` | API secret do Cloudinary |
+| `SPOTIFY_CLIENT_ID` | Client ID do app Spotify (opcional) |
+| `SPOTIFY_CLIENT_SECRET` | Client Secret do app Spotify (opcional) |
+| `SPOTIFY_REDIRECT_URI` | Ex.: `https://seudominio.com/api/spotify/callback` (opcional) |
 
 ---
 

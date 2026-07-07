@@ -11,6 +11,7 @@ const multer = require('multer');
 const path = require('path');
 const cloudinary = require('cloudinary').v2;
 const rateLimit = require('express-rate-limit');
+const crypto = require('crypto');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -102,6 +103,7 @@ const SiteSettings = mongoose.model('SiteSettings', new mongoose.Schema({
     nowPlayingTrack: { type: String, default: 'lofi in the swamp' },
     nowPlayingArtist: { type: String, default: 'frog beats' },
     featuredCaption: { type: String, default: 'tempo perfeito pra programar ☂️' },
+    spotifyRefreshToken: { type: String, default: '', select: false },
     updatedAt: { type: Date, default: Date.now }
 }));
 
@@ -109,6 +111,44 @@ async function getOrCreateSettings() {
     let settings = await SiteSettings.findOne();
     if (!settings) settings = await SiteSettings.create({});
     return settings;
+}
+
+// Refresh token nunca é selecionado por padrão (evita vazar no GET /settings público)
+async function getSettingsWithSpotifyToken() {
+    let settings = await SiteSettings.findOne().select('+spotifyRefreshToken');
+    if (!settings) settings = await SiteSettings.create({});
+    return settings;
+}
+
+async function isSpotifyConnected() {
+    const s = await SiteSettings.findOne().select('+spotifyRefreshToken').lean();
+    return !!(s && s.spotifyRefreshToken);
+}
+
+// Token de acesso do Spotify expira em ~1h; cacheado em memória entre requisições
+// (só ajuda dentro da mesma instância "quente" da function, mas evita renovar a cada poll)
+let spotifyAccessTokenCache = { token: null, expiresAt: 0 };
+
+async function getSpotifyAccessToken(refreshToken) {
+    if (spotifyAccessTokenCache.token && spotifyAccessTokenCache.expiresAt > Date.now()) {
+        return spotifyAccessTokenCache.token;
+    }
+    const basic = Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64');
+    const resp = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${basic}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refreshToken })
+    });
+    if (!resp.ok) throw new Error('Falha ao renovar token do Spotify');
+    const data = await resp.json();
+    spotifyAccessTokenCache = {
+        token: data.access_token,
+        expiresAt: Date.now() + (data.expires_in - 60) * 1000
+    };
+    return data.access_token;
 }
 
 function slugify(text) {
@@ -626,7 +666,8 @@ app.delete('/admin/guestbook/:id', requireAuth, async (req, res) => {
 app.get('/settings', async (req, res) => {
     try {
         const settings = await getOrCreateSettings();
-        res.json(settings);
+        const spotifyConnected = await isSpotifyConnected();
+        res.json({ ...settings.toObject(), spotifyConnected });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao buscar configurações' });
     }
@@ -659,6 +700,99 @@ app.put('/admin/settings', requireAuth, [
         res.json({ success: true, settings });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao salvar configurações' });
+    }
+});
+
+// ── Now Playing real via Spotify OAuth (Fase 30) ──────────────────────────
+
+app.get('/admin/spotify/connect', requireAuth, (req, res) => {
+    const state = crypto.randomBytes(16).toString('hex');
+    req.session.spotifyOAuthState = state;
+    const params = new URLSearchParams({
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        response_type: 'code',
+        redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
+        scope: 'user-read-currently-playing',
+        state
+    });
+    res.redirect(`https://accounts.spotify.com/authorize?${params.toString()}`);
+});
+
+app.get('/spotify/callback', async (req, res) => {
+    const { code, state, error } = req.query;
+    if (error || !code || !state || state !== req.session.spotifyOAuthState) {
+        return res.redirect('/dashboard.html?spotify=error');
+    }
+    delete req.session.spotifyOAuthState;
+
+    try {
+        const basic = Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64');
+        const resp = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${basic}`,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code,
+                redirect_uri: process.env.SPOTIFY_REDIRECT_URI
+            })
+        });
+        if (!resp.ok) throw new Error('Falha na troca de code por tokens');
+        const data = await resp.json();
+
+        const settings = await getOrCreateSettings();
+        settings.spotifyRefreshToken = data.refresh_token;
+        await settings.save();
+        spotifyAccessTokenCache = { token: null, expiresAt: 0 };
+
+        res.redirect('/dashboard.html?spotify=connected');
+    } catch (err) {
+        res.redirect('/dashboard.html?spotify=error');
+    }
+});
+
+app.delete('/admin/spotify/disconnect', requireAuth, async (req, res) => {
+    try {
+        const settings = await getOrCreateSettings();
+        settings.spotifyRefreshToken = '';
+        await settings.save();
+        spotifyAccessTokenCache = { token: null, expiresAt: 0 };
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao desconectar' });
+    }
+});
+
+app.get('/spotify/now-playing', async (req, res) => {
+    try {
+        const settings = await getSettingsWithSpotifyToken();
+        if (!settings.spotifyRefreshToken) return res.json({ connected: false });
+
+        const accessToken = await getSpotifyAccessToken(settings.spotifyRefreshToken);
+        const resp = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+
+        if (resp.status === 204) return res.json({ connected: true, playing: false });
+        if (!resp.ok) return res.json({ connected: false });
+
+        const data = await resp.json();
+        if (!data || !data.item) return res.json({ connected: true, playing: false });
+
+        res.json({
+            connected: true,
+            playing: !!data.is_playing,
+            track: data.item.name,
+            artist: (data.item.artists || []).map(a => a.name).join(', '),
+            albumArt: data.item.album?.images?.[0]?.url || '',
+            url: data.item.external_urls?.spotify || '',
+            progressMs: data.progress_ms || 0,
+            durationMs: data.item.duration_ms || 0
+        });
+    } catch (err) {
+        res.json({ connected: false });
     }
 });
 

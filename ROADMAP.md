@@ -173,15 +173,15 @@ Baseado nos mockups em `public/imagens/UX Design/` (versões desktop e mobile), 
 - [ ] Converter ilustrações novas para WebP/SVG otimizado
 - [ ] Revisar lazy loading com os novos cards e widgets
 
-### Fase 30 — Now Playing real via Spotify OAuth (planejada, ainda não implementada)
-Resolve o pendente da Fase 23/25: hoje o widget Now Playing só mostra texto estático editado no dashboard. A ideia é refletir de verdade o que está tocando no Spotify da autora, em tempo real, com um link pra quem visita abrir e ouvir no Spotify (a API de "currently playing" não garante mais `preview_url` de 30s pra apps novos, então não dá pra tocar prévia embutida — o play acontece abrindo o Spotify).
+### Fase 30 — Now Playing real via Spotify OAuth ✅ implementada no código (2026-07-07)
+Resolve o pendente da Fase 23/25: o widget Now Playing agora pode refletir de verdade o que está tocando no Spotify da autora, em tempo real, com um link pra quem visita abrir e ouvir no Spotify (a API de "currently playing" não garante mais `preview_url` de 30s pra apps novos, então não dá pra tocar prévia embutida — o play acontece abrindo o Spotify).
 
-- [ ] **Ação fora do código:** criar app em developer.spotify.com/dashboard, anotar Client ID/Secret, registrar Redirect URIs: `https://nayfts.dev/api/spotify/callback`, `https://floresta-criativa.vercel.app/api/spotify/callback`, `http://localhost:3000/api/spotify/callback`
-- [ ] Env vars novas (`.env` local + Vercel): `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REDIRECT_URI`
-- [ ] `SiteSettings`: novo campo `spotifyRefreshToken`
-- [ ] Rotas em `api/index.js`: `GET /admin/spotify/connect` (inicia OAuth, `requireAuth`), `GET /spotify/callback` (troca `code` por tokens, salva refresh token), `GET /spotify/now-playing` (público — token cacheado em memória, consulta `https://api.spotify.com/v1/me/player/currently-playing`, cai em `{connected:false}` se não conectado ou em erro)
-- [ ] Dashboard: botão "Conectar ao Spotify" + indicador de status, ao lado dos campos manuais de Now Playing (que passam a ser só o fallback exibido quando nada estiver tocando)
-- [ ] `index.html`/`search.js`: polling a cada ~20s em `/spotify/now-playing`, atualiza track/artista/capa/progresso/link "ouvir no Spotify"; sem conexão ou erro, mantém o comportamento estático atual
+- [ ] **Ação fora do código, ainda pendente:** criar app em developer.spotify.com/dashboard, anotar Client ID/Secret, registrar Redirect URIs: `https://nayfts.dev/api/spotify/callback`, `https://floresta-criativa.vercel.app/api/spotify/callback`, `http://127.0.0.1:3000/api/spotify/callback` (Spotify não aceita `http://localhost`, só o IP de loopback literal) — sem isso o botão "Conectar ao Spotify" não funciona ainda
+- [x] Env vars novas (`.env` local, placeholders vazios até você preencher com as credenciais reais do app Spotify; adicionar também no Vercel antes do deploy): `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REDIRECT_URI`
+- [x] `SiteSettings`: novo campo `spotifyRefreshToken` (`select:false` — nunca é retornado por `GET /settings`, que é público)
+- [x] Rotas em `api/index.js`: `GET /admin/spotify/connect` (inicia OAuth com proteção CSRF via `state` na sessão, `requireAuth`), `GET /spotify/callback` (valida `state`, troca `code` por tokens, salva refresh token), `DELETE /admin/spotify/disconnect` (limpa o token, `requireAuth`), `GET /spotify/now-playing` (público — access token cacheado em memória, consulta `https://api.spotify.com/v1/me/player/currently-playing`, cai em `{connected:false}` se não conectado ou em erro)
+- [x] Dashboard: botão "Conectar ao Spotify" + indicador de status (✅/❌) + botão "Desconectar", ao lado dos campos manuais de Now Playing (que agora são só o fallback exibido quando o Spotify não está conectado ou nada está tocando)
+- [x] `index.html`/`search.js`: polling a cada 20s em `/spotify/now-playing`, atualiza track/artista/capa do álbum/barra de progresso/link "Ouvir no Spotify"; sem conexão, sem música tocando ou em erro, mantém o comportamento estático atual do `/settings`
 
 ---
 

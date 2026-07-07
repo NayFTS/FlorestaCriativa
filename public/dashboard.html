@@ -161,12 +161,24 @@
 
         <div class="settings-row">
           <div>
-            <label for="settingsTrack">Now Playing — música:</label>
+            <label for="settingsTrack">Now Playing — música (fallback manual):</label>
             <input type="text" id="settingsTrack" maxlength="100" placeholder="lofi in the swamp">
           </div>
           <div>
-            <label for="settingsArtist">Now Playing — artista:</label>
+            <label for="settingsArtist">Now Playing — artista (fallback manual):</label>
             <input type="text" id="settingsArtist" maxlength="100" placeholder="frog beats">
+          </div>
+        </div>
+        <p class="settings-hint">O texto acima só aparece quando o Spotify não está conectado ou nada está tocando no momento.</p>
+
+        <div class="settings-row spotify-connect-row">
+          <div>
+            <span>Spotify:</span>
+            <strong id="spotifyStatus">Verificando...</strong>
+          </div>
+          <div class="spotify-connect-actions">
+            <a href="/api/admin/spotify/connect" class="btn-spotify-connect">Conectar ao Spotify</a>
+            <button type="button" id="spotifyDisconnectBtn" class="btn-secondary" hidden>Desconectar</button>
           </div>
         </div>
 
@@ -335,9 +347,26 @@
               document.getElementById('settingsTrack').value = s.nowPlayingTrack || '';
               document.getElementById('settingsArtist').value = s.nowPlayingArtist || '';
               document.getElementById('settingsFeatured').value = s.featuredCaption || '';
+              document.getElementById('spotifyStatus').textContent = s.spotifyConnected ? '✅ Conectado' : '❌ Não conectado';
+              document.getElementById('spotifyDisconnectBtn').hidden = !s.spotifyConnected;
           })
           .catch(() => {});
   }
+
+  document.getElementById('spotifyDisconnectBtn').addEventListener('click', function() {
+      fetch(`${API_BASE}/admin/spotify/disconnect`, { method: 'DELETE' })
+          .then(() => loadSettings());
+  });
+
+  (function handleSpotifyOAuthReturn() {
+      const spotifyParam = new URLSearchParams(location.search).get('spotify');
+      if (!spotifyParam) return;
+      const feedback = document.getElementById('settingsFeedback');
+      feedback.textContent = spotifyParam === 'connected'
+          ? 'Spotify conectado com sucesso!'
+          : 'Não foi possível conectar ao Spotify. Tente novamente.';
+      window.history.replaceState({}, '', location.pathname);
+  })();
 
   document.getElementById('settingsForm').addEventListener('submit', function(event) {
       event.preventDefault();

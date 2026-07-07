@@ -122,6 +122,105 @@ if (document.readyState === 'loading') {
     loadSiteSettings();
 }
 
+function _formatMsAsTime(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return `${min}:${String(sec).padStart(2, '0')}`;
+}
+
+function _updateNowPlayingProgressUI(progressMs, durationMs) {
+    const fill = document.querySelector('.widget-progress-fill');
+    if (fill) fill.style.width = Math.min(100, (progressMs / durationMs) * 100) + '%';
+
+    const elapsedEl = document.getElementById('nowPlayingElapsed');
+    const durationEl = document.getElementById('nowPlayingDuration');
+    if (elapsedEl && durationEl) {
+        elapsedEl.textContent = _formatMsAsTime(progressMs);
+        durationEl.textContent = _formatMsAsTime(durationMs);
+        elapsedEl.hidden = false;
+        durationEl.hidden = false;
+    }
+}
+
+// Entre os polls de 20s ao servidor, extrapola o progresso localmente a cada
+// segundo (baseado no timestamp da última resposta), pra barra e tempo
+// avançarem sozinhos sem precisar dar refresh na página.
+let _spotifyTicker = null;
+let _spotifyTickerInterval = null;
+
+function _startSpotifyProgressTicker(progressMs, durationMs) {
+    _spotifyTicker = { progressMs, durationMs, fetchedAt: Date.now() };
+    if (_spotifyTickerInterval) return;
+    _spotifyTickerInterval = setInterval(() => {
+        if (!_spotifyTicker) return;
+        const elapsedSinceFetch = Date.now() - _spotifyTicker.fetchedAt;
+        const currentProgress = Math.min(_spotifyTicker.progressMs + elapsedSinceFetch, _spotifyTicker.durationMs);
+        _updateNowPlayingProgressUI(currentProgress, _spotifyTicker.durationMs);
+    }, 1000);
+}
+
+function _stopSpotifyProgressTicker() {
+    _spotifyTicker = null;
+    if (_spotifyTickerInterval) {
+        clearInterval(_spotifyTickerInterval);
+        _spotifyTickerInterval = null;
+    }
+}
+
+function loadSpotifyNowPlaying() {
+    const trackEl = document.getElementById('nowPlayingTrack');
+    const artistEl = document.getElementById('nowPlayingArtist');
+    if (!trackEl) return;
+
+    fetch(`${API_BASE}/spotify/now-playing`)
+        .then(r => r.json())
+        .then(data => {
+            const playIcon = document.getElementById('nowPlayingPlayIcon');
+
+            // Sem conexão, sem música tocando ou erro: mantém o fallback estático do /settings
+            if (!data.connected || !data.playing) {
+                if (playIcon) playIcon.classList.remove('is-playing');
+                _stopSpotifyProgressTicker();
+                return;
+            }
+
+            trackEl.textContent = data.track;
+            if (artistEl) artistEl.textContent = data.artist;
+            if (playIcon) playIcon.classList.add('is-playing');
+
+            const cover = document.getElementById('nowPlayingCover');
+            if (cover && data.albumArt) {
+                cover.src = data.albumArt;
+                cover.hidden = false;
+            }
+
+            const link = document.getElementById('nowPlayingLink');
+            if (link && data.url) {
+                link.href = data.url;
+                link.hidden = false;
+            }
+
+            if (data.durationMs) {
+                _updateNowPlayingProgressUI(data.progressMs, data.durationMs);
+                _startSpotifyProgressTicker(data.progressMs, data.durationMs);
+            }
+        })
+        .catch(() => {});
+}
+
+function initSpotifyNowPlaying() {
+    if (!document.getElementById('nowPlayingTrack')) return;
+    loadSpotifyNowPlaying();
+    setInterval(loadSpotifyNowPlaying, 20000);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSpotifyNowPlaying);
+} else {
+    initSpotifyNowPlaying();
+}
+
 function toggleSearch() {
     const overlay = document.getElementById('searchOverlay');
     if (!overlay) return;

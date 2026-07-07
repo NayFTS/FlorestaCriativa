@@ -338,9 +338,34 @@
             <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
           </div>
           <div class="widget-nowplaying">
-            <strong id="nowPlayingTrack">Carregando...</strong>
-            <span id="nowPlayingArtist"></span>
-            <div class="widget-progress"><div class="widget-progress-fill"></div></div>
+            <div class="widget-nowplaying-main">
+              <img id="nowPlayingCover" class="widget-nowplaying-cover" src="" alt="" hidden loading="lazy">
+              <div class="widget-nowplaying-info">
+                <strong id="nowPlayingTrack">Carregando...</strong>
+                <span id="nowPlayingArtist"></span>
+              </div>
+            </div>
+
+            <div class="widget-nowplaying-progress-row">
+              <span id="nowPlayingElapsed" class="widget-nowplaying-time" hidden>0:00</span>
+              <div class="widget-progress"><div class="widget-progress-fill"></div></div>
+              <span id="nowPlayingDuration" class="widget-nowplaying-time" hidden>0:00</span>
+            </div>
+
+            <div class="widget-nowplaying-controls" aria-hidden="true">
+              <span class="np-control np-control--prev">
+                <span class="np-skip-bar"></span><span class="np-skip-tri"></span>
+              </span>
+              <span class="np-control np-control--play" id="nowPlayingPlayIcon">
+                <span class="np-icon-play"></span>
+                <span class="np-icon-pause"><span></span><span></span></span>
+              </span>
+              <span class="np-control np-control--next">
+                <span class="np-skip-tri"></span><span class="np-skip-bar"></span>
+              </span>
+            </div>
+
+            <a id="nowPlayingLink" class="widget-nowplaying-link" href="#" target="_blank" rel="noopener" hidden>Ouvir no Spotify ↗</a>
           </div>
         </div>
 
@@ -357,7 +382,7 @@
 
       <section id="guestbook" class="container">
         <div class="guestbook-card sticker-card">
-          <img src="imagens/decor/planta-suculenta.png" alt="" class="guestbook-decor" aria-hidden="true" loading="lazy">
+          <img src="imagens/decor/planta-suculenta-caneca-coracao-1.png" alt="" class="guestbook-decor" aria-hidden="true" loading="lazy">
           <h2>📝 Guestbook</h2>
           <p class="guestbook-subtitle">Deixe uma mensagem pra sapinha ♡</p>
           <div class="guestbook-layout">
