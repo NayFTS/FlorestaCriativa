@@ -138,11 +138,23 @@
     </div>
         <div style="height:40px"></div>
 <section id="verde-inspiracao">
+      <div class="listing-controls" id="post-list-controls">
+        <div class="listing-pills" role="group" aria-label="Filtrar por categoria">
+          <button type="button" class="filter-pill active" data-category="">Todos</button>
+        </div>
+        <select class="listing-sort" aria-label="Ordenar posts">
+          <option value="latest">Mais recentes</option>
+          <option value="oldest">Mais antigos</option>
+          <option value="likes">Mais curtidos</option>
+          <option value="views">Mais vistos</option>
+        </select>
+      </div>
       <div id="post-list"></div>
+      <div class="listing-pagination" id="post-list-pagination"></div>
     </section>
     <script src="search.js"></script>
     <script>
-      window.onload = () => loadPosts('verde-inspiracao.html', 'post-list');
+      window.onload = () => initPostListing('verde-inspiracao.html', 'post-list');
     </script>
       </main>
     </div>

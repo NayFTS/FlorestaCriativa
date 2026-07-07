@@ -431,82 +431,163 @@ function updateLoginButton() {
 
 updateLoginButton();
 
-function loadPosts(pageUrl, containerId, page, limit) {
-    if (page === undefined) page = 1;
-    if (limit === undefined) limit = 5;
-    const container = document.getElementById(containerId);
+function _renderPostCard(post) {
+    const temp = document.createElement('div');
+    temp.innerHTML = post.content;
+    const text = (temp.textContent || temp.innerText || '').trim();
+    const excerpt = text.length > 150 ? text.substring(0, 150) + '...' : text;
+    const link = post.slug
+        ? `post.html?slug=${post.slug}`
+        : `post.html?id=${post._id}`;
+    const imgSrc = post.image_path
+        ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
+        : null;
+    const dateStr = post.publish_date
+        ? new Date(post.publish_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+        : '';
 
-    if (page === 1) {
-        container.innerHTML = '<p class="post-loading">Carregando...</p>';
+    const postItem = document.createElement('div');
+    postItem.className = 'post-container';
+    postItem.innerHTML =
+        (imgSrc
+            ? `<a href="${link}" class="post-img-link" tabindex="-1" aria-hidden="true"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy"></a>`
+            : '<div class="post-img-placeholder"></div>') +
+        `<div class="post-card-body">
+            <h3><a href="${link}">${_escapeHtmlGlobal(post.title)}</a></h3>
+            <p>${_escapeHtmlGlobal(excerpt)}</p>
+            <div class="post-card-stats">
+                <button type="button" class="like-btn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
+                <span class="comment-count">💬 ${post.commentsCount || 0}</span>
+            </div>
+            <div class="post-card-footer">
+                <a href="${link}" class="leia-mais">Leia mais</a>
+                ${dateStr ? `<time class="post-date">${dateStr}</time>` : ''}
+            </div>
+        </div>`;
+    _wireLikeButton(postItem.querySelector('.like-btn'), post._id, post.likes);
+    return postItem;
+}
+
+// Intervalo de páginas com reticências, ex: [1, '...', 4, 5, 6, '...', 12]
+function _paginationRange(current, total) {
+    const range = [];
+    for (let i = 1; i <= total; i++) {
+        if (i === 1 || i === total || (i >= current - 1 && i <= current + 1)) range.push(i);
+    }
+    const withDots = [];
+    let prev = 0;
+    range.forEach(i => {
+        if (prev && i - prev > 1) withDots.push('...');
+        withDots.push(i);
+        prev = i;
+    });
+    return withDots;
+}
+
+function _renderPagination(el, page, limit, total, onGoto) {
+    if (!el) return;
+    el.innerHTML = '';
+    const pageCount = Math.max(1, Math.ceil(total / limit));
+    if (pageCount <= 1) return;
+
+    function makeBtn(label, targetPage, opts) {
+        opts = opts || {};
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = label;
+        btn.className = 'pagination-btn' + (opts.active ? ' active' : '');
+        if (opts.disabled) btn.disabled = true;
+        else btn.onclick = () => onGoto(targetPage);
+        return btn;
     }
 
-    const existing = document.getElementById('loadMoreBtn');
-    if (existing) existing.remove();
+    el.appendChild(makeBtn('‹', page - 1, { disabled: page <= 1 }));
+    _paginationRange(page, pageCount).forEach(p => {
+        if (p === '...') {
+            const span = document.createElement('span');
+            span.className = 'pagination-ellipsis';
+            span.textContent = '…';
+            el.appendChild(span);
+        } else {
+            el.appendChild(makeBtn(String(p), p, { active: p === page }));
+        }
+    });
+    el.appendChild(makeBtn('›', page + 1, { disabled: page >= pageCount }));
+}
 
-    fetch(`${API_BASE}/posts?url=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`)
-        .then(response => response.json())
-        .then(data => {
-            if (page === 1) container.innerHTML = '';
+function initPostListing(pageUrl, containerId) {
+    const container = document.getElementById(containerId);
+    const controls = document.getElementById(containerId + '-controls');
+    const pagination = document.getElementById(containerId + '-pagination');
+    const state = { page: 1, limit: 6, category: '', sort: 'latest' };
 
-            const posts = data.posts || [];
-            const total = data.total || 0;
+    function render() {
+        container.innerHTML = '<p class="post-loading">Carregando...</p>';
+        const params = new URLSearchParams({ url: pageUrl, page: state.page, limit: state.limit, sort: state.sort });
+        if (state.category) params.set('category', state.category);
 
-            if (posts.length === 0 && page === 1) {
-                container.innerHTML = '<p>Nenhum post encontrado.</p>';
-                return;
-            }
+        fetch(`${API_BASE}/posts?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                const posts = data.posts || [];
+                const total = data.total || 0;
+                container.innerHTML = '';
 
-            posts.forEach(post => {
-                const temp = document.createElement('div');
-                temp.innerHTML = post.content;
-                const text = (temp.textContent || temp.innerText || '').trim();
-                const excerpt = text.length > 150 ? text.substring(0, 150) + '...' : text;
-                const link = post.slug
-                    ? `post.html?slug=${post.slug}`
-                    : `post.html?id=${post._id}`;
-                const imgSrc = post.image_path
-                    ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
-                    : null;
-                const dateStr = post.publish_date
-                    ? new Date(post.publish_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
-                    : '';
+                if (posts.length === 0) {
+                    container.innerHTML = '<p>Nenhum post encontrado.</p>';
+                } else {
+                    posts.forEach(post => container.appendChild(_renderPostCard(post)));
+                }
 
-                const postItem = document.createElement('div');
-                postItem.className = 'post-container';
-                postItem.innerHTML =
-                    (imgSrc
-                        ? `<a href="${link}" class="post-img-link" tabindex="-1" aria-hidden="true"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy"></a>`
-                        : '<div class="post-img-placeholder"></div>') +
-                    `<div class="post-card-body">
-                        <h3><a href="${link}">${_escapeHtmlGlobal(post.title)}</a></h3>
-                        <p>${_escapeHtmlGlobal(excerpt)}</p>
-                        <div class="post-card-stats">
-                            <button type="button" class="like-btn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
-                            <span class="comment-count">💬 ${post.commentsCount || 0}</span>
-                        </div>
-                        <div class="post-card-footer">
-                            <a href="${link}" class="leia-mais">Leia mais</a>
-                            ${dateStr ? `<time class="post-date">${dateStr}</time>` : ''}
-                        </div>
-                    </div>`;
-                container.appendChild(postItem);
-                _wireLikeButton(postItem.querySelector('.like-btn'), post._id, post.likes);
-            });
-
-            const loaded = (page - 1) * limit + posts.length;
-            if (loaded < total) {
-                const btn = document.createElement('button');
-                btn.id = 'loadMoreBtn';
-                btn.className = 'load-more-btn';
-                btn.textContent = 'Carregar mais';
-                btn.onclick = () => loadPosts(pageUrl, containerId, page + 1, limit);
-                container.parentNode.insertBefore(btn, container.nextSibling);
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao buscar posts:', error);
-            if (page === 1) {
+                _renderPagination(pagination, state.page, state.limit, total, (goto) => {
+                    state.page = goto;
+                    render();
+                    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao buscar posts:', error);
                 container.innerHTML = '<p class="post-error">Erro ao carregar os posts. Tente novamente mais tarde.</p>';
-            }
-        });
+            });
+    }
+
+    if (controls) {
+        const sortSelect = controls.querySelector('.listing-sort');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', () => {
+                state.sort = sortSelect.value;
+                state.page = 1;
+                render();
+            });
+        }
+
+        const pillsEl = controls.querySelector('.listing-pills');
+        if (pillsEl) {
+            fetch(`${API_BASE}/posts/categories?url=${encodeURIComponent(pageUrl)}`)
+                .then(response => response.json())
+                .then(categories => {
+                    (categories || []).forEach(cat => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'filter-pill';
+                        btn.textContent = cat;
+                        btn.dataset.category = cat;
+                        pillsEl.appendChild(btn);
+                    });
+                })
+                .catch(() => {});
+
+            pillsEl.addEventListener('click', (e) => {
+                const btn = e.target.closest('.filter-pill');
+                if (!btn) return;
+                pillsEl.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.category = btn.dataset.category || '';
+                state.page = 1;
+                render();
+            });
+        }
+    }
+
+    render();
 }

@@ -3279,22 +3279,94 @@ select {
     border-radius: 5px;
 }
 
-/* Botão "Carregar mais" */
-.load-more-btn {
-    display: block;
-    margin: 20px auto;
-    padding: 12px 30px;
-    background-color: var(--color-accent);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+/* Controles da listagem: filtro por categoria + ordenação */
+.listing-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
 }
 
-.load-more-btn:hover {
-    background-color: var(--color-accent-dark);
+.listing-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    border: var(--border-card-width) solid var(--color-border);
+    border-radius: var(--radius-pill);
+    font-size: 0.85em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.filter-pill:hover { background: var(--color-accent-light); }
+
+.filter-pill.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.listing-sort {
+    padding: 6px 12px;
+    border: var(--border-card-width) solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.85em;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Paginação numerada */
+.listing-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 28px 0 12px;
+}
+
+.pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: var(--border-card-width) solid var(--color-border);
+    border-radius: var(--radius-pill);
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) { background: var(--color-accent-light); }
+.pagination-btn:disabled { opacity: 0.4; cursor: default; }
+
+.pagination-btn.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.pagination-ellipsis {
+    color: var(--color-text-secondary);
+    padding: 0 4px;
+}
+
+@media (max-width: 520px) {
+    .listing-controls { flex-direction: column; align-items: stretch; }
+    .listing-sort { align-self: flex-start; }
 }
 
 /* Preview de imagem no formulário */

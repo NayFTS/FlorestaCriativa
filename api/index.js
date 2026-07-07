@@ -354,26 +354,52 @@ app.post('/editPost/:id', requireAuth, galleryUpload, async (req, res) => {
 
 
 
+const POST_SORT_OPTIONS = {
+    latest: { publish_date: -1 },
+    oldest: { publish_date: 1 },
+    likes: { likes: -1 },
+    views: { views: -1 },
+};
+
 // Rota para buscar posts
 app.get('/posts', async (req, res) => {
-    const { url, page, limit } = req.query;
+    const { url, page, limit, category, sort } = req.query;
     try {
         const query = { status: { $ne: 'draft' } };
         if (url) query.url = url;
+        if (category) {
+            const categories = category.split(',').map(c => c.trim()).filter(Boolean);
+            if (categories.length) query.categories = { $in: categories };
+        }
+        const sortOption = POST_SORT_OPTIONS[sort] || POST_SORT_OPTIONS.latest;
         if (page && limit) {
             const pageNum = Math.max(1, parseInt(page) || 1);
             const limitNum = Math.min(50, parseInt(limit) || 5);
             const skip = (pageNum - 1) * limitNum;
             const [posts, total] = await Promise.all([
-                Post.find(query).sort({ publish_date: -1 }).skip(skip).limit(limitNum),
+                Post.find(query).sort(sortOption).skip(skip).limit(limitNum),
                 Post.countDocuments(query)
             ]);
             return res.json({ posts, total });
         }
-        const posts = await Post.find(query).sort({ publish_date: -1 });
+        const posts = await Post.find(query).sort(sortOption);
         res.json(posts);
     } catch (err) {
         console.error('Erro ao buscar posts:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+// Categorias distintas usadas pelos posts publicados de uma página (para os filtros da listagem)
+app.get('/posts/categories', async (req, res) => {
+    try {
+        const { url } = req.query;
+        const query = { status: { $ne: 'draft' } };
+        if (url) query.url = url;
+        const categories = await Post.distinct('categories', query);
+        res.json(categories.filter(Boolean).sort((a, b) => a.localeCompare(b, 'pt-BR')));
+    } catch (err) {
+        console.error('Erro ao buscar categorias:', err);
         res.status(500).json({ message: 'Erro no servidor' });
     }
 });
