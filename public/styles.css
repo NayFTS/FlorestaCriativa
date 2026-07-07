@@ -603,8 +603,8 @@ body.page-public .site-main {
 
     .nav-drawer .sidebar-footer .icon-btn,
     .nav-drawer .sidebar-footer .theme-toggle {
-        width: 38px;
-        height: 38px;
+        width: 42px;
+        height: 42px;
         flex-shrink: 0;
         padding: 0;
         display: flex;
@@ -1491,7 +1491,7 @@ input.input-error, input.input-error:focus {
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .home-grid {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -1552,7 +1552,7 @@ input.input-error, input.input-error:focus {
     pointer-events: none;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .guestbook-decor { display: none; }
 }
 
@@ -1652,7 +1652,7 @@ input.input-error, input.input-error:focus {
     font-size: 0.92rem;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .guestbook-layout { grid-template-columns: 1fr; }
 }
 
@@ -1941,8 +1941,8 @@ input.input-error, input.input-error:focus {
     }
 
     .post-mobile-share {
-        width: 34px;
-        height: 34px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         background: var(--color-surface-alt);
         border: var(--border-card-width) solid var(--color-border);
@@ -2561,9 +2561,10 @@ section#rascunhos-da-floresta {
 /* Rodapé do card: botão + data */
 .post-card-footer {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px 12px;
     margin-top: 14px;
 }
 
@@ -2596,7 +2597,9 @@ section#rascunhos-da-floresta {
     gap: 4px;
     background: none;
     border: none;
-    padding: 2px 0;
+    padding: 10px 6px;
+    margin: -10px -6px;
+    min-height: 40px;
     font-size: 1em;
     color: var(--color-text-secondary);
     cursor: pointer;
@@ -2806,6 +2809,7 @@ section#rascunhos-da-floresta {
     max-width: 68ch;
     margin-left: auto;
     margin-right: auto;
+    overflow-wrap: break-word;
 }
 
 .content-body p {
@@ -2814,6 +2818,26 @@ section#rascunhos-da-floresta {
 
 .content-body pre, .content-body code {
     font-family: var(--font-code);
+}
+
+/* Blocos <pre> (multi-linha) rolam na horizontal em vez de estourar a
+   largura; <code> inline quebra linha em vez de ficar cortado pelo
+   overflow-x:clip do html. */
+.content-body pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+}
+
+.content-body code {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.content-body pre code {
+    overflow-wrap: normal;
+    word-break: normal;
+    white-space: pre;
 }
 
 .content-body h2, .content-body h3, .content-body h4 {
@@ -3836,6 +3860,20 @@ select {
     margin: 0;
 }
 
+/* Em telas estreitas, a imagem (90vw) deixa pouca margem — encolhe a
+   imagem e os botões de navegação pra eles pararem de se sobrepor. */
+@media (max-width: 480px) {
+    .lightbox img { max-width: 78vw; }
+
+    .lightbox-nav {
+        font-size: 1.3em;
+        padding: 6px 8px;
+    }
+
+    .lightbox-prev { left: 4px; }
+    .lightbox-next { right: 4px; }
+}
+
 /* Preview de galeria nos formulários */
 .gallery-preview-edit {
     display: flex;
@@ -3861,8 +3899,8 @@ select {
 
 .gallery-remove-btn {
     position: absolute;
-    top: -6px;
-    right: -6px;
+    top: -8px;
+    right: -8px;
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -3877,6 +3915,13 @@ select {
     line-height: 1;
     padding: 0;
     transition: background-color 0.2s;
+}
+
+/* Área de toque maior que o círculo visível, sem aumentar o badge */
+.gallery-remove-btn::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
 }
 
 /* ===================== */
