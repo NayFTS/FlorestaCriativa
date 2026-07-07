@@ -1512,6 +1512,26 @@ input.input-error, input.input-error:focus {
     }
 }
 
+/* Todas as outras páginas no desktop: mesmo princípio da home — a janela não
+   rola, só o conteúdo principal (.site-main) rola internamente. A sidebar já
+   tem seu próprio scroll interno via position:sticky + overflow-y. */
+@media (min-width: 1101px) {
+    body:not(.page-home) {
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    body:not(.page-home) .site-shell {
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    body:not(.page-home) .site-main {
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
 @media (max-width: 1100px) {
     .home-grid {
         grid-template-columns: 1fr 1fr;
