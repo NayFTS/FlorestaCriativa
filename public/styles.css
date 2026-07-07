@@ -3328,6 +3328,31 @@ select {
     cursor: pointer;
 }
 
+.portfolio-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.view-toggle {
+    display: flex;
+    border: var(--border-card-width) solid var(--color-border);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+
+.view-toggle-btn {
+    padding: 6px 12px;
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    border: none;
+    cursor: pointer;
+    font-size: 0.95em;
+    line-height: 1;
+}
+
+.view-toggle-btn.active { background: var(--color-accent); color: white; }
+
 /* Paginação numerada */
 .listing-pagination {
     display: flex;
@@ -3431,11 +3456,58 @@ select {
 /* SAPO IMAGINÁRIO — PROJECT CARDS */
 /* ===================== */
 
+.portfolio-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+.portfolio-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 20px;
+}
+
+.widget-tools-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.widget-tools-list li strong { color: var(--color-text); }
+.widget-tools-list li span { font-size: 0.85em; }
+
+@media (max-width: 1024px) {
+    .portfolio-layout { grid-template-columns: 1fr; }
+    .portfolio-sidebar { position: static; }
+}
+
 .project-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     padding: 16px 0 8px;
+}
+
+.project-grid.view-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-grid.view-list .project-card { flex-direction: row; }
+
+.project-grid.view-list .project-card-img {
+    width: 240px;
+    aspect-ratio: auto;
+    flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+    .project-grid.view-list .project-card { flex-direction: column; }
+    .project-grid.view-list .project-card-img { width: 100%; aspect-ratio: 16 / 9; }
 }
 
 .project-card {

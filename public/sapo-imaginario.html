@@ -139,7 +139,71 @@
 
         <div style="height:40px"></div>
 <section id="sapo-imaginario" style="padding: 0 16px;">
-      <div id="project-grid" class="project-grid"></div>
+      <div class="portfolio-layout">
+        <div class="portfolio-main">
+          <div class="listing-controls" id="project-grid-controls">
+            <div class="listing-pills" role="group" aria-label="Filtrar por categoria">
+              <button type="button" class="filter-pill active" data-category="">Todos</button>
+            </div>
+            <div class="portfolio-controls-right">
+              <select class="listing-sort" aria-label="Ordenar projetos">
+                <option value="latest">Mais recentes</option>
+                <option value="oldest">Mais antigos</option>
+                <option value="likes">Mais curtidos</option>
+                <option value="views">Mais vistos</option>
+              </select>
+              <div class="view-toggle" role="group" aria-label="Alternar visualização">
+                <button type="button" class="view-toggle-btn active" data-view="grid" aria-label="Ver em grade">▦</button>
+                <button type="button" class="view-toggle-btn" data-view="list" aria-label="Ver em lista">☰</button>
+              </div>
+            </div>
+          </div>
+          <div id="project-grid" class="project-grid"></div>
+          <div class="listing-pagination" id="project-grid-pagination"></div>
+        </div>
+
+        <aside class="portfolio-sidebar">
+          <div class="widget-card sticker-card sticker-card--sm widget-featured">
+            <div class="widget-window-header">
+              <h3>📌 Featured Project</h3>
+              <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            </div>
+            <div id="featuredProject">Carregando...</div>
+          </div>
+
+          <div class="widget-card sticker-card sticker-card--sm">
+            <div class="widget-window-header">
+              <h3>🛠️ Tools I Use</h3>
+              <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            </div>
+            <ul class="widget-list widget-tools-list">
+              <li><strong>VS Code</strong><span>código &amp; desenvolvimento</span></li>
+            </ul>
+          </div>
+
+          <div class="widget-card sticker-card sticker-card--sm">
+            <div class="widget-window-header">
+              <h3>✨ Skills &amp; Services</h3>
+              <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            </div>
+            <div class="category-chip-list">
+              <span class="category-chip">Web Design</span>
+              <span class="category-chip">Front-end Dev</span>
+              <span class="category-chip">UI/UX Design</span>
+            </div>
+          </div>
+
+          <div class="widget-card sticker-card sticker-card--sm widget-gardenlog">
+            <div class="widget-window-header">
+              <h3>🪵 Recent Updates</h3>
+              <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            </div>
+            <ul class="widget-list" id="portfolioRecentUpdates">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
     </section>
 
     <!-- Preview Drawer -->
@@ -160,24 +224,122 @@
 
     <script src="search.js"></script>
     <script>
-      function loadProjects() {
-          const grid = document.getElementById('project-grid');
-          grid.innerHTML = '<p class="post-loading" style="grid-column:1/-1">Carregando projetos...</p>';
+      const PORTFOLIO_URL = 'sapo-imaginario.html';
 
-          fetch(`${API_BASE}/posts?url=${encodeURIComponent('sapo-imaginario.html')}`)
+      function initProjectListing() {
+          const grid = document.getElementById('project-grid');
+          const controls = document.getElementById('project-grid-controls');
+          const pagination = document.getElementById('project-grid-pagination');
+          const state = { page: 1, limit: 6, category: '', sort: 'latest', view: 'grid' };
+
+          function render() {
+              grid.innerHTML = '<p class="post-loading" style="grid-column:1/-1">Carregando projetos...</p>';
+              const params = new URLSearchParams({ url: PORTFOLIO_URL, page: state.page, limit: state.limit, sort: state.sort });
+              if (state.category) params.set('category', state.category);
+
+              fetch(`${API_BASE}/posts?${params.toString()}`)
+                  .then(r => r.json())
+                  .then(data => {
+                      const posts = data.posts || [];
+                      const total = data.total || 0;
+                      grid.innerHTML = '';
+                      if (!posts.length) {
+                          grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:32px 0; color:var(--color-text-secondary)">Nenhum projeto ainda. Em breve!</p>';
+                      } else {
+                          posts.forEach(post => grid.appendChild(buildCard(post)));
+                      }
+                      _renderPagination(pagination, state.page, state.limit, total, (goto) => {
+                          state.page = goto;
+                          render();
+                          grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      });
+                  })
+                  .catch(() => {
+                      grid.innerHTML = '<p class="post-error" style="grid-column:1/-1">Erro ao carregar projetos. Tente novamente.</p>';
+                  });
+          }
+
+          const sortSelect = controls.querySelector('.listing-sort');
+          sortSelect.addEventListener('change', () => {
+              state.sort = sortSelect.value;
+              state.page = 1;
+              render();
+          });
+
+          const pillsEl = controls.querySelector('.listing-pills');
+          fetch(`${API_BASE}/posts/categories?url=${encodeURIComponent(PORTFOLIO_URL)}`)
+              .then(r => r.json())
+              .then(categories => {
+                  (categories || []).forEach(cat => {
+                      const btn = document.createElement('button');
+                      btn.type = 'button';
+                      btn.className = 'filter-pill';
+                      btn.textContent = cat;
+                      btn.dataset.category = cat;
+                      pillsEl.appendChild(btn);
+                  });
+              })
+              .catch(() => {});
+
+          pillsEl.addEventListener('click', (e) => {
+              const btn = e.target.closest('.filter-pill');
+              if (!btn) return;
+              pillsEl.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              state.category = btn.dataset.category || '';
+              state.page = 1;
+              render();
+          });
+
+          controls.querySelectorAll('.view-toggle-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                  controls.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+                  btn.classList.add('active');
+                  state.view = btn.dataset.view;
+                  grid.classList.toggle('view-list', state.view === 'list');
+              });
+          });
+
+          render();
+      }
+
+      function loadPortfolioSidebar() {
+          const featuredEl = document.getElementById('featuredProject');
+          const updatesEl = document.getElementById('portfolioRecentUpdates');
+
+          fetch(`${API_BASE}/posts?url=${encodeURIComponent(PORTFOLIO_URL)}&page=1&limit=1&sort=likes`)
               .then(r => r.json())
               .then(data => {
-                  const posts = Array.isArray(data) ? data : (data.posts || []);
-                  grid.innerHTML = '';
-                  if (!posts.length) {
-                      grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:32px 0; color:var(--color-text-secondary)">Nenhum projeto ainda. Em breve!</p>';
+                  const post = (data.posts || [])[0];
+                  if (!post) {
+                      featuredEl.innerHTML = '<p>Nenhum projeto ainda.</p>';
                       return;
                   }
-                  posts.forEach(post => grid.appendChild(buildCard(post)));
+                  const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
+                  const imgSrc = post.image_path
+                      ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
+                      : null;
+                  const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy">` : '';
+                  featuredEl.innerHTML = `${imgHtml}
+                      <p><strong>${_escapeHtmlGlobal(post.title)}</strong></p>
+                      <a href="${link}" class="leia-mais">Ver projeto →</a>`;
               })
-              .catch(() => {
-                  grid.innerHTML = '<p class="post-error" style="grid-column:1/-1">Erro ao carregar projetos. Tente novamente.</p>';
-              });
+              .catch(() => { featuredEl.innerHTML = '<p>Não foi possível carregar.</p>'; });
+
+          fetch(`${API_BASE}/posts?url=${encodeURIComponent(PORTFOLIO_URL)}&page=1&limit=4&sort=latest`)
+              .then(r => r.json())
+              .then(data => {
+                  const posts = data.posts || [];
+                  if (!posts.length) {
+                      updatesEl.innerHTML = '<li>Nenhuma atualização ainda.</li>';
+                      return;
+                  }
+                  const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+                  updatesEl.innerHTML = posts.map(post =>
+                      `<li>📷 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(post.title)}</a>"</li>`
+                  ).join('');
+              })
+              .catch(() => { updatesEl.innerHTML = '<li>Não foi possível carregar.</li>'; });
       }
 
       function buildCard(post) {
@@ -273,7 +435,7 @@
 
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
 
-      window.onload = loadProjects;
+      window.onload = () => { initProjectListing(); loadPortfolioSidebar(); };
     </script>
 
       </main>
