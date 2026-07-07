@@ -2797,6 +2797,81 @@ section#rascunhos-da-floresta {
     color: white;
 }
 
+.about-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+.about-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 20px;
+}
+
+.quick-facts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quick-fact-row {
+    display: grid;
+    grid-template-columns: 24px 140px 1fr;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 0.95em;
+}
+
+.quick-fact-label {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.journey-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 20px;
+    border-left: 2px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.journey-timeline li {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.journey-timeline li::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 2px solid var(--color-surface);
+}
+
+.journey-year {
+    font-weight: 700;
+    color: var(--color-accent-dark);
+    flex-shrink: 0;
+    min-width: 44px;
+}
+
+@media (max-width: 1024px) {
+    .about-layout { grid-template-columns: 1fr; }
+    .about-sidebar { position: static; }
+}
+
 @media (max-width: 520px) {
     .about-profile {
         flex-direction: column;
@@ -2804,6 +2879,8 @@ section#rascunhos-da-floresta {
         padding: 22px 16px;
     }
     .about-section { padding: 18px 16px; }
+    .quick-fact-row { grid-template-columns: 20px 1fr; }
+    .quick-fact-value { grid-column: 2; }
 }
 
 /* Sitemap na home */
