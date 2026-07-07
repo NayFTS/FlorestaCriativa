@@ -11,26 +11,79 @@
     <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
   </head>
-  <body>
-    <header>
-      <a href="index.html">
-      <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
-      </a>
-      <h1>Floresta Criativa</h1>
-      <p>Bem-vindo ao meu espaço de escrita, projetos e inspiração!</p>
-    </header>
-    <div id="top-image"></div>
-    <nav>
-      <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-      <div class="menu" id="menu">
-        <a href="index.html">Home</a>
-        <a href="verde-inspiracao.html">Verde Inspiração</a>
-        <a href="sapo-imaginario.html">Sapo Imaginário</a>
-        <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
-        <a href="login.html" id="loginButton">Login</a>
-        <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+  <body class="page-home page-public">
+    <div class="site-shell">
+      <div class="topbar">
+        <nav class="topbar-nav" aria-label="Navegação principal">
+          <a href="index.html">Home</a>
+          <a href="verde-inspiracao.html">Blog</a>
+          <a href="sapo-imaginario.html">Portfólio</a>
+          <a href="rascunhos-da-floresta.html">Projetos</a>
+          <a href="sobre-mim.html">About</a>
+        </nav>
+        <div class="topbar-actions theme-toggle-target">
+          <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" onclick="toggleSearch()">
+            <span class="search-bar-placeholder">Pesquisar...</span>
+            <img src="imagens/decor/icone-busca-lupa.png" alt="" class="search-bar-icon" loading="lazy">
+          </button>
+        </div>
       </div>
-    </nav>
+
+      <aside class="site-sidebar">
+        <a href="index.html" class="topbar-sign">
+          <img class="topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+        </a>
+        <div class="sidebar-widgets">
+          <div class="currently-widget">
+            <h4>🌱 Currently</h4>
+            <ul class="widget-list" id="currentlyList">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+          <div class="mood-widget">
+            <h4>Mood</h4>
+            <div class="widget-mood" id="moodWidget">
+              <div class="mood-carousel">
+                <img src="imagens/decor/sapo-sentado.png" alt="" class="mood-carousel-img">
+              </div>
+              <span class="widget-mood-label">Carregando...</span>
+            </div>
+          </div>        </div>
+        <div class="sidebar-footer">
+          <a href="login.html" class="login-link">Login</a>
+        </div>
+      </aside>
+
+      <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir menu">&#9776;</button>
+      <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+      <div class="nav-drawer" id="navDrawer">
+        <a href="index.html" class="sidebar-logo">
+          <img src="imagens/nayfts-header-mid.png" alt="NAYFTS" loading="lazy">
+          <span>Floresta Criativa</span>
+        </a>
+        <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
+          <a href="index.html">🏠 Home</a>
+          <a href="verde-inspiracao.html">🌿 Verde Inspiração</a>
+          <a href="sapo-imaginario.html">🐸 Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html">📝 Rascunhos da Floresta</a>
+          <a href="sobre-mim.html">🐸 Sobre Mim</a>
+          <a href="#guestbook">📝 Guestbook</a>
+        </div>
+        <div class="sidebar-footer theme-toggle-target">
+          <a href="login.html" class="login-link">Login</a>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
+        <a href="index.html"><span class="bottom-nav-icon">🏠</span>Home</a>
+        <a href="verde-inspiracao.html"><span class="bottom-nav-icon">🌿</span>Verde</a>
+        <a href="sapo-imaginario.html"><span class="bottom-nav-icon">🐸</span>Sapo</a>
+        <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon">📝</span>Rascunhos</a>
+      </div>
+
+      <main class="site-main">
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
       <div class="search-overlay-box">
         <div class="search-overlay-box-header">
@@ -60,8 +113,21 @@
     <script>
       let _idx = 0, _posts = [], _timer = null;
 
+      function _buildGardenLog(data) {
+          const log = document.getElementById('gardenLog');
+          if (!data.length) {
+              log.innerHTML = '<li>Nenhuma postagem ainda.</li>';
+              return;
+          }
+          const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+          log.innerHTML = data.slice(0, 4).map(post =>
+              `<li>🌱 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${post.title}</a>"</li>`
+          ).join('');
+      }
+
       function _build(data) {
           _posts = data;
+          _buildGardenLog(data);
           const track = document.getElementById('carouselTrack');
           const info  = document.getElementById('carouselInfo');
           const dots  = document.getElementById('carouselDots');
@@ -70,7 +136,7 @@
           data.forEach((post, i) => {
               const img  = post.image_path
                   ? (post.image_path.startsWith('http') ? post.image_path : `/imagens/uploads/${post.image_path}`)
-                  : 'imagens/quadrado_da_floresta.webp';
+                  : 'imagens/quadrado-da-floresta.webp';
               const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
               const tmp  = document.createElement('div');
               tmp.innerHTML = post.content;
@@ -141,12 +207,82 @@
                   document.getElementById('carouselInfo').innerHTML =
                       '<p style="padding:16px;text-align:center;color:var(--color-text-secondary)">Não foi possível carregar os posts.</p>';
               });
+          loadGuestbook();
+          initGuestbookForm();
       };
+
+      function escapeHtml(str) {
+          const div = document.createElement('div');
+          div.appendChild(document.createTextNode(String(str)));
+          return div.innerHTML;
+      }
+
+      function loadGuestbook() {
+          fetch(`${API_BASE}/guestbook`)
+              .then(r => r.json())
+              .then(entries => {
+                  const wrap = document.getElementById('guestbookEntries');
+                  if (!entries.length) {
+                      wrap.innerHTML = '<p class="widget-hint">Nenhuma mensagem ainda — seja a primeira!</p>';
+                      return;
+                  }
+                  wrap.innerHTML = entries.map(e => {
+                      const date = new Date(e.createdAt).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+                      return `<div class="guestbook-entry">
+                          <strong>${escapeHtml(e.author)}</strong>
+                          <span class="guestbook-entry-date">${date}</span>
+                          <p>${escapeHtml(e.message)}</p>
+                      </div>`;
+                  }).join('');
+              })
+              .catch(() => {
+                  document.getElementById('guestbookEntries').innerHTML =
+                      '<p class="widget-hint">Não foi possível carregar as mensagens.</p>';
+              });
+      }
+
+      function initGuestbookForm() {
+          document.getElementById('guestbookForm').addEventListener('submit', function(event) {
+              event.preventDefault();
+              const author = document.getElementById('guestbookAuthor').value.trim();
+              const message = document.getElementById('guestbookMessage').value.trim();
+              const feedback = document.getElementById('guestbookFeedback');
+              const btn = this.querySelector('button[type="submit"]');
+              btn.disabled = true;
+              feedback.textContent = '';
+
+              fetch(`${API_BASE}/guestbook`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ author, message })
+              })
+              .then(r => r.json().then(data => ({ ok: r.ok, data })))
+              .then(({ ok, data }) => {
+                  btn.disabled = false;
+                  if (ok) {
+                      feedback.textContent = data.message;
+                      this.reset();
+                      loadGuestbook();
+                  } else {
+                      feedback.textContent = data.errors?.[0]?.msg || data.message || 'Erro ao enviar mensagem.';
+                  }
+              })
+              .catch(() => {
+                  btn.disabled = false;
+                  feedback.textContent = 'Erro ao enviar mensagem.';
+              });
+          });
+      }
     </script>
 
-    <div class="container" id="content">
+    <div class="container home-grid" id="content">
+      <div class="home-header-box sticker-card">
+        <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+        <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+      </div>
+
       <section id="posts-recentes">
-        <h2>Posts Recentes</h2>
+        <h2>🌿 Posts Recentes</h2>
         <div class="carousel-outer">
           <div class="carousel-clip" id="carouselWrap">
             <div class="carousel-track" id="carouselTrack"></div>
@@ -157,79 +293,91 @@
           <div class="carousel-dots" id="carouselDots"></div>
         </div>
       </section>
+
+      <div class="home-quicklinks-col">
+        <div class="widget-card sticker-card sticker-card--sm">
+          <h3>🔗 Quick Links</h3>
+          <div class="quicklink-panel">
+            <a href="verde-inspiracao.html" class="quicklink-row">
+              <img src="imagens/decor/icone-arte-paleta.png" alt="" class="quicklink-icon" loading="lazy">
+              <span class="quicklink-text"><strong>Verde Inspiração</strong><span>arte e criatividade</span></span>
+            </a>
+            <a href="sapo-imaginario.html" class="quicklink-row">
+              <img src="imagens/decor/icone-projetos-codigo.png" alt="" class="quicklink-icon" loading="lazy">
+              <span class="quicklink-text"><strong>Sapo Imaginário</strong><span>códigos e experimentos</span></span>
+            </a>
+            <a href="rascunhos-da-floresta.html" class="quicklink-row">
+              <img src="imagens/decor/icone-blog-livro.png" alt="" class="quicklink-icon" loading="lazy">
+              <span class="quicklink-text"><strong>Rascunhos da Floresta</strong><span>textos e ideias soltas</span></span>
+            </a>
+            <a href="sobre-mim.html" class="quicklink-row">
+              <img src="imagens/decor/icone-perfil-usuario.png" alt="" class="quicklink-icon" loading="lazy">
+              <span class="quicklink-text"><strong>Sobre Mim</strong><span>quem é a sapinha por trás</span></span>
+            </a>
+            <a href="#guestbook" class="quicklink-row">
+              <img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="quicklink-icon" loading="lazy">
+              <span class="quicklink-text"><strong>Guestbook</strong><span>deixe uma mensagem</span></span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="home-widgets">
+        <div class="widget-card sticker-card sticker-card--sm widget-featured">
+          <div class="widget-window-header">
+            <h3>📷 Featured</h3>
+            <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          </div>
+          <img src="imagens/decor/sapo-guarda-chuva.png" alt="" loading="lazy">
+          <p id="featuredCaption">Carregando...</p>
+        </div>
+
+        <div class="widget-card sticker-card sticker-card--sm">
+          <div class="widget-window-header">
+            <h3>🎵 Now Playing</h3>
+            <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          </div>
+          <div class="widget-nowplaying">
+            <strong id="nowPlayingTrack">Carregando...</strong>
+            <span id="nowPlayingArtist"></span>
+            <div class="widget-progress"><div class="widget-progress-fill"></div></div>
+          </div>
+        </div>
+
+        <div class="widget-card sticker-card sticker-card--sm">
+          <div class="widget-window-header">
+            <h3>🪵 Garden Log</h3>
+            <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          </div>
+          <ul class="widget-list" id="gardenLog">
+            <li>Carregando...</li>
+          </ul>
+        </div>
+      </aside>
+
+      <section id="guestbook" class="container">
+        <div class="guestbook-card sticker-card">
+          <img src="imagens/decor/planta-suculenta.png" alt="" class="guestbook-decor" aria-hidden="true" loading="lazy">
+          <h2>📝 Guestbook</h2>
+          <p class="guestbook-subtitle">Deixe uma mensagem pra sapinha ♡</p>
+          <div class="guestbook-layout">
+            <form id="guestbookForm" class="guestbook-form">
+              <label for="guestbookAuthor">Seu nome:</label>
+              <input type="text" id="guestbookAuthor" name="author" maxlength="60" required>
+              <label for="guestbookMessage">Mensagem:</label>
+              <textarea id="guestbookMessage" name="message" maxlength="500" rows="1" required></textarea>
+              <button type="submit">Enviar</button>
+              <p id="guestbookFeedback"></p>
+            </form>
+            <div class="guestbook-entries" id="guestbookEntries">
+              <p class="widget-hint">Carregando mensagens...</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <section id="sobre" class="container">
-      <div class="about-profile">
-        <img src="imagens/profile-picture.jpeg" alt="Foto de Nay" class="about-avatar">
-        <div class="about-intro">
-          <h2>Olá, sou a Nay!</h2>
-          <p class="about-tagline">Escritora, curiosa e habitante da floresta.</p>
-        </div>
-      </div>
-
-      <div class="about-section">
-        <h3>Sobre mim</h3>
-        <p>
-          Bem-vinda à Floresta Criativa! Este é o meu espaço pessoal na internet —
-          um lugar onde junto tudo que me move: escrita, projetos, referências e
-          devaneios do dia a dia. Aqui não tem tema fixo, só autenticidade.
-        </p>
-        <p>
-          Sou apaixonada por histórias em todas as formas: animes, jogos, livros,
-          séries — e principalmente as que eu mesma crio. A escrita é o meu jeito
-          favorito de processar o mundo e de deixar um rastro de quem eu fui em
-          cada fase da vida.
-        </p>
-        <p>
-          Também me aventuro pelo desenvolvimento web, onde código e criatividade
-          andam juntos. Construir esse site foi parte do processo — aprender fazendo,
-          errando e tentando de novo, do mesmo jeito que a escrita funciona.
-        </p>
-      </div>
-
-      <div class="about-section">
-        <h3>O que tem por aqui</h3>
-        <div class="about-sitemap">
-          <a href="verde-inspiracao.html" class="about-sitemap-item">
-            <span class="about-sitemap-icon">🌿</span>
-            <div>
-              <strong>Verde Inspiração</strong>
-              <p>Hobbies, animes, jogos e leituras que me inspiram.</p>
-            </div>
-          </a>
-          <a href="sapo-imaginario.html" class="about-sitemap-item">
-            <span class="about-sitemap-icon">🐸</span>
-            <div>
-              <strong>Sapo Imaginário</strong>
-              <p>Projetos e experimentos de programação.</p>
-            </div>
-          </a>
-          <a href="rascunhos-da-floresta.html" class="about-sitemap-item">
-            <span class="about-sitemap-icon">📝</span>
-            <div>
-              <strong>Rascunhos da Floresta</strong>
-              <p>Textos, crônicas e tudo que escrevo.</p>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div class="about-section">
-        <h3>Encontre-me por aí</h3>
-        <div class="about-links">
-          <a href="https://github.com/nayfts" target="_blank" rel="noopener" class="about-link-btn">
-            GitHub
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <div id="bottom-image"></div>
-    <footer>
-      <div class="footer-content">
-        <p>Floresta Criativa &copy; 2026</p>
-      </div>
-    </footer>
+      </main>
+    </div>
   </body>
 </html>

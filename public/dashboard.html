@@ -12,27 +12,85 @@
     <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
   </head>
   <body>
-    <header>
-      <a href="index.html">
-        <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
-      </a>
-      <h1>Floresta Criativa</h1>
-    </header>
-
-    <div id="top-image"></div>
-
-    <nav>
-      <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-      <div class="menu" id="menu">
-        <a href="index.html">Home</a>
-        <a href="verde-inspiracao.html">Verde Inspiração</a>
-        <a href="sapo-imaginario.html">Sapo Imaginário</a>
-        <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
-        <a href="login.html" id="loginButton">Login</a>
-        <a href="#" id="logoutButton">Sair</a>
-        <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+    <div class="site-shell">
+      <div class="topbar">
+        <nav class="topbar-nav" aria-label="Navegação principal">
+          <a href="index.html">Home</a>
+          <a href="verde-inspiracao.html">Blog</a>
+          <a href="sapo-imaginario.html">Portfólio</a>
+          <a href="rascunhos-da-floresta.html">Projetos</a>
+          <a href="sobre-mim.html">About</a>
+        </nav>
+        <div class="topbar-actions theme-toggle-target">
+          <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+        </div>
       </div>
-    </nav>
+
+      <aside class="site-sidebar">
+        <a href="index.html" class="topbar-sign">
+          <img class="topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+        </a>
+        <div class="sidebar-widgets">
+          <div>
+            <h4>🌱 Currently</h4>
+            <ul class="widget-list" id="currentlyList">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Mood</h4>
+            <div class="widget-mood" id="moodWidget">
+              <span class="widget-mood-emoji">🐸</span>
+              <span class="widget-mood-label">Carregando...</span>
+            </div>
+          </div>
+          <img src="imagens/decor/sapo-sentado.png" alt="" class="sidebar-sticker" aria-hidden="true" loading="lazy">
+        </div>
+        <div class="sidebar-footer">
+          <a href="login.html" id="loginButton" class="login-link">Login</a>
+          <a href="#" class="logout-link" title="Sair">🚪</a>
+        </div>
+      </aside>
+
+      <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir menu">&#9776;</button>
+      <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+      <div class="nav-drawer" id="navDrawer">
+        <a href="index.html" class="sidebar-logo">
+          <img src="imagens/nayfts-header-mid.png" alt="NAYFTS" loading="lazy">
+          <span>Floresta Criativa</span>
+        </a>
+        <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
+          <a href="index.html">🏠 Home</a>
+          <a href="verde-inspiracao.html">🌿 Verde Inspiração</a>
+          <a href="sapo-imaginario.html">🐸 Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html">📝 Rascunhos da Floresta</a>
+          <a href="sobre-mim.html">🐸 Sobre Mim</a>
+          <a href="#guestbook">📝 Guestbook</a>
+        </div>
+        <div class="sidebar-footer theme-toggle-target">
+          <a href="login.html" class="login-link">Login</a>
+          <a href="#" class="logout-link" title="Sair">🚪</a>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
+        <a href="index.html"><span class="bottom-nav-icon">🏠</span>Home</a>
+        <a href="verde-inspiracao.html"><span class="bottom-nav-icon">🌿</span>Verde</a>
+        <a href="sapo-imaginario.html"><span class="bottom-nav-icon">🐸</span>Sapo</a>
+        <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon">📝</span>Rascunhos</a>
+      </div>
+
+      <main class="site-main">
+    <div class="home-header-box sticker-card">
+      <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+      <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+    </div>
+    <div class="page-banner-caption">
+      <h1>Floresta Criativa</h1>
+    </div>
+
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
       <div class="search-overlay-box">
         <div class="search-overlay-box-header">
@@ -78,18 +136,50 @@
       <div id="recentPosts"></div>
     </div>
 
-    <div class="dashboard-recent-posts" id="pendingCommentsWrap" style="display:none">
-      <h3>Comentários pendentes <span id="pendingCommentCount" class="badge badge-draft"></span></h3>
-      <div id="pendingComments"></div>
+    <div class="dashboard-recent-posts" id="pendingModerationWrap" style="display:none">
+      <h3>Moderação pendente <span id="pendingModerationCount" class="badge badge-draft"></span></h3>
+      <div id="pendingModeration"></div>
+    </div>
+
+    <div class="dashboard-recent-posts">
+      <h3>Configurações do site</h3>
+      <p class="settings-hint">Edite o "Currently", "Mood" e "Now Playing" que aparecem na home — sem precisar mexer no código.</p>
+      <form id="settingsForm" class="settings-form">
+        <label for="settingsCurrently">Currently (uma linha por item):</label>
+        <textarea id="settingsCurrently" rows="4" placeholder="✍️ Escrevendo uma história nova"></textarea>
+
+        <div class="settings-row">
+          <div>
+            <label for="settingsMoodEmoji">Mood — emoji:</label>
+            <input type="text" id="settingsMoodEmoji" maxlength="10" placeholder="🐸">
+          </div>
+          <div>
+            <label for="settingsMoodLabel">Mood — humor:</label>
+            <input type="text" id="settingsMoodLabel" maxlength="60" placeholder="tranquila">
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div>
+            <label for="settingsTrack">Now Playing — música:</label>
+            <input type="text" id="settingsTrack" maxlength="100" placeholder="lofi in the swamp">
+          </div>
+          <div>
+            <label for="settingsArtist">Now Playing — artista:</label>
+            <input type="text" id="settingsArtist" maxlength="100" placeholder="frog beats">
+          </div>
+        </div>
+
+        <label for="settingsFeatured">Featured — legenda:</label>
+        <input type="text" id="settingsFeatured" maxlength="120" placeholder="tempo perfeito pra programar ☂️">
+
+        <button type="submit">Salvar configurações</button>
+        <p id="settingsFeedback"></p>
+      </form>
     </div>
 
     <script>
   var API_BASE = '/api';
-
-  function toggleMenu() {
-      const menu = document.getElementById('menu');
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-  }
 
   fetch(`${API_BASE}/user-info`)
       .then(response => {
@@ -102,19 +192,19 @@
       .then(data => {
           if (data && data.username) {
               document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${data.username}!`;
-              document.getElementById('loginButton').textContent = 'Perfil';
-              document.getElementById('loginButton').href = 'dashboard.html';
           }
       })
       .catch(error => console.error('Erro ao verificar autenticação:', error));
 
-  document.getElementById('logoutButton').addEventListener('click', function(event) {
-      event.preventDefault();
-      fetch(`${API_BASE}/logout`)
-          .then(response => {
-              if (response.ok) window.location.href = 'login.html';
-          })
-          .catch(error => console.error('Erro ao fazer logout:', error));
+  document.querySelectorAll('.logout-link').forEach(btn => {
+      btn.addEventListener('click', function(event) {
+          event.preventDefault();
+          fetch(`${API_BASE}/logout`)
+              .then(response => {
+                  if (response.ok) window.location.href = 'login.html';
+              })
+              .catch(error => console.error('Erro ao fazer logout:', error));
+      });
   });
 
   fetch(`${API_BASE}/dashboard-stats`)
@@ -151,92 +241,142 @@
       })
       .catch(error => console.error('Erro ao carregar estatísticas:', error));
 
-  // ── Moderação de comentários ───────────────────────────
+  // ── Moderação unificada: comentários + guestbook ────────
   function escapeHtml(str) {
       const div = document.createElement('div');
       div.appendChild(document.createTextNode(String(str)));
       return div.innerHTML;
   }
 
-  function loadPendingComments() {
-      fetch(`${API_BASE}/admin/comments/pending`)
-          .then(r => r.json())
-          .then(comments => {
-              if (!comments.length) return;
-              const wrap = document.getElementById('pendingCommentsWrap');
-              wrap.style.display = 'block';
-              document.getElementById('pendingCommentCount').textContent = comments.length;
-              const container = document.getElementById('pendingComments');
-              container.innerHTML = '';
-              comments.forEach(c => {
-                  const date = new Date(c.createdAt).toLocaleDateString('pt-BR', {
-                      day: '2-digit', month: 'short', year: 'numeric'
-                  });
-                  const postTitle = c.post ? escapeHtml(c.post.title) : 'Post removido';
-                  const postLink = c.post
-                      ? (c.post.slug ? `post.html?slug=${c.post.slug}` : `post.html?id=${c.post._id}`)
-                      : '#';
-                  const el = document.createElement('div');
-                  el.className = 'pending-comment-item';
-                  el.dataset.id = c._id;
-                  el.innerHTML = `
-                      <div class="pending-comment-meta">
-                          <strong>${escapeHtml(c.author)}</strong>
-                          <time>${date}</time>
-                          <span>em <a href="${postLink}">${postTitle}</a></span>
-                      </div>
-                      <p class="pending-comment-body">${escapeHtml(c.content)}</p>
-                      <div class="pending-comment-actions">
-                          <button class="btn-approve" onclick="approveComment('${c._id}', this)">Aprovar</button>
-                          <button class="btn-reject" onclick="rejectComment('${c._id}', this)">Rejeitar</button>
-                      </div>
-                  `;
-                  container.appendChild(el);
+  const MODERATION_ENDPOINTS = {
+      comment: { pending: 'admin/comments/pending', approve: id => `admin/comments/${id}/approve`, reject: id => `admin/comments/${id}` },
+      guestbook: { pending: 'admin/guestbook/pending', approve: id => `admin/guestbook/${id}/approve`, reject: id => `admin/guestbook/${id}` }
+  };
+
+  function loadPendingModeration() {
+      Promise.all([
+          fetch(`${API_BASE}/admin/comments/pending`).then(r => r.json()).then(items => items.map(c => ({ ...c, _type: 'comment' }))).catch(() => []),
+          fetch(`${API_BASE}/admin/guestbook/pending`).then(r => r.json()).then(items => items.map(e => ({ ...e, _type: 'guestbook' }))).catch(() => [])
+      ]).then(([comments, guestbook]) => {
+          const all = [...comments, ...guestbook].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          if (!all.length) return;
+
+          const wrap = document.getElementById('pendingModerationWrap');
+          wrap.style.display = 'block';
+          document.getElementById('pendingModerationCount').textContent = all.length;
+          const container = document.getElementById('pendingModeration');
+          container.innerHTML = '';
+
+          all.forEach(item => {
+              const isComment = item._type === 'comment';
+              const date = new Date(item.createdAt).toLocaleDateString('pt-BR', {
+                  day: '2-digit', month: 'short', year: 'numeric'
               });
-          })
-          .catch(() => {});
+              const postTitle = isComment ? (item.post ? escapeHtml(item.post.title) : 'Post removido') : null;
+              const postLink = isComment
+                  ? (item.post ? (item.post.slug ? `post.html?slug=${item.post.slug}` : `post.html?id=${item.post._id}`) : '#')
+                  : null;
+              const el = document.createElement('div');
+              el.className = 'pending-comment-item';
+              el.dataset.id = item._id;
+              el.dataset.type = item._type;
+              el.innerHTML = `
+                  <div class="pending-comment-meta">
+                      <span class="moderation-type-badge">${isComment ? '💬 Comentário' : '📝 Guestbook'}</span>
+                      <strong>${escapeHtml(item.author)}</strong>
+                      <time>${date}</time>
+                      ${isComment ? `<span>em <a href="${postLink}">${postTitle}</a></span>` : ''}
+                  </div>
+                  <p class="pending-comment-body">${escapeHtml(isComment ? item.content : item.message)}</p>
+                  <div class="pending-comment-actions">
+                      <button class="btn-approve" onclick="moderateItem('${item._type}', '${item._id}', 'approve', this)">Aprovar</button>
+                      <button class="btn-reject" onclick="moderateItem('${item._type}', '${item._id}', 'reject', this)">Rejeitar</button>
+                  </div>
+              `;
+              container.appendChild(el);
+          });
+      });
   }
 
-  function approveComment(id, btn) {
+  function moderateItem(type, id, action, btn) {
       btn.disabled = true;
-      fetch(`${API_BASE}/admin/comments/${id}/approve`, { method: 'PATCH' })
+      const endpoints = MODERATION_ENDPOINTS[type];
+      const url = `${API_BASE}/${action === 'approve' ? endpoints.approve(id) : endpoints.reject(id)}`;
+      fetch(url, { method: action === 'approve' ? 'PATCH' : 'DELETE' })
           .then(r => r.json())
           .then(data => {
-              if (data.success) removeCommentCard(id);
+              if (data.success) removeModerationCard(id);
+              else btn.disabled = false;
           })
           .catch(() => { btn.disabled = false; });
   }
 
-  function rejectComment(id, btn) {
-      btn.disabled = true;
-      fetch(`${API_BASE}/admin/comments/${id}`, { method: 'DELETE' })
-          .then(r => r.json())
-          .then(data => {
-              if (data.success) removeCommentCard(id);
-          })
-          .catch(() => { btn.disabled = false; });
-  }
-
-  function removeCommentCard(id) {
+  function removeModerationCard(id) {
       const el = document.querySelector(`.pending-comment-item[data-id="${id}"]`);
       if (el) el.remove();
       const remaining = document.querySelectorAll('.pending-comment-item').length;
       if (!remaining) {
-          document.getElementById('pendingCommentsWrap').style.display = 'none';
+          document.getElementById('pendingModerationWrap').style.display = 'none';
       } else {
-          document.getElementById('pendingCommentCount').textContent = remaining;
+          document.getElementById('pendingModerationCount').textContent = remaining;
       }
   }
 
-  loadPendingComments();
+  loadPendingModeration();
+
+  // ── Configurações do site ────────────────────────────────
+  function loadSettings() {
+      fetch(`${API_BASE}/settings`)
+          .then(r => r.json())
+          .then(s => {
+              document.getElementById('settingsCurrently').value = (s.currently || []).join('\n');
+              document.getElementById('settingsMoodEmoji').value = s.moodEmoji || '';
+              document.getElementById('settingsMoodLabel').value = s.moodLabel || '';
+              document.getElementById('settingsTrack').value = s.nowPlayingTrack || '';
+              document.getElementById('settingsArtist').value = s.nowPlayingArtist || '';
+              document.getElementById('settingsFeatured').value = s.featuredCaption || '';
+          })
+          .catch(() => {});
+  }
+
+  document.getElementById('settingsForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const feedback = document.getElementById('settingsFeedback');
+      const btn = this.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      feedback.textContent = '';
+
+      const currently = document.getElementById('settingsCurrently').value
+          .split('\n').map(s => s.trim()).filter(Boolean);
+
+      fetch(`${API_BASE}/admin/settings`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              currently,
+              moodEmoji: document.getElementById('settingsMoodEmoji').value.trim(),
+              moodLabel: document.getElementById('settingsMoodLabel').value.trim(),
+              nowPlayingTrack: document.getElementById('settingsTrack').value.trim(),
+              nowPlayingArtist: document.getElementById('settingsArtist').value.trim(),
+              featuredCaption: document.getElementById('settingsFeatured').value.trim()
+          })
+      })
+      .then(r => r.json().then(data => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+          btn.disabled = false;
+          feedback.textContent = ok ? 'Configurações salvas!' : (data.errors?.[0]?.msg || data.message || 'Erro ao salvar.');
+      })
+      .catch(() => {
+          btn.disabled = false;
+          feedback.textContent = 'Erro ao salvar configurações.';
+      });
+  });
+
+  loadSettings();
     </script>
 
-    <div id="bottom-image"></div>
-    <footer>
-      <div class="footer-content">
-        <p>Floresta Criativa &copy; 2026</p>
-      </div>
-    </footer>
     <script src="search.js"></script>
+      </main>
+    </div>
   </body>
 </html>

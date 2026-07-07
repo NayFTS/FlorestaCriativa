@@ -12,24 +12,83 @@
     <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
   </head>
   <body>
-    <header>
-      <a href="index.html">
-      <img id="header-image" src="imagens/nayfts-header-mid.png" alt="NayFTS header" loading="lazy">
-      </a>
+    <div class="site-shell">
+      <div class="topbar">
+        <nav class="topbar-nav" aria-label="Navegação principal">
+          <a href="index.html">Home</a>
+          <a href="verde-inspiracao.html">Blog</a>
+          <a href="sapo-imaginario.html">Portfólio</a>
+          <a href="rascunhos-da-floresta.html">Projetos</a>
+          <a href="sobre-mim.html">About</a>
+        </nav>
+        <div class="topbar-actions theme-toggle-target">
+          <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+        </div>
+      </div>
+
+      <aside class="site-sidebar">
+        <a href="index.html" class="topbar-sign">
+          <img class="topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+        </a>
+        <div class="sidebar-widgets">
+          <div>
+            <h4>🌱 Currently</h4>
+            <ul class="widget-list" id="currentlyList">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Mood</h4>
+            <div class="widget-mood" id="moodWidget">
+              <span class="widget-mood-emoji">🐸</span>
+              <span class="widget-mood-label">Carregando...</span>
+            </div>
+          </div>
+          <img src="imagens/decor/sapo-sentado.png" alt="" class="sidebar-sticker" aria-hidden="true" loading="lazy">
+        </div>
+        <div class="sidebar-footer">
+          <a href="login.html" class="login-link">Login</a>
+        </div>
+      </aside>
+
+      <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir menu">&#9776;</button>
+      <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+      <div class="nav-drawer" id="navDrawer">
+        <a href="index.html" class="sidebar-logo">
+          <img src="imagens/nayfts-header-mid.png" alt="NAYFTS" loading="lazy">
+          <span>Floresta Criativa</span>
+        </a>
+        <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
+          <a href="index.html">🏠 Home</a>
+          <a href="verde-inspiracao.html">🌿 Verde Inspiração</a>
+          <a href="sapo-imaginario.html">🐸 Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html">📝 Rascunhos da Floresta</a>
+          <a href="sobre-mim.html">🐸 Sobre Mim</a>
+          <a href="#guestbook">📝 Guestbook</a>
+        </div>
+        <div class="sidebar-footer theme-toggle-target">
+          <a href="login.html" class="login-link">Login</a>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
+        <a href="index.html"><span class="bottom-nav-icon">🏠</span>Home</a>
+        <a href="verde-inspiracao.html"><span class="bottom-nav-icon">🌿</span>Verde</a>
+        <a href="sapo-imaginario.html"><span class="bottom-nav-icon">🐸</span>Sapo</a>
+        <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon">📝</span>Rascunhos</a>
+      </div>
+
+      <main class="site-main">
+    <div class="home-header-box sticker-card">
+      <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+      <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+    </div>
+    <div class="page-banner-caption">
       <h1>Floresta Criativa</h1>
       <p>Área de Login</p>
-    </header>
-    <div id="top-image"></div>
-    <nav>
-      <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-      <div class="menu" id="menu">
-        <a href="index.html">Home</a>
-        <a href="verde-inspiracao.html">Verde Inspiração</a>
-        <a href="sapo-imaginario.html">Sapo Imaginário</a>
-        <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
-        <button id="searchToggle" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()">🔍</button>
-      </div>
-    </nav>
+    </div>
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
       <div class="search-overlay-box">
         <div class="search-overlay-box-header">
@@ -58,15 +117,13 @@
     <div class="login-container">
       <h2>Login</h2>
       <form id="loginForm">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        
+        <label for="username">Usuário:</label>
+        <input type="text" id="username" name="username" required>
+
         <label for="password">Senha:</label>
         <input type="password" id="password" name="password" required>
 
         <button type="submit">Entrar</button>
-        <p><a href="reset-password.html">Esqueci minha senha</a></p>
-
       </form>
       <p id="errorMessage"></p>
     </div>
@@ -74,32 +131,20 @@
     <script>
   var API_BASE = '/api';
 
-      const emailInput = document.getElementById('email');
+      const usernameInput = document.getElementById('username');
       const passwordInput = document.getElementById('password');
 
       document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const email = emailInput.value.trim();
+        const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
         const errorMessageElement = document.getElementById('errorMessage');
 
         // Limpa estado de erro anterior
         errorMessageElement.innerHTML = '';
-        emailInput.classList.remove('input-error');
+        usernameInput.classList.remove('input-error');
         passwordInput.classList.remove('input-error');
-
-        // Validação no lado do cliente
-        if (!email.includes('@') || !email.includes('.')) {
-          emailInput.classList.add('input-error');
-          errorMessageElement.innerHTML = 'Por favor, insira um email válido.';
-          return;
-        }
-        if (password.length < 6) {
-          passwordInput.classList.add('input-error');
-          errorMessageElement.innerHTML = 'A senha deve ter pelo menos 6 caracteres.';
-          return;
-        }
 
         const submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
@@ -108,7 +153,7 @@
         fetch(`${API_BASE}/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ username, password })
         })
         .then(response => {
             if (!response.ok) {
@@ -122,7 +167,7 @@
         .catch(error => {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Entrar';
-            emailInput.classList.add('input-error');
+            usernameInput.classList.add('input-error');
             passwordInput.classList.add('input-error');
             if (error.errors) {
                 errorMessageElement.innerHTML = error.errors.map(err => `<p>${err.msg}</p>`).join('');
@@ -137,11 +182,7 @@
     </script>
     
     <script src="search.js"></script>
-    <div id="bottom-image"></div>
-    <footer>
-      <div class="footer-content">
-        <p>Floresta Criativa &copy; 2026</p>
-      </div>
-    </footer>
+      </main>
+    </div>
   </body>
 </html>
