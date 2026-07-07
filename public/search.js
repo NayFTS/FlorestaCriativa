@@ -190,8 +190,7 @@ function loadSiteSettings() {
     const currentlyLists = document.querySelectorAll('.js-currently-list');
     const nowPlayingTrack = document.getElementById('nowPlayingTrack');
     const nowPlayingArtist = document.getElementById('nowPlayingArtist');
-    const featuredCaption = document.getElementById('featuredCaption');
-    if (!currentlyLists.length && !nowPlayingTrack && !featuredCaption) return;
+    if (!currentlyLists.length && !nowPlayingTrack) return;
 
     fetch(`${API_BASE}/settings`)
         .then(r => r.json())
@@ -203,7 +202,6 @@ function loadSiteSettings() {
             });
             if (nowPlayingTrack) nowPlayingTrack.textContent = s.nowPlayingTrack || '';
             if (nowPlayingArtist) nowPlayingArtist.textContent = s.nowPlayingArtist || '';
-            if (featuredCaption) featuredCaption.textContent = s.featuredCaption || '';
         })
         .catch(() => {});
 }

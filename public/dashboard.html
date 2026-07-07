@@ -192,9 +192,6 @@
           </div>
         </div>
 
-        <label for="settingsFeatured">Featured — legenda:</label>
-        <input type="text" id="settingsFeatured" maxlength="120" placeholder="tempo perfeito pra programar ☂️">
-
         <button type="submit">Salvar configurações</button>
         <p id="settingsFeedback"></p>
       </form>
@@ -354,7 +351,6 @@
               document.getElementById('settingsCurrently').value = (s.currently || []).join('\n');
               document.getElementById('settingsTrack').value = s.nowPlayingTrack || '';
               document.getElementById('settingsArtist').value = s.nowPlayingArtist || '';
-              document.getElementById('settingsFeatured').value = s.featuredCaption || '';
               document.getElementById('spotifyStatus').textContent = s.spotifyConnected ? '✅ Conectado' : '❌ Não conectado';
               document.getElementById('spotifyDisconnectBtn').hidden = !s.spotifyConnected;
           })
@@ -392,8 +388,7 @@
           body: JSON.stringify({
               currently,
               nowPlayingTrack: document.getElementById('settingsTrack').value.trim(),
-              nowPlayingArtist: document.getElementById('settingsArtist').value.trim(),
-              featuredCaption: document.getElementById('settingsFeatured').value.trim()
+              nowPlayingArtist: document.getElementById('settingsArtist').value.trim()
           })
       })
       .then(r => r.json().then(data => ({ ok: r.ok, data })))

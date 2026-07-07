@@ -245,7 +245,7 @@
 
           document.getElementById('content').value = getContent();
           const formData = new FormData(this);
-          const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
+          const selectedCategories = Array.from(document.querySelectorAll('#postForm input[name="category[]"]:checked'))
               .map(checkbox => checkbox.value);
           formData.append('categories', JSON.stringify(selectedCategories));
           formData.append('status', submitStatus);

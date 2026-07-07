@@ -320,7 +320,7 @@
 
               if (data.categories) {
                   data.categories.forEach(category => {
-                      const checkbox = document.querySelector(`input[name="category[]"][value="${category}"]`);
+                      const checkbox = document.querySelector(`#editPostForm input[name="category[]"][value="${category}"]`);
                       if (checkbox) checkbox.checked = true;
                   });
               }
@@ -381,7 +381,7 @@
 
       document.getElementById('content').value = editorInstance.getData();
       const formData = new FormData(this);
-      const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked'))
+      const selectedCategories = Array.from(document.querySelectorAll('#editPostForm input[name="category[]"]:checked'))
           .map(checkbox => checkbox.value);
       formData.append('categories', JSON.stringify(selectedCategories));
       formData.set('technologies', JSON.stringify(techList));

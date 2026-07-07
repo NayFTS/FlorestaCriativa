@@ -154,7 +154,7 @@
           data.forEach((post, i) => {
               const img  = post.image_path
                   ? (post.image_path.startsWith('http') ? post.image_path : `/imagens/uploads/${post.image_path}`)
-                  : 'imagens/quadrado-da-floresta.webp';
+                  : 'imagens/decor/banner-header-dia.png';
               const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
               const tmp  = document.createElement('div');
               tmp.innerHTML = post.content;
@@ -227,7 +227,28 @@
               });
           loadGuestbook();
           initGuestbookForm();
+          loadFeaturedPost();
       };
+
+      function loadFeaturedPost() {
+          const featuredEl = document.getElementById('featuredPost');
+          fetch(`${API_BASE}/posts?page=1&limit=1&sort=likes`)
+              .then(r => r.json())
+              .then(data => {
+                  const post = (data.posts || [])[0];
+                  if (!post) {
+                      featuredEl.innerHTML = '<p>Nenhum post ainda.</p>';
+                      return;
+                  }
+                  const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
+                  const imgSrc = post.image_path
+                      ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
+                      : 'imagens/decor/sapo-guarda-chuva.png';
+                  featuredEl.innerHTML = `<a href="${link}"><img src="${imgSrc}" alt="${escapeHtml(post.title)}" loading="lazy"></a>
+                      <p><a href="${link}">${escapeHtml(post.title)}</a> — ${post.likes || 0} curtidas</p>`;
+              })
+              .catch(() => { featuredEl.innerHTML = '<p>Não foi possível carregar.</p>'; });
+      }
 
       function escapeHtml(str) {
           const div = document.createElement('div');
@@ -346,8 +367,7 @@
             <h3>📷 Featured</h3>
             <span class="window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
           </div>
-          <img src="imagens/decor/sapo-guarda-chuva.png" alt="" loading="lazy">
-          <p id="featuredCaption">Carregando...</p>
+          <div id="featuredPost">Carregando...</div>
         </div>
 
         <div class="widget-card sticker-card sticker-card--sm widget-nowplaying-card">

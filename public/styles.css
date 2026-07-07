@@ -71,6 +71,28 @@
     --shadow-card-hover: 0 6px 24px rgba(0, 0, 0, 0.45);
 
     --noise-opacity: 0.05;
+
+    color-scheme: dark;
+    scrollbar-color: var(--color-accent-dark) var(--color-bg-secondary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--color-accent-dark);
+    border-radius: var(--radius-pill);
+    border: 3px solid var(--color-bg-secondary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
 }
 
 /* Textura de papel / noise extremamente discreta sobre o fundo */
@@ -511,6 +533,7 @@ body.page-public .site-main {
     font-size: 0.8rem;
     gap: 4px;
     overflow-y: auto;
+    overscroll-behavior-y: contain;
     min-height: 0;
     color: #4A5A3F;
 }
@@ -681,6 +704,7 @@ body.page-public .site-main {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         overflow-y: auto;
+        overscroll-behavior-y: contain;
     }
 
     .nav-drawer.open { transform: translateX(0); }
@@ -2811,7 +2835,7 @@ section#rascunhos-da-floresta {
 .about-profile {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 44px;
     margin-bottom: 32px;
     padding: 28px 24px;
     background: var(--color-surface);
@@ -2819,13 +2843,28 @@ section#rascunhos-da-floresta {
     border-radius: 12px;
 }
 
+.about-avatar-frame {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+}
+
 .about-avatar {
     width: 110px;
     height: 110px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--color-accent);
-    flex-shrink: 0;
+}
+
+.about-avatar-wreath {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 176px;
+    height: 176px;
+    transform: translate(-50%, calc(-50% + 8px));
+    pointer-events: none;
 }
 
 .about-intro h2 {
