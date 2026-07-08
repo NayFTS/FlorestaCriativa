@@ -1,0 +1,783 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Vercel CLI 54.20.1 (Node.js 26.4.0)
+Retrieving project…
+> Ready! Available at http://127.0.0.1:3000
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Erro ao conectar ao MongoDB: MongoNetworkError: read ECONNRESET
+    at TLSSocket.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongodb\src\cmap\connect.ts:394:16)
+    at Object.onceWrapper (node:events:631:12)
+    at TLSSocket.emit (node:events:509:20)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errorLabelSet: Set(1) { 'ResetPool' },
+  beforeHandshake: false,
+  connectionGeneration: 0,
+  [cause]: Error: read ECONNRESET
+      at TLSWrap.onStreamRead (node:internal/stream_base_commons:216:20) {
+    errno: -4077,
+    code: 'ECONNRESET',
+    syscall: 'read'
+  }
+}
+MongoNetworkError: read ECONNRESET
+    at TLSSocket.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongodb\src\cmap\connect.ts:394:16)
+    at Object.onceWrapper (node:events:631:12)
+    at TLSSocket.emit (node:events:509:20)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Conectado ao MongoDB: Atlas
+ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+    at Object.xForwardedForHeader (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\express-rate-limit\dist\index.cjs:381:13)
+    at wrappedValidations.<computed> [as xForwardedForHeader] (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\express-rate-limit\dist\index.cjs:704:22)
+    at Object.keyGenerator (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\express-rate-limit\dist\index.cjs:811:20)
+    at C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\express-rate-limit\dist\index.cjs:893:32
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\express-rate-limit\dist\index.cjs:854:5 {
+  code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+  help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+}
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Erro ao conectar ao MongoDB: MongoNetworkError: read ECONNRESET
+    at TLSSocket.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongodb\src\cmap\connect.ts:394:16)
+    at Object.onceWrapper (node:events:631:12)
+    at TLSSocket.emit (node:events:509:20)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errorLabelSet: Set(1) { 'ResetPool' },
+  beforeHandshake: false,
+  connectionGeneration: 0,
+  [cause]: Error: read ECONNRESET
+      at TLSWrap.onStreamRead (node:internal/stream_base_commons:216:20) {
+    errno: -4077,
+    code: 'ECONNRESET',
+    syscall: 'read'
+  }
+}
+node:internal/process/promises:324
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+MongoNetworkError: read ECONNRESET
+    at TLSSocket.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongodb\src\cmap\connect.ts:394:16)
+    at Object.onceWrapper (node:events:631:12)
+    at TLSSocket.emit (node:events:509:20)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errorLabelSet: Set(1) { 'ResetPool' },
+  beforeHandshake: false,
+  connectionGeneration: 0,
+  [cause]: Error: read ECONNRESET
+      at TLSWrap.onStreamRead (node:internal/stream_base_commons:216:20) {
+    errno: -4077,
+    code: 'ECONNRESET',
+    syscall: 'read'
+  }
+}
+
+Node.js v26.4.0
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Conectado ao MongoDB: Atlas
+Erro ao buscar categorias: MongooseError: Operation `posts.distinct()` buffering timed out after 10000ms
+    at Timeout.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:185:23)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+Erro ao buscar posts: MongooseError: Operation `posts.find()` buffering timed out after 10000ms
+    at Timeout.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:185:23)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: 74400000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: 74400000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: 4C870000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: 4C870000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: A82E0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: A82E0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: A8820000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: E47E0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: A8820000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+MongooseServerSelectionError: E47E0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: CC810000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: CC810000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao buscar posts: MongooseError: Operation `posts.find()` buffering timed out after 10000ms
+    at Timeout.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:185:23)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+Erro ao buscar categorias: MongooseError: Operation `posts.distinct()` buffering timed out after 10000ms
+    at Timeout.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:185:23)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+Erro ao buscar posts: MongooseError: Operation `posts.find()` buffering timed out after 10000ms
+    at Timeout.<anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:185:23)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: 40700000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: 40700000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: D0850000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: D0850000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: 54760000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: 54760000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: 00750000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: 00750000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: 0C4F0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+Erro ao conectar ao MongoDB: MongooseServerSelectionError: 80590000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'forestdatabase-shard-00-00.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-01.vdg3a.mongodb.net:27017' => [ServerDescription],
+      'forestdatabase-shard-00-02.vdg3a.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-m4bgfa-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined
+}
+MongooseServerSelectionError: 0C4F0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)
+MongooseServerSelectionError: 80590000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:openssl\ssl\record\rec_layer_s3.c:918:SSL alert number 80
+
+    at _handleConnectionErrors (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1154:11)
+    at NativeConnection.openUri (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\mongoose\lib\connection.js:1085:11)
+    at async <anonymous> (C:\Users\natha\OneDrive\Desktop\Vibe Coding\Floresta Criativa\node_modules\connect-mongo\src\lib\MongoStore.ts:306:28)

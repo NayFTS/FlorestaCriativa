@@ -40,9 +40,24 @@ const mongoAtlas = process.env.MONGO_ATLAS; // 🔹 A URL do Atlas virá do .env
 
 const mongoURI = mongoAtlas || mongoLocal; // 🔹 Por padrão, usa o Atlas se disponível
 
-mongoose.connect(mongoURI)
-    .then(() => console.log(`Conectado ao MongoDB: ${mongoURI.includes('localhost') ? 'Local' : 'Atlas'}`))
-    .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
+// Em ambiente serverless o processo pode ser reaproveitado entre requisições; guardamos a
+// conexão em `global` para não abrir uma conexão nova a cada cold start/reload (isso é o que
+// estava estourando o limite de conexões simultâneas do Atlas). maxPoolSize baixo porque cada
+// instância da função já mantém seu próprio pool.
+let mongoConnectPromise = global.__mongoConnectPromise;
+if (!mongoConnectPromise) {
+    mongoConnectPromise = mongoose.connect(mongoURI, { maxPoolSize: 5 })
+        .then(m => {
+            console.log(`Conectado ao MongoDB: ${mongoURI.includes('localhost') ? 'Local' : 'Atlas'}`);
+            return m;
+        })
+        .catch(err => {
+            console.error('Erro ao conectar ao MongoDB:', err);
+            global.__mongoConnectPromise = null;
+            throw err;
+        });
+    global.__mongoConnectPromise = mongoConnectPromise;
+}
 
 // Vercel passa o caminho completo (/api/login) ao Express; strip do prefixo antes do roteamento
 app.use((req, res, next) => {
@@ -56,7 +71,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: mongoURI,
+        clientPromise: mongoConnectPromise.then(m => m.connection.getClient()),
         collectionName: 'sessions'
     }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }

@@ -1,0 +1,40 @@
+/* Tema custom do OverlayScrollbars, usando as cores do design system do site */
+.os-theme-forest {
+    box-sizing: border-box;
+    --os-size: 12px;
+    --os-padding-perpendicular: 2px;
+    --os-padding-axis: 2px;
+    --os-track-bg: var(--color-bg-secondary);
+    --os-track-bg-hover: var(--color-bg-secondary);
+    --os-track-bg-active: var(--color-bg-secondary);
+    --os-track-border-radius: 999px;
+    --os-handle-interactive-area-offset: 4px;
+    --os-handle-border-radius: 999px;
+    --os-handle-bg: var(--color-accent-dark);
+    --os-handle-bg-hover: var(--color-accent);
+    --os-handle-bg-active: var(--color-accent);
+}
+
+/* O OverlayScrollbars move o conteúdo pra dentro de um wrapper (viewport) que por padrão
+   é display:block — nos containers abaixo o layout original depende de flex-column, então
+   o wrapper precisa repetir esse comportamento pra não quebrar o alinhamento dos itens. */
+.nav-drawer[data-overlayscrollbars] [data-overlayscrollbars-viewport],
+.site-sidebar[data-overlayscrollbars] [data-overlayscrollbars-viewport],
+.guestbook-entries[data-overlayscrollbars] [data-overlayscrollbars-viewport],
+.currently-widget .widget-list[data-overlayscrollbars] [data-overlayscrollbars-viewport],
+.search-overlay-box #searchResults[data-overlayscrollbars] [data-overlayscrollbars-viewport] {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-drawer[data-overlayscrollbars] [data-overlayscrollbars-viewport],
+.site-sidebar[data-overlayscrollbars] [data-overlayscrollbars-viewport] { gap: 20px; }
+.guestbook-entries[data-overlayscrollbars] [data-overlayscrollbars-viewport] { gap: 6px; }
+.currently-widget .widget-list[data-overlayscrollbars] [data-overlayscrollbars-viewport] {
+    align-items: center;
+    gap: 4px;
+}
+.search-overlay-box #searchResults[data-overlayscrollbars] [data-overlayscrollbars-viewport] {
+    justify-content: center;
+    align-items: center;
+}

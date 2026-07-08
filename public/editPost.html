@@ -6,6 +6,10 @@
     <title>Floresta Criativa - Editar Post</title>
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="vendor/overlayscrollbars/overlayscrollbars.min.css">
+    <link rel="stylesheet" href="scrollbars.css">
+    <script defer src="vendor/overlayscrollbars/overlayscrollbars.min.js"></script>
+    <script defer src="scrollbars.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
   </head>
   <body>
@@ -54,12 +58,26 @@
         </div>
       </aside>
 
-      <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir menu">&#9776;</button>
+      <header class="mobile-topbar">
+        <div class="mobile-topbar-row">
+          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
+          <div class="mobile-topbar-controls">
+            <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir menu">&#9776;</button>
+            <a href="index.html" class="mobile-topbar-sign" aria-label="Floresta Criativa — início">
+              <img class="mobile-topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS" loading="lazy">
+              <img class="mobile-topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS" loading="lazy">
+            </a>
+            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+            <div class="mobile-topbar-actions theme-toggle-target"></div>
+          </div>
+          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
+        </div>
+      </header>
       <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
       <div class="nav-drawer" id="navDrawer">
         <a href="index.html" class="sidebar-logo">
-          <img src="imagens/nayfts-header-mid.png" alt="NAYFTS" loading="lazy">
-          <span>Floresta Criativa</span>
+          <img class="sidebar-logo-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="sidebar-logo-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
         </a>
         <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
           <a href="dashboard.html">📊 Dashboard</a>
