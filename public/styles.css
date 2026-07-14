@@ -704,7 +704,10 @@ body.page-public .site-main {
 @media (max-width: 768px) {
     .site-shell { display: block; }
     .topbar { display: none; }
-    .site-sidebar { display: none; }
+    /* !important: o OverlayScrollbars (scrollbars.js) injeta seu próprio <style>
+       com display:flex pro host (mesma especificidade de .site-sidebar, carregado
+       depois do nosso CSS) e vencia o cascade, deixando a sidebar visível no mobile. */
+    .site-sidebar { display: none !important; }
     /* Zera a margem de 20px do .site-main no mobile — nas páginas admin (sem
        .page-public) essa margem sobrava como espaço morto que as páginas
        públicas já não tinham. */
@@ -834,7 +837,11 @@ body.page-public .site-main {
         display: flex;
         flex-direction: column;
         gap: 20px;
-        position: fixed;
+        /* !important: mesmo problema do .site-sidebar — o OverlayScrollbars injeta
+           position:relative pro host (mesma especificidade, carregado depois do
+           nosso CSS), tirando o drawer do position:fixed e jogando ele no fluxo
+           normal da página (com height:100vh, empurrando o conteúdo lá pra baixo). */
+        position: fixed !important;
         top: 0;
         left: 0;
         height: 100vh;
@@ -2176,6 +2183,26 @@ input.input-error, input.input-error:focus {
 .ck.ck-toolbar { flex-wrap: wrap !important; }
 .ck.ck-toolbar__items { flex-wrap: wrap !important; }
 
+/* CKEditor: acompanha o modo noturno (por padrão vem com fundo branco fixo) */
+[data-theme="dark"] .ck.ck-editor__editable_inline,
+[data-theme="dark"] .ck.ck-content {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+}
+[data-theme="dark"] .ck.ck-toolbar {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+}
+[data-theme="dark"] .ck.ck-toolbar .ck-icon,
+[data-theme="dark"] .ck.ck-toolbar .ck-button__label {
+    color: var(--color-text) !important;
+}
+[data-theme="dark"] .ck.ck-button:not(.ck-disabled):hover,
+[data-theme="dark"] .ck.ck-button.ck-on {
+    background: var(--color-surface-hover) !important;
+}
+
 /* Botão de Publicar */
 #postForm button[type="submit"] {
     margin-top: 20px;
@@ -2688,6 +2715,34 @@ input.input-error, input.input-error:focus {
     border-radius: var(--radius-card-sm);
     border: 1px solid var(--color-border);
     font-size: 1em;
+}
+
+/* Botão nativo "Escolher arquivo" (capa + galeria) alinhado ao design system e ao tema */
+#postForm input[type="file"],
+#editPostForm input[type="file"] {
+    color: var(--color-text-secondary);
+}
+#postForm input[type="file"]::file-selector-button,
+#editPostForm input[type="file"]::file-selector-button,
+#postForm input[type="file"]::-webkit-file-upload-button,
+#editPostForm input[type="file"]::-webkit-file-upload-button {
+    padding: 8px 16px;
+    margin-right: 10px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-accent);
+    color: white;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#postForm input[type="file"]::file-selector-button:hover,
+#editPostForm input[type="file"]::file-selector-button:hover,
+#postForm input[type="file"]::-webkit-file-upload-button:hover,
+#editPostForm input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: var(--color-accent-dark);
 }
 
 #editPostForm input[type="text"],
