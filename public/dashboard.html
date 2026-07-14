@@ -254,7 +254,7 @@
               <h3>Suas Estatísticas:</h3>
               <p>Total de Postagens: ${data.totalPosts} (${data.publishedCount || 0} publicadas · ${data.draftCount || 0} rascunhos)</p>
               <p>Total de Visualizações: ${data.totalViews || 0}</p>
-              <p>Post mais visualizado: "${data.mostPopularPost}"</p>
+              <p>Post mais visualizado: "${escapeHtml(data.mostPopularPost)}"</p>
           `;
 
           const container = document.getElementById('recentPosts');
@@ -271,7 +271,7 @@
                   const el = document.createElement('div');
                   el.className = 'recent-post-item';
                   el.innerHTML = `
-                      <h4>${post.title} ${isDraft ? '<span class="badge badge-draft">Rascunho</span>' : ''}</h4>
+                      <h4>${escapeHtml(post.title)} ${isDraft ? '<span class="badge badge-draft">Rascunho</span>' : ''}</h4>
                       <p>${excerpt}...</p>
                       ${isDraft ? '' : `<a href="${link}">Ler mais</a>`}
                   `;

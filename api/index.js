@@ -44,15 +44,30 @@ const mongoURI = mongoAtlas || mongoLocal; // 🔹 Por padrão, usa o Atlas se d
 // conexão em `global` para não abrir uma conexão nova a cada cold start/reload (isso é o que
 // estava estourando o limite de conexões simultâneas do Atlas). maxPoolSize baixo porque cada
 // instância da função já mantém seu próprio pool.
+//
+// O MongoStore da sessão (abaixo) é criado uma única vez e fica preso para sempre à promise
+// que recebe nesse momento — se ela rejeitar, a sessão inteira quebra pro resto da vida dessa
+// instância "quente", mesmo depois que uma nova tentativa de conexão teria dado certo. Por
+// isso tentamos reconectar algumas vezes aqui antes de desistir, já que falhas de rede
+// transitórias (ECONNRESET, handshake TLS) contra o Atlas são esperadas ocasionalmente.
+async function connectWithRetry(uri, options, attempts = 3, delayMs = 1000) {
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+        try {
+            const m = await mongoose.connect(uri, options);
+            console.log(`Conectado ao MongoDB: ${uri.includes('localhost') ? 'Local' : 'Atlas'}`);
+            return m;
+        } catch (err) {
+            console.error(`Erro ao conectar ao MongoDB (tentativa ${attempt}/${attempts}):`, err);
+            if (attempt === attempts) throw err;
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+    }
+}
+
 let mongoConnectPromise = global.__mongoConnectPromise;
 if (!mongoConnectPromise) {
-    mongoConnectPromise = mongoose.connect(mongoURI, { maxPoolSize: 5 })
-        .then(m => {
-            console.log(`Conectado ao MongoDB: ${mongoURI.includes('localhost') ? 'Local' : 'Atlas'}`);
-            return m;
-        })
+    mongoConnectPromise = connectWithRetry(mongoURI, { maxPoolSize: 5 })
         .catch(err => {
-            console.error('Erro ao conectar ao MongoDB:', err);
             global.__mongoConnectPromise = null;
             throw err;
         });
@@ -289,7 +304,17 @@ app.get('/logout', (req, res) => {
 });
 
 
-app.post('/addPost', requireAuth, galleryUpload, async (req, res) => {
+const postValidators = [
+    body('title').trim().notEmpty().withMessage('Título é obrigatório').isLength({ max: 200 }).withMessage('Título muito longo'),
+    body('content').trim().notEmpty().withMessage('Conteúdo é obrigatório'),
+    body('url').trim().notEmpty().withMessage('URL é obrigatória')
+];
+
+app.post('/addPost', requireAuth, galleryUpload, postValidators, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: errors.array()[0].msg, errors: errors.array() });
+    }
     try {
         const { title, content, url, status, external_link, preview_link } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
@@ -317,7 +342,11 @@ app.post('/addPost', requireAuth, galleryUpload, async (req, res) => {
 });
 
 // Rota de edição (exemplo semelhante)
-app.post('/editPost/:id', requireAuth, galleryUpload, async (req, res) => {
+app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: errors.array()[0].msg, errors: errors.array() });
+    }
     try {
         const postId = req.params.id;
 

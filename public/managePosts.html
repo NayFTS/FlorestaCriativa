@@ -195,6 +195,12 @@
   let currentPage = 1;
   const PAGE_SIZE = 10;
 
+  function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(String(str)));
+      return div.innerHTML;
+  }
+
   function loadManagedPosts() {
       fetch(`${API_BASE}/user-posts`)
           .then(response => {
@@ -229,7 +235,7 @@
           const isDraft = post.status === 'draft';
           const row = document.createElement('tr');
           row.innerHTML = `
-              <td data-label="Título">${post.title}</td>
+              <td data-label="Título">${escapeHtml(post.title)}</td>
               <td data-label="Status"><span class="badge ${isDraft ? 'badge-draft' : 'badge-published'}">${isDraft ? 'Rascunho' : 'Publicado'}</span></td>
               <td data-label="Data">${new Date(post.publish_date).toLocaleDateString('pt-BR')}</td>
               <td data-label="Views">${post.views || 0}</td>
