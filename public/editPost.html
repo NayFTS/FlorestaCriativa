@@ -222,6 +222,12 @@
           <input type="checkbox" id="cat5" value="Slice of Life" name="category[]">
           <label for="cat5">Slice of Life</label>
         </div>
+        <div id="customCategoryList" class="tech-tags-editable"></div>
+        <div class="category-add-row">
+          <input type="text" id="customCategoryInput" placeholder="Nova categoria...">
+          <button type="button" id="addCategoryBtn">+ Adicionar categoria</button>
+        </div>
+        <div id="categorySuggestions" class="category-suggestions" hidden></div>
       </fieldset><br><br>
 
       <button type="submit">Salvar Alterações</button>
@@ -258,12 +264,104 @@
       renderTechTags();
   }
 
+  function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(String(str)));
+      return div.innerHTML;
+  }
+
   function renderTechTags() {
       document.getElementById('technologiesData').value = JSON.stringify(techList);
       document.getElementById('techTagsList').innerHTML = techList.map((t, idx) =>
-          `<span class="tech-tag">${t}<button type="button" class="tech-tag-remove" onclick="removeTech(${idx})" aria-label="Remover">×</button></span>`
+          `<span class="tech-tag">${escapeHtml(t)}<button type="button" class="tech-tag-remove" onclick="removeTech(${idx})" aria-label="Remover">×</button></span>`
       ).join('');
   }
+
+  // Categoria personalizada
+  const FIXED_CATEGORIES = ['Escrita', 'Projetos', 'Animes', 'Jogos', 'Slice of Life'];
+  let customCategories = [];
+
+  function addCustomCategory() {
+      const input = document.getElementById('customCategoryInput');
+      const val = input.value.trim();
+      const exists = FIXED_CATEGORIES.some(c => c.toLowerCase() === val.toLowerCase())
+          || customCategories.some(c => c.toLowerCase() === val.toLowerCase());
+      if (val && !exists) {
+          customCategories.push(val);
+          renderCustomCategories();
+          renderCategorySuggestions(allKnownCategories);
+      }
+      input.value = '';
+  }
+
+  function removeCustomCategory(i) {
+      customCategories.splice(i, 1);
+      renderCustomCategories();
+      renderCategorySuggestions(allKnownCategories);
+  }
+
+  function renderCustomCategories() {
+      document.getElementById('customCategoryList').innerHTML = customCategories.map((c, idx) =>
+          `<span class="tech-tag">${escapeHtml(c)}<button type="button" class="tech-tag-remove" onclick="removeCustomCategory(${idx})" aria-label="Remover">×</button></span>`
+      ).join('');
+  }
+
+  document.getElementById('addCategoryBtn').addEventListener('click', addCustomCategory);
+  document.getElementById('customCategoryInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          addCustomCategory();
+      }
+  });
+
+  // Sugestões de categorias já usadas em outros posts
+  let allKnownCategories = [];
+  let currentSuggestions = [];
+
+  function loadCategorySuggestions() {
+      fetch(`${API_BASE}/posts/categories`)
+          .then(r => r.ok ? r.json() : [])
+          .then(categories => {
+              allKnownCategories = Array.isArray(categories) ? categories : [];
+              renderCategorySuggestions(allKnownCategories);
+          })
+          .catch(() => {});
+  }
+
+  function renderCategorySuggestions(categories) {
+      const selected = Array.from(document.querySelectorAll('#editPostForm input[name="category[]"]:checked'))
+          .map(cb => cb.value)
+          .concat(customCategories);
+      currentSuggestions = categories.filter(c =>
+          !FIXED_CATEGORIES.some(f => f.toLowerCase() === c.toLowerCase()) &&
+          !selected.some(s => s.toLowerCase() === c.toLowerCase())
+      );
+      const box = document.getElementById('categorySuggestions');
+      if (!currentSuggestions.length) {
+          box.hidden = true;
+          box.innerHTML = '';
+          return;
+      }
+      box.hidden = false;
+      box.innerHTML = '<span class="category-suggestions-label">Já usadas:</span>' +
+          currentSuggestions.map((c, idx) =>
+              `<button type="button" class="category-suggestion-tag" onclick="addCategoryFromSuggestion(${idx})">+ ${escapeHtml(c)}</button>`
+          ).join('');
+  }
+
+  function addCategoryFromSuggestion(idx) {
+      const cat = currentSuggestions[idx];
+      if (cat === undefined) return;
+      if (!customCategories.some(c => c.toLowerCase() === cat.toLowerCase())) {
+          customCategories.push(cat);
+          renderCustomCategories();
+      }
+      renderCategorySuggestions(allKnownCategories);
+  }
+
+  document.querySelectorAll('#editPostForm input[name="category[]"]').forEach(cb => {
+      cb.addEventListener('change', () => renderCategorySuggestions(allKnownCategories));
+  });
 
   if (!postId || postId === 'null' || postId === 'undefined' || postId.length !== 24) {
       alert('ID de post inválido.');
@@ -341,10 +439,17 @@
 
               if (data.categories) {
                   data.categories.forEach(category => {
-                      const checkbox = document.querySelector(`#editPostForm input[name="category[]"][value="${category}"]`);
-                      if (checkbox) checkbox.checked = true;
+                      const checkbox = Array.from(document.querySelectorAll('#editPostForm input[name="category[]"]'))
+                          .find(cb => cb.value === category);
+                      if (checkbox) {
+                          checkbox.checked = true;
+                      } else if (!customCategories.includes(category)) {
+                          customCategories.push(category);
+                      }
                   });
+                  renderCustomCategories();
               }
+              loadCategorySuggestions();
 
               // Project fields
               if (data.url === 'sapo-imaginario.html') {
@@ -403,7 +508,8 @@
       document.getElementById('content').value = editorInstance.getData();
       const formData = new FormData(this);
       const selectedCategories = Array.from(document.querySelectorAll('#editPostForm input[name="category[]"]:checked'))
-          .map(checkbox => checkbox.value);
+          .map(checkbox => checkbox.value)
+          .concat(customCategories);
       formData.append('categories', JSON.stringify(selectedCategories));
       formData.set('technologies', JSON.stringify(techList));
 
