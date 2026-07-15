@@ -708,6 +708,7 @@ app.get('/admin/comments/pending', requireAuth, async (req, res) => {
 
 app.patch('/admin/comments/:id/approve', requireAuth, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Comentário inválido' });
         const comment = await Comment.findById(req.params.id);
         if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
         if (!comment.approved) {
@@ -723,6 +724,7 @@ app.patch('/admin/comments/:id/approve', requireAuth, async (req, res) => {
 
 app.delete('/admin/comments/:id', requireAuth, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Comentário inválido' });
         const comment = await Comment.findByIdAndDelete(req.params.id);
         if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
         if (comment.approved) {
@@ -776,6 +778,7 @@ app.get('/admin/guestbook/pending', requireAuth, async (req, res) => {
 
 app.patch('/admin/guestbook/:id/approve', requireAuth, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Mensagem inválida' });
         const entry = await GuestbookEntry.findByIdAndUpdate(req.params.id, { approved: true }, { new: true });
         if (!entry) return res.status(404).json({ message: 'Mensagem não encontrada' });
         res.json({ success: true });
@@ -786,6 +789,7 @@ app.patch('/admin/guestbook/:id/approve', requireAuth, async (req, res) => {
 
 app.delete('/admin/guestbook/:id', requireAuth, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Mensagem inválida' });
         const entry = await GuestbookEntry.findByIdAndDelete(req.params.id);
         if (!entry) return res.status(404).json({ message: 'Mensagem não encontrada' });
         res.json({ success: true });
