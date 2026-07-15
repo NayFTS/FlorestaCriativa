@@ -1,104 +1,124 @@
-# Auditoria — Floresta Criativa (13 jul 2026)
+# Auditoria — Floresta Criativa (14 jul 2026)
 
-Atualização da auditoria de 07/07/2026, considerando os commits `35cb68d` → `a100cd2` (categoria no editar/publicar, fallback do carrossel, widget Featured dinâmico, divisores decorativos na sidebar, nomes originais no topbar, header de widgets estilo janela, header mobile completo, correção de conexões MongoDB) e a correção de `connectWithRetry` aplicada em `api/index.js` na sessão anterior a esta.
+Atualização da auditoria de 13/07/2026, considerando os commits `47b6c0c` (validação de
+title/content/url, escape de HTML no admin, login alinhado ao chrome público) e `905a34a`
+(CKEditor no modo escuro, sticker sapo-sentado em todas as páginas públicas, overrides do
+OverlayScrollbars).
 
 Nada foi alterado durante essa auditoria — é só leitura e mapeamento.
 
 ---
 
-## Correção de MongoDB (já aplicada e verificada)
+## Resolvido desde a auditoria de 13/07
 
-`api/index.js:43-93` — `connectWithRetry` está coerente: 3 tentativas com 1s de intervalo, reseta `global.__mongoConnectPromise` só quando todas falham, `MongoStore` consome a mesma promise via `clientPromise`. Limitação inerente ao padrão (não é bug): se as 3 tentativas falharem, a instância "quente" do Lambda fica com sessão quebrada até um cold start novo — o retry só cobre falhas transitórias, como o próprio comentário no código já avisa.
+Os 3 itens de prioridade alta da auditoria anterior foram corrigidos e verificados:
+
+1. **Validação de `title`/`content`/`url`** — `postValidators` (`api/index.js:307-311`) agora
+   valida via `express-validator` em `/addPost` (313) e `/editPost/:id` (345), mesmo padrão de
+   `/login`, `/comments`, `/guestbook`.
+2. **Escape de HTML no admin** — `dashboard.html` e `managePosts.html` agora usam `escapeHtml()`
+   em título de post e "mais visualizado".
+3. **`login.html` alinhado ao chrome público** — `<body class="page-public">` presente; vinhas
+   decorativas, cartão flutuante e link GitHub no lugar do "Login" antigo.
+
+**Bônus não listado como prioridade, mas também resolvido:** a inconsistência do sticker
+`sapo-sentado.png` (antes só em `login.html` entre as páginas públicas) foi resolvida no commit
+`905a34a` — o sticker agora aparece na sidebar desktop de **todas** as páginas públicas (index,
+login, sobre-mim, sapo-imaginario, rascunhos-da-floresta, post, verde-inspiracao), igual às
+páginas internas. Confirmado via grep: 11 arquivos HTML têm o sticker, incluindo as 7 páginas
+públicas.
+
+**Resolvido nesta sessão:** `ObjectId.isValid()` adicionado nas 4 rotas de admin que faltavam
+(`/admin/comments/:id/approve`, `DELETE /admin/comments/:id`, `/admin/guestbook/:id/approve`,
+`DELETE /admin/guestbook/:id`), mesmo padrão já usado nas outras 5 rotas — id malformado agora
+retorna 400 em vez de 500 genérico.
+
+---
+
+## Correção de MongoDB (já aplicada, ainda coerente)
+
+`api/index.js:53-93` — `connectWithRetry`: 3 tentativas com 1s de intervalo, reseta
+`global.__mongoConnectPromise` só quando todas falham, `MongoStore` consome a mesma promise via
+`clientPromise`. Sem mudanças desde a última auditoria.
 
 ---
 
 ## 1. Bugs de backend
 
-### Alta
-1. **`api/index.js` `/addPost` e `/editPost/:id` (linhas 307-379)** — Nenhuma validação de `title`/`content`/`url` no servidor (diferente de `/login`, `/comments`, `/guestbook`, `/admin/settings`, que usam `express-validator`). O único guarda é o `required` do HTML, contornável via chamada direta à API. Um post com `title` vazio vira slug genérico `"post"` e title `""`, quebrando `<h2>${title}</h2>` em toda página que exibe o post.
-
 ### Média
-2. **`/admin/comments/:id/approve`, `DELETE /admin/comments/:id`, `/admin/guestbook/:id/approve`, `DELETE /admin/guestbook/:id` (linhas 695-781)** — Não validam `mongoose.Types.ObjectId.isValid(id)` antes de consultar, diferente de `/posts/:id/like`, `/unlike`, `/publish`, `DELETE /posts/:id`, `/posts/:id/data` (essas já foram corrigidas). Id malformado vira 500 genérico em vez de 400.
-3. **`/dashboard-stats`, `/user-posts` (linhas 549-582)** — Ainda carregam `Post.find({})` inteiro na memória pra somar contadores; "mais popular" só olha `views`, ignora `likes`/`commentsCount`.
+1. **`/dashboard-stats` (573), `/user-posts` (563)** — Ainda carregam `Post.find({})` inteiro na
+   memória pra somar contadores; "mais popular" só olha `views`, ignora `likes`/`commentsCount`.
 
 ### Baixa
-4. **`GuestbookEntry` schema (linhas 122-127) vs `index.html` 452-455** — Backend aceita `author` até 60 e `message` até 500 caracteres, mas o formulário (compactado no commit `2832072`) limita a 10 e 50 no HTML. Chamada direta à API ainda grava textos maiores do que o card foi desenhado pra exibir.
-5. **`package.json`** — `"main": "index.js"` aponta pra um arquivo que não existe na raiz (entrypoint real é `api/index.js`, referenciado em `vercel.json`). Inofensivo, mas é metadado incorreto.
+2. **`GuestbookEntry` schema (`api/index.js:122-127`) vs `index.html:455,457`** — Backend aceita
+   `author` até 60 e `message` até 500 caracteres, mas o formulário HTML limita a 10 e 50.
+   Chamada direta à API ainda grava textos maiores do que o card foi desenhado pra exibir.
+3. **`package.json:4`** — `"main": "index.js"` aponta pra um arquivo que não existe na raiz
+   (entrypoint real é `api/index.js`, referenciado em `vercel.json`). Inofensivo, metadado
+   incorreto.
 
 ---
 
 ## 2. Bugs de frontend/JS
 
-### Alta
-1. **`dashboard.html:257,274`, `managePosts.html:232`** — Título do post (e `mostPopularPost`) inseridos via `innerHTML` **sem escapar**, diferente de `post.html`/`search.js` (já usam `escapeHtml`/`_escapeHtmlGlobal`). `dashboard.html` até define `escapeHtml` localmente (linha 285-289) e usa corretamente na moderação de comentários — só não aplica nesses três pontos. Risco prático baixo hoje (só a autora cria posts), mas um título com `"` ou `<` já quebra a própria página admin, e é vetor de XSS se a conta admin for comprometida.
-
 ### Baixa
-2. **`editPost.html:264`, `publicar.html:343`** — Tags de tecnologia renderizadas sem escapar no editor administrativo. Mesmo padrão do item acima, exposição mínima.
-3. **`styles.css` 1509-1581 (Now Playing)** — Controles ⏮ ▶ ⏭ continuam sem `addEventListener` em `search.js` — decorativos, sem funcionar.
+1. **`styles.css:1563-1635` (Now Playing)** — Controles `.np-control--prev`/`.np-control--next`
+   (`index.html:421,428`) continuam sem `addEventListener` — `search.js:269` só liga o ícone de
+   play/pause ao estado real do Spotify, prev/next são puramente decorativos.
+
+**Resolvido nesta sessão:** tags de tecnologia em `editPost.html`/`publicar.html` agora passam
+por `escapeHtml()` antes de entrar via `innerHTML`, mesmo padrão já usado pro título do post.
+Aproveitando a mudança, também foi adicionado um campo de **categoria personalizada** (botão "+
+Adicionar categoria") nos dois formulários, além das 5 categorias fixas em checkbox — as
+categorias digitadas viram chips removíveis, escapados do mesmo jeito, e são mescladas às
+categorias marcadas no envio do form. Em `editPost.html`, categorias já salvas no post que não
+batem com nenhum checkbox fixo (ex.: categoria personalizada de uma edição anterior) agora viram
+chip em vez de serem perdidas silenciosamente ao salvar de novo.
 
 ---
 
 ## 3. Inconsistências visuais/UX entre páginas
 
-### Alta
-1. **`login.html`** — Única página "pública" sem `class="page-public"` no `<body>` (linha 18). Efeitos:
-   - Topbar/sidebar ficam com visual "quadrado" antigo (sem `border-radius`, sem o cartão flutuante que as outras 6 páginas públicas têm).
-   - `search.js:61` (`injectCornerVines`) não injeta as vinhas decorativas nos cantos (checa `body.page-public`).
-   - Sidebar footer (linha 58-60) ainda mostra link "Login" old-style em vez do ícone GitHub que as outras páginas já mostram no mesmo espaço.
-   - Resultado: página fica num estado híbrido, sem nenhuma das melhorias de chrome do redesign recente.
-
-### Média
-2. **`login.html` sidebar-widgets (linha 56)** — Tem o sticker `sapo-sentado.png`, igual às páginas admin, mas nenhuma das 6 páginas públicas tem esse sticker — reforça o estado "nem admin nem público".
+Nenhuma pendência nova encontrada. A inconsistência do `login.html` (chrome público e sticker)
+foi resolvida — ver seção "Resolvido" acima.
 
 ---
 
 ## 4. Funcionalidade faltando / incompleta
 
 ### Média
-1. **`sapo-imaginario.html` "Tools I Use"/"Skills & Services" (linhas 192-212)** — Conteúdo fixo no HTML, não vem de `/settings` como Currently/Now Playing. Implementação parcial se a intenção era ficar editável pelo dashboard.
-2. **`sobre-mim.html` "My Tools"/"Things That Matter" (linhas 290-313)** — Mesmo padrão, conteúdo fixo.
+1. **`sapo-imaginario.html:195` "Tools I Use"/"Skills & Services"** — Conteúdo fixo no HTML, não
+   vem de `/settings` como Currently/Now Playing. Implementação parcial se a intenção era ficar
+   editável pelo dashboard.
+2. **`sobre-mim.html:294,305` "My Tools"/"Things That Matter"** — Mesmo padrão, conteúdo fixo.
 
 ### Baixa
-3. **`post.html` mobile** — O botão "← Voltar" foi escondido inteiramente abaixo de 768px (em vez de reposicionado) ao resolver o conflito com o botão de hambúrguer — hoje não há botão de voltar visível no post em mobile. Vale confirmar se foi intencional.
+3. **`post.html` mobile** — `.back-button-container` (`styles.css:2262-2269`) segue com
+   `display: none` no breakpoint mobile — não há botão de voltar visível no post em mobile. Vale
+   confirmar se foi intencional.
 
 ---
 
 ## 5. Código morto / lixo
 
 ### Média
-1. **`vercel-dev.log`** (raiz, commitado no `a100cd2`) — 783 linhas de log de dev, foram parar no commit por engano. Sem segredos expostos.
-2. **`public/imagens/temp/Captura de tela 2026-07-08 122929.png`** (commitado no `a100cd2`) — Screenshot de trabalho, também parece ter entrado sem querer.
+1. **`vercel-dev.log`** (raiz, ainda rastreado pelo git, 37KB) — log de dev que entrou por
+   engano no commit `a100cd2`, continua no repositório. Sem segredos expostos, mas não deveria
+   estar versionado.
+2. **`public/imagens/temp/Captura de tela 2026-07-08 122929.png`** — Já está marcado como
+   deletado no working tree (não commitado ainda, ver `git status`). Falta só commitar a
+   remoção.
 
 ### Baixa
-3. **`styles.css` 3792-3810 (`.hamburger`)** — Regra sem HTML correspondente (botão real usa `.drawer-toggle`).
-4. **`styles.css` 2265-2273 (`#registerLink`)** — Regra para elemento que não existe em nenhuma página.
-5. **`.env` / segredos** — Verificado: `.env` está no `.gitignore`, não rastreado pelo git. Nenhum segredo commitado encontrado.
-
----
-
-## 6. Já resolvido desde a auditoria de 07/07
-
-- Curtidas sem verificação de servidor → `req.session.likedPosts` bloqueia duplicidade por sessão.
-- Aprovar comentário duas vezes duplicava contador → guard `if (!comment.approved)` antes de incrementar.
-- Título/tecnologias/alt sem escapar em `post.html`/`search.js` → corrigido nesses dois arquivos (reapareceu em `dashboard.html`/`managePosts.html`, ver seção 2).
-- Like/unlike/publish/delete sem validar ObjectId → corrigido nessas 4 rotas (mesma lacuna ainda existe em `/admin/comments/*` e `/admin/guestbook/*`, ver seção 1).
-- Categorias duplicadas em `search.js` → dedup com `[...new Set(...)]`.
-- Sem como despublicar um post → `editPost.html` agora tem `<select id="status">`.
-- `models/Post.js` morto e `dist/styles.css` obsoleto → removidos do repo.
-- CSS órfão (`.footer-content`, `.search-container`, `.section-divider`, `.sticker-pill`, `.widget-quicklinks`, `#header-image`) → removido (só `.hamburger`/`#registerLink` sobraram, ver seção 5).
-- `class="active"` fixo em `sobre-mim.html` → depende só de `markActiveNavLinks()`.
-- `mongodb` como dependência direta não usada → removido do `package.json`.
-- Conflito hambúrguer/botão voltar em `post.html` mobile → resolvido (mas ver item novo na seção 4).
-- Drawer e busca não se fechavam um ao outro → `toggleDrawer()`/`toggleSearch()` agora fecham mutuamente.
-- Breakpoints 768px/600px brigando na tabela de posts → resolvido, com comentário no CSS.
-- Guestbook com breakpoint 700px vs nav 768px → unificado em 768px.
-- Admin sem link de volta ao Dashboard, bottom-nav de 4 itens, drawer sem widgets → todos resolvidos.
-- Gaps de mockup (filtro de categoria, ordenação, sidebar de widgets em Verde Inspiração/Rascunhos/Sapo Imaginário, Quick Facts/Things I Love/Journey em Sobre Mim, Featured dinâmico, fallback de carrossel) → todos implementados.
+3. **`styles.css:3859 (.hamburger)`** — Regra sem HTML correspondente (nenhuma página usa
+   `class="hamburger"`; botão real usa `.drawer-toggle`).
+4. **`styles.css:2292 (#registerLink)`** — Regra para elemento que não existe em nenhuma página.
+5. **`.env` / segredos** — Verificado de novo: `.env` está no `.gitignore`, não rastreado.
+   Nenhum segredo commitado encontrado.
 
 ---
 
 ## Prioridade sugerida
 
-1. Validar `title`/`content`/`url` no servidor em `/addPost` e `/editPost/:id`.
-2. Escapar HTML em `dashboard.html`/`managePosts.html` (título do post, mais visualizado).
-3. Aplicar `class="page-public"` (ou o tratamento equivalente) em `login.html` pra alinhar com o resto do chrome público.
+1. Commitar a remoção do screenshot temp e adicionar `vercel-dev.log` ao `.gitignore` (+ remover
+   do índice).
