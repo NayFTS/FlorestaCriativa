@@ -135,6 +135,14 @@ const SiteSettings = mongoose.model('SiteSettings', new mongoose.Schema({
     nowPlayingTrack: { type: String, default: 'lofi in the swamp' },
     nowPlayingArtist: { type: String, default: 'frog beats' },
     spotifyRefreshToken: { type: String, default: '', select: false },
+    tools: {
+        type: [{ name: String, desc: String, _id: false }],
+        default: [{ name: 'VS Code', desc: 'código & desenvolvimento' }]
+    },
+    skills: {
+        type: [String],
+        default: ['Web Design', 'Front-end Dev', 'UI/UX Design']
+    },
     updatedAt: { type: Date, default: Date.now }
 }));
 
@@ -884,18 +892,29 @@ app.put('/admin/settings', requireAuth, [
     body('currently').optional({ nullable: true }).isArray().withMessage('Currently deve ser uma lista'),
     body('nowPlayingTrack').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome da música muito longo'),
     body('nowPlayingArtist').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome do artista muito longo'),
+    body('tools').optional({ nullable: true }).isArray().withMessage('Tools deve ser uma lista'),
+    body('skills').optional({ nullable: true }).isArray().withMessage('Skills deve ser uma lista'),
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
         const settings = await getOrCreateSettings();
-        const { currently, nowPlayingTrack, nowPlayingArtist } = req.body;
+        const { currently, nowPlayingTrack, nowPlayingArtist, tools, skills } = req.body;
         if (currently !== undefined) {
             settings.currently = currently.map(c => String(c).trim()).filter(Boolean).slice(0, 10);
         }
         if (nowPlayingTrack !== undefined) settings.nowPlayingTrack = nowPlayingTrack;
         if (nowPlayingArtist !== undefined) settings.nowPlayingArtist = nowPlayingArtist;
+        if (tools !== undefined) {
+            settings.tools = tools
+                .map(t => ({ name: String(t.name || '').trim().slice(0, 60), desc: String(t.desc || '').trim().slice(0, 100) }))
+                .filter(t => t.name)
+                .slice(0, 20);
+        }
+        if (skills !== undefined) {
+            settings.skills = skills.map(s => String(s).trim().slice(0, 60)).filter(Boolean).slice(0, 20);
+        }
         settings.updatedAt = new Date();
         await settings.save();
         res.json({ success: true, settings });

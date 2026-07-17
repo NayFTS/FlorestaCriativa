@@ -227,6 +227,12 @@
         </div>
         <p class="settings-hint">O texto acima só aparece quando o Spotify não está conectado ou nada está tocando no momento.</p>
 
+        <label for="settingsTools">Tools I Use — Sapo Imaginário (uma por linha, formato Nome | Descrição):</label>
+        <textarea id="settingsTools" rows="4" placeholder="VS Code | código &amp; desenvolvimento"></textarea>
+
+        <label for="settingsSkills">Skills &amp; Services — Sapo Imaginário (uma por linha):</label>
+        <textarea id="settingsSkills" rows="4" placeholder="Web Design"></textarea>
+
         <div class="settings-row spotify-connect-row">
           <div>
             <span>Spotify:</span>
@@ -509,6 +515,8 @@
               document.getElementById('settingsCurrently').value = (s.currently || []).join('\n');
               document.getElementById('settingsTrack').value = s.nowPlayingTrack || '';
               document.getElementById('settingsArtist').value = s.nowPlayingArtist || '';
+              document.getElementById('settingsTools').value = (s.tools || []).map(t => t.desc ? `${t.name} | ${t.desc}` : t.name).join('\n');
+              document.getElementById('settingsSkills').value = (s.skills || []).join('\n');
               document.getElementById('spotifyStatus').textContent = s.spotifyConnected ? '✅ Conectado' : '❌ Não conectado';
               document.getElementById('spotifyDisconnectBtn').hidden = !s.spotifyConnected;
           })
@@ -540,13 +548,25 @@
       const currently = document.getElementById('settingsCurrently').value
           .split('\n').map(s => s.trim()).filter(Boolean);
 
+      const tools = document.getElementById('settingsTools').value
+          .split('\n').map(line => line.trim()).filter(Boolean)
+          .map(line => {
+              const [name, ...rest] = line.split('|');
+              return { name: name.trim(), desc: rest.join('|').trim() };
+          });
+
+      const skills = document.getElementById('settingsSkills').value
+          .split('\n').map(s => s.trim()).filter(Boolean);
+
       fetch(`${API_BASE}/admin/settings`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
               currently,
               nowPlayingTrack: document.getElementById('settingsTrack').value.trim(),
-              nowPlayingArtist: document.getElementById('settingsArtist').value.trim()
+              nowPlayingArtist: document.getElementById('settingsArtist').value.trim(),
+              tools,
+              skills
           })
       })
       .then(r => r.json().then(data => ({ ok: r.ok, data })))

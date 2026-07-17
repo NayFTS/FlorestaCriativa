@@ -190,7 +190,9 @@ function loadSiteSettings() {
     const currentlyLists = document.querySelectorAll('.js-currently-list');
     const nowPlayingTrack = document.getElementById('nowPlayingTrack');
     const nowPlayingArtist = document.getElementById('nowPlayingArtist');
-    if (!currentlyLists.length && !nowPlayingTrack) return;
+    const toolsList = document.getElementById('toolsList');
+    const skillsList = document.getElementById('skillsList');
+    if (!currentlyLists.length && !nowPlayingTrack && !toolsList && !skillsList) return;
 
     fetch(`${API_BASE}/settings`)
         .then(r => r.json())
@@ -202,6 +204,16 @@ function loadSiteSettings() {
             });
             if (nowPlayingTrack) nowPlayingTrack.textContent = s.nowPlayingTrack || '';
             if (nowPlayingArtist) nowPlayingArtist.textContent = s.nowPlayingArtist || '';
+            if (toolsList) {
+                toolsList.innerHTML = (s.tools && s.tools.length)
+                    ? s.tools.map(t => `<li><strong>${_escapeHtmlGlobal(t.name)}</strong><span>${_escapeHtmlGlobal(t.desc || '')}</span></li>`).join('')
+                    : '<li>Nada por aqui no momento.</li>';
+            }
+            if (skillsList) {
+                skillsList.innerHTML = (s.skills && s.skills.length)
+                    ? s.skills.map(sk => `<span class="category-chip">${_escapeHtmlGlobal(sk)}</span>`).join('')
+                    : '';
+            }
         })
         .catch(() => {});
 }
@@ -266,18 +278,14 @@ function loadSpotifyNowPlaying() {
     fetch(`${API_BASE}/spotify/now-playing`)
         .then(r => r.json())
         .then(data => {
-            const playIcon = document.getElementById('nowPlayingPlayIcon');
-
             // Sem conexão, sem música tocando ou erro: mantém o fallback estático do /settings
             if (!data.connected || !data.playing) {
-                if (playIcon) playIcon.classList.remove('is-playing');
                 _stopSpotifyProgressTicker();
                 return;
             }
 
             trackEl.textContent = data.track;
             if (artistEl) artistEl.textContent = data.artist;
-            if (playIcon) playIcon.classList.add('is-playing');
 
             const cover = document.getElementById('nowPlayingCover');
             if (cover && data.albumArt) {
