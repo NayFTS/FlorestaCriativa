@@ -233,6 +233,12 @@
         <label for="settingsSkills">Skills &amp; Services — Sapo Imaginário (uma por linha):</label>
         <textarea id="settingsSkills" rows="4" placeholder="Web Design"></textarea>
 
+        <label for="settingsAboutTools">My Tools — Sobre Mim (uma por linha, formato Nome | Descrição):</label>
+        <textarea id="settingsAboutTools" rows="4" placeholder="Claude | IA — código &amp; criatividade"></textarea>
+
+        <label for="settingsAboutValues">Things That Matter — Sobre Mim (uma por linha):</label>
+        <textarea id="settingsAboutValues" rows="4" placeholder="Criatividade"></textarea>
+
         <div class="settings-row spotify-connect-row">
           <div>
             <span>Spotify:</span>
@@ -517,6 +523,8 @@
               document.getElementById('settingsArtist').value = s.nowPlayingArtist || '';
               document.getElementById('settingsTools').value = (s.tools || []).map(t => t.desc ? `${t.name} | ${t.desc}` : t.name).join('\n');
               document.getElementById('settingsSkills').value = (s.skills || []).join('\n');
+              document.getElementById('settingsAboutTools').value = (s.aboutTools || []).map(t => t.desc ? `${t.name} | ${t.desc}` : t.name).join('\n');
+              document.getElementById('settingsAboutValues').value = (s.aboutValues || []).join('\n');
               document.getElementById('spotifyStatus').textContent = s.spotifyConnected ? '✅ Conectado' : '❌ Não conectado';
               document.getElementById('spotifyDisconnectBtn').hidden = !s.spotifyConnected;
           })
@@ -545,28 +553,25 @@
       btn.disabled = true;
       feedback.textContent = '';
 
-      const currently = document.getElementById('settingsCurrently').value
+      const parseLines = id => document.getElementById(id).value
           .split('\n').map(s => s.trim()).filter(Boolean);
 
-      const tools = document.getElementById('settingsTools').value
-          .split('\n').map(line => line.trim()).filter(Boolean)
-          .map(line => {
-              const [name, ...rest] = line.split('|');
-              return { name: name.trim(), desc: rest.join('|').trim() };
-          });
-
-      const skills = document.getElementById('settingsSkills').value
-          .split('\n').map(s => s.trim()).filter(Boolean);
+      const parseTools = id => parseLines(id).map(line => {
+          const [name, ...rest] = line.split('|');
+          return { name: name.trim(), desc: rest.join('|').trim() };
+      });
 
       fetch(`${API_BASE}/admin/settings`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-              currently,
+              currently: parseLines('settingsCurrently'),
               nowPlayingTrack: document.getElementById('settingsTrack').value.trim(),
               nowPlayingArtist: document.getElementById('settingsArtist').value.trim(),
-              tools,
-              skills
+              tools: parseTools('settingsTools'),
+              skills: parseLines('settingsSkills'),
+              aboutTools: parseTools('settingsAboutTools'),
+              aboutValues: parseLines('settingsAboutValues')
           })
       })
       .then(r => r.json().then(data => ({ ok: r.ok, data })))

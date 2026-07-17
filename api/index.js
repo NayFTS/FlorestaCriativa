@@ -143,6 +143,17 @@ const SiteSettings = mongoose.model('SiteSettings', new mongoose.Schema({
         type: [String],
         default: ['Web Design', 'Front-end Dev', 'UI/UX Design']
     },
+    aboutTools: {
+        type: [{ name: String, desc: String, _id: false }],
+        default: [
+            { name: 'VS Code', desc: 'código & desenvolvimento' },
+            { name: 'Claude', desc: 'IA — código & criatividade' }
+        ]
+    },
+    aboutValues: {
+        type: [String],
+        default: ['Criatividade', 'Gentileza', 'Amor', 'Paciência', 'Sossego']
+    },
     updatedAt: { type: Date, default: Date.now }
 }));
 
@@ -888,33 +899,41 @@ app.get('/settings', async (req, res) => {
     }
 });
 
+function sanitizeToolsList(tools) {
+    return tools
+        .map(t => ({ name: String(t.name || '').trim().slice(0, 60), desc: String(t.desc || '').trim().slice(0, 100) }))
+        .filter(t => t.name)
+        .slice(0, 20);
+}
+
+function sanitizeStringList(items) {
+    return items.map(s => String(s).trim().slice(0, 60)).filter(Boolean).slice(0, 20);
+}
+
 app.put('/admin/settings', requireAuth, [
     body('currently').optional({ nullable: true }).isArray().withMessage('Currently deve ser uma lista'),
     body('nowPlayingTrack').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome da música muito longo'),
     body('nowPlayingArtist').optional({ nullable: true }).trim().isLength({ max: 100 }).withMessage('Nome do artista muito longo'),
     body('tools').optional({ nullable: true }).isArray().withMessage('Tools deve ser uma lista'),
     body('skills').optional({ nullable: true }).isArray().withMessage('Skills deve ser uma lista'),
+    body('aboutTools').optional({ nullable: true }).isArray().withMessage('About tools deve ser uma lista'),
+    body('aboutValues').optional({ nullable: true }).isArray().withMessage('About values deve ser uma lista'),
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
         const settings = await getOrCreateSettings();
-        const { currently, nowPlayingTrack, nowPlayingArtist, tools, skills } = req.body;
+        const { currently, nowPlayingTrack, nowPlayingArtist, tools, skills, aboutTools, aboutValues } = req.body;
         if (currently !== undefined) {
             settings.currently = currently.map(c => String(c).trim()).filter(Boolean).slice(0, 10);
         }
         if (nowPlayingTrack !== undefined) settings.nowPlayingTrack = nowPlayingTrack;
         if (nowPlayingArtist !== undefined) settings.nowPlayingArtist = nowPlayingArtist;
-        if (tools !== undefined) {
-            settings.tools = tools
-                .map(t => ({ name: String(t.name || '').trim().slice(0, 60), desc: String(t.desc || '').trim().slice(0, 100) }))
-                .filter(t => t.name)
-                .slice(0, 20);
-        }
-        if (skills !== undefined) {
-            settings.skills = skills.map(s => String(s).trim().slice(0, 60)).filter(Boolean).slice(0, 20);
-        }
+        if (tools !== undefined) settings.tools = sanitizeToolsList(tools);
+        if (skills !== undefined) settings.skills = sanitizeStringList(skills);
+        if (aboutTools !== undefined) settings.aboutTools = sanitizeToolsList(aboutTools);
+        if (aboutValues !== undefined) settings.aboutValues = sanitizeStringList(aboutValues);
         settings.updatedAt = new Date();
         await settings.save();
         res.json({ success: true, settings });

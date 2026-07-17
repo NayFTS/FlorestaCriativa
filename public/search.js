@@ -186,13 +186,29 @@ function _wireLikeButton(btn, postId, initialLikes) {
     });
 }
 
+function _renderToolsListInto(el, tools) {
+    if (!el) return;
+    el.innerHTML = (tools && tools.length)
+        ? tools.map(t => `<li><strong>${_escapeHtmlGlobal(t.name)}</strong><span>${_escapeHtmlGlobal(t.desc || '')}</span></li>`).join('')
+        : '<li>Nada por aqui no momento.</li>';
+}
+
+function _renderChipListInto(el, items) {
+    if (!el) return;
+    el.innerHTML = (items && items.length)
+        ? items.map(i => `<span class="category-chip">${_escapeHtmlGlobal(i)}</span>`).join('')
+        : '';
+}
+
 function loadSiteSettings() {
     const currentlyLists = document.querySelectorAll('.js-currently-list');
     const nowPlayingTrack = document.getElementById('nowPlayingTrack');
     const nowPlayingArtist = document.getElementById('nowPlayingArtist');
     const toolsList = document.getElementById('toolsList');
     const skillsList = document.getElementById('skillsList');
-    if (!currentlyLists.length && !nowPlayingTrack && !toolsList && !skillsList) return;
+    const aboutToolsList = document.getElementById('aboutToolsList');
+    const aboutValuesList = document.getElementById('aboutValuesList');
+    if (!currentlyLists.length && !nowPlayingTrack && !toolsList && !skillsList && !aboutToolsList && !aboutValuesList) return;
 
     fetch(`${API_BASE}/settings`)
         .then(r => r.json())
@@ -204,16 +220,10 @@ function loadSiteSettings() {
             });
             if (nowPlayingTrack) nowPlayingTrack.textContent = s.nowPlayingTrack || '';
             if (nowPlayingArtist) nowPlayingArtist.textContent = s.nowPlayingArtist || '';
-            if (toolsList) {
-                toolsList.innerHTML = (s.tools && s.tools.length)
-                    ? s.tools.map(t => `<li><strong>${_escapeHtmlGlobal(t.name)}</strong><span>${_escapeHtmlGlobal(t.desc || '')}</span></li>`).join('')
-                    : '<li>Nada por aqui no momento.</li>';
-            }
-            if (skillsList) {
-                skillsList.innerHTML = (s.skills && s.skills.length)
-                    ? s.skills.map(sk => `<span class="category-chip">${_escapeHtmlGlobal(sk)}</span>`).join('')
-                    : '';
-            }
+            _renderToolsListInto(toolsList, s.tools);
+            _renderChipListInto(skillsList, s.skills);
+            _renderToolsListInto(aboutToolsList, s.aboutTools);
+            _renderChipListInto(aboutValuesList, s.aboutValues);
         })
         .catch(() => {});
 }
