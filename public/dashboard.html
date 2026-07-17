@@ -184,6 +184,31 @@
     </div>
 
     <div class="dashboard-recent-posts">
+      <h3>Gerenciar Guestbook</h3>
+      <p class="settings-hint">Mensagens já aprovadas do <a href="livro-de-visitas.html" target="_blank">livro de visitas</a>. Arquive pra tirar da exibição pública sem apagar, ou exclua de vez.</p>
+      <div class="listing-controls">
+        <select id="guestbookAdminFilter">
+          <option value="active">Ativas</option>
+          <option value="archived">Arquivadas</option>
+          <option value="all">Todas</option>
+        </select>
+      </div>
+      <div id="guestbookAdminList"></div>
+      <div class="listing-pagination" id="guestbookAdminPagination"></div>
+    </div>
+
+    <!-- Modal de confirmação de exclusão (guestbook) -->
+    <div id="guestbookDeleteModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <p>Tem certeza que deseja excluir esta mensagem? Essa ação não pode ser desfeita.</p>
+        <div class="modal-actions">
+          <button id="guestbookModalCancel" class="btn-secondary">Cancelar</button>
+          <button id="guestbookModalConfirm" class="btn-danger">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-recent-posts">
       <h3>Configurações do site</h3>
       <p class="settings-hint">Edite o "Currently" e "Now Playing" que aparecem na home — sem precisar mexer no código. O card "Mood" agora é automático, baseado no clima.</p>
       <form id="settingsForm" class="settings-form">
@@ -254,7 +279,7 @@
               <h3>Suas Estatísticas:</h3>
               <p>Total de Postagens: ${data.totalPosts} (${data.publishedCount || 0} publicadas · ${data.draftCount || 0} rascunhos)</p>
               <p>Total de Visualizações: ${data.totalViews || 0}</p>
-              <p>Post mais visualizado: "${escapeHtml(data.mostPopularPost)}"</p>
+              <p>Post mais popular: "${escapeHtml(data.mostPopularPost)}"</p>
           `;
 
           const container = document.getElementById('recentPosts');
@@ -352,9 +377,9 @@
   }
 
   function removeModerationCard(id) {
-      const el = document.querySelector(`.pending-comment-item[data-id="${id}"]`);
+      const el = document.querySelector(`#pendingModeration .pending-comment-item[data-id="${id}"]`);
       if (el) el.remove();
-      const remaining = document.querySelectorAll('.pending-comment-item').length;
+      const remaining = document.querySelectorAll('#pendingModeration .pending-comment-item').length;
       if (!remaining) {
           document.getElementById('pendingModerationWrap').style.display = 'none';
       } else {
@@ -363,6 +388,118 @@
   }
 
   loadPendingModeration();
+
+  // ── Gerenciar Guestbook (mensagens já aprovadas) ─────────
+  let guestbookAdminPage = 1;
+
+  function loadGuestbookAdmin(page) {
+      guestbookAdminPage = page;
+      const status = document.getElementById('guestbookAdminFilter').value;
+      const list = document.getElementById('guestbookAdminList');
+      list.innerHTML = '<p class="widget-hint">Carregando...</p>';
+      fetch(`${API_BASE}/admin/guestbook?status=${status}&page=${page}&limit=10`)
+          .then(r => r.json())
+          .then(({ entries, total, limit }) => {
+              if (!entries.length) {
+                  list.innerHTML = '<p class="widget-hint">Nenhuma mensagem encontrada.</p>';
+                  renderGuestbookAdminPagination(0, 0);
+                  return;
+              }
+              list.innerHTML = entries.map(e => {
+                  const date = new Date(e.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+                  return `<div class="pending-comment-item" data-id="${e._id}">
+                      <div class="pending-comment-meta">
+                          <span class="moderation-type-badge">${e.archived ? '📦 Arquivada' : '📝 Guestbook'}</span>
+                          <strong>${escapeHtml(e.author)}</strong>
+                          <time>${date}</time>
+                      </div>
+                      <p class="pending-comment-body">${escapeHtml(e.message)}</p>
+                      <div class="pending-comment-actions">
+                          ${e.archived
+                              ? `<button class="btn-approve" onclick="unarchiveGuestbookEntry('${e._id}', this)">Restaurar</button>`
+                              : `<button class="btn-archive" onclick="archiveGuestbookEntry('${e._id}', this)">Arquivar</button>`}
+                          <button class="btn-reject" onclick="deleteGuestbookEntry('${e._id}')">Excluir</button>
+                      </div>
+                  </div>`;
+              }).join('');
+              renderGuestbookAdminPagination(page, Math.ceil(total / limit));
+          })
+          .catch(() => {
+              list.innerHTML = '<p class="widget-hint">Não foi possível carregar as mensagens.</p>';
+          });
+  }
+
+  function renderGuestbookAdminPagination(page, totalPages) {
+      const container = document.getElementById('guestbookAdminPagination');
+      container.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '← Anterior';
+      prevBtn.disabled = page <= 1;
+      prevBtn.onclick = () => loadGuestbookAdmin(page - 1);
+      container.appendChild(prevBtn);
+
+      const info = document.createElement('span');
+      info.textContent = `Página ${page} de ${totalPages}`;
+      container.appendChild(info);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = 'Próxima →';
+      nextBtn.disabled = page >= totalPages;
+      nextBtn.onclick = () => loadGuestbookAdmin(page + 1);
+      container.appendChild(nextBtn);
+  }
+
+  function archiveGuestbookEntry(id, btn) {
+      btn.disabled = true;
+      fetch(`${API_BASE}/admin/guestbook/${id}/archive`, { method: 'PATCH' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) loadGuestbookAdmin(guestbookAdminPage);
+              else btn.disabled = false;
+          })
+          .catch(() => { btn.disabled = false; });
+  }
+
+  function unarchiveGuestbookEntry(id, btn) {
+      btn.disabled = true;
+      fetch(`${API_BASE}/admin/guestbook/${id}/unarchive`, { method: 'PATCH' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) loadGuestbookAdmin(guestbookAdminPage);
+              else btn.disabled = false;
+          })
+          .catch(() => { btn.disabled = false; });
+  }
+
+  function guestbookConfirmDelete() {
+      return new Promise(resolve => {
+          const modal = document.getElementById('guestbookDeleteModal');
+          modal.style.display = 'flex';
+          document.getElementById('guestbookModalConfirm').onclick = () => {
+              modal.style.display = 'none';
+              resolve(true);
+          };
+          document.getElementById('guestbookModalCancel').onclick = () => {
+              modal.style.display = 'none';
+              resolve(false);
+          };
+      });
+  }
+
+  async function deleteGuestbookEntry(id) {
+      const confirmed = await guestbookConfirmDelete();
+      if (!confirmed) return;
+      fetch(`${API_BASE}/admin/guestbook/${id}`, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) loadGuestbookAdmin(guestbookAdminPage);
+          });
+  }
+
+  document.getElementById('guestbookAdminFilter').addEventListener('change', () => loadGuestbookAdmin(1));
+  loadGuestbookAdmin(1);
 
   // ── Configurações do site ────────────────────────────────
   function loadSettings() {

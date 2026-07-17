@@ -278,13 +278,17 @@
           return div.innerHTML;
       }
 
+      const GUESTBOOK_HOME_LIMIT = 5;
+
       function loadGuestbook() {
-          fetch(`${API_BASE}/guestbook`)
+          fetch(`${API_BASE}/guestbook?limit=${GUESTBOOK_HOME_LIMIT}`)
               .then(r => r.json())
-              .then(entries => {
+              .then(({ entries, total }) => {
                   const wrap = document.getElementById('guestbookEntries');
+                  const moreBtn = document.getElementById('guestbookMoreBtn');
                   if (!entries.length) {
                       wrap.innerHTML = _emptyStateHtml('imagens/decor/sapo-dormindo-lago.png', 'Nenhuma mensagem ainda — seja a primeira!', null, 'empty-state--sm');
+                      moreBtn.style.display = 'none';
                       return;
                   }
                   wrap.innerHTML = entries.map(e => {
@@ -295,6 +299,7 @@
                           <p>${escapeHtml(e.message)}</p>
                       </div>`;
                   }).join('');
+                  moreBtn.style.display = total > GUESTBOOK_HOME_LIMIT ? '' : 'none';
               })
               .catch(() => {
                   document.getElementById('guestbookEntries').innerHTML =
@@ -380,9 +385,9 @@
               <img src="imagens/decor/icone-perfil-usuario.png" alt="" class="quicklink-icon" loading="lazy">
               <span class="quicklink-text"><strong>Sobre Mim</strong><span>quem é a sapinha por trás</span></span>
             </a>
-            <a href="#guestbook" class="quicklink-row">
+            <a href="livro-de-visitas.html" class="quicklink-row">
               <img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="quicklink-icon" loading="lazy">
-              <span class="quicklink-text"><strong>Guestbook</strong><span>deixe uma mensagem</span></span>
+              <span class="quicklink-text"><strong>Guestbook</strong><span>veja as mensagens</span></span>
             </a>
           </div>
         </div>
@@ -452,14 +457,17 @@
           <div class="guestbook-layout">
             <form id="guestbookForm" class="guestbook-form">
               <label for="guestbookAuthor">Seu nome:</label>
-              <input type="text" id="guestbookAuthor" name="author" maxlength="10" required>
+              <input type="text" id="guestbookAuthor" name="author" maxlength="60" required>
               <label for="guestbookMessage">Mensagem:</label>
-              <textarea id="guestbookMessage" name="message" maxlength="50" rows="1" required></textarea>
+              <textarea id="guestbookMessage" name="message" maxlength="500" rows="3" required></textarea>
               <button type="submit">Enviar</button>
               <p id="guestbookFeedback"></p>
             </form>
-            <div class="guestbook-entries" id="guestbookEntries">
-              <p class="widget-hint">Carregando mensagens...</p>
+            <div class="guestbook-entries-col">
+              <div class="guestbook-entries" id="guestbookEntries">
+                <p class="widget-hint">Carregando mensagens...</p>
+              </div>
+              <a href="livro-de-visitas.html" class="leia-mais guestbook-more-btn" id="guestbookMoreBtn" style="display:none">Ver mais mensagens</a>
             </div>
           </div>
         </div>

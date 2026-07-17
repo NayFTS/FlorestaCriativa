@@ -123,7 +123,8 @@ const GuestbookEntry = mongoose.model('GuestbookEntry', new mongoose.Schema({
     author: { type: String, required: true, maxlength: 60 },
     message: { type: String, required: true, maxlength: 500 },
     createdAt: { type: Date, default: Date.now },
-    approved: { type: Boolean, default: false }
+    approved: { type: Boolean, default: false },
+    archived: { type: Boolean, default: false }
 }));
 
 const SiteSettings = mongoose.model('SiteSettings', new mongoose.Schema({
@@ -562,7 +563,7 @@ app.get('/search', async (req, res) => {
 
 app.get('/user-posts', requireAuth, async (req, res) => {
     try {
-        const posts = await Post.find({}).sort({ publish_date: -1 });
+        const posts = await Post.find({}, 'title status publish_date views').sort({ publish_date: -1 });
         res.json(posts);
     } catch (err) {
         console.error('Erro ao buscar postagens do usuário:', err);
@@ -572,21 +573,42 @@ app.get('/user-posts', requireAuth, async (req, res) => {
 
 app.get('/dashboard-stats', requireAuth, async (req, res) => {
     try {
-        const [allPosts, recentPosts] = await Promise.all([
-            Post.find({}),
-            Post.find({}).sort({ publish_date: -1 }).limit(3)
+        const [counts, [mostPopularPost], recentPosts] = await Promise.all([
+            Post.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        totalPosts: { $sum: 1 },
+                        draftCount: { $sum: { $cond: [{ $eq: ['$status', 'draft'] }, 1, 0] } },
+                        totalViews: { $sum: { $ifNull: ['$views', 0] } },
+                    },
+                },
+            ]),
+            Post.aggregate([
+                {
+                    $addFields: {
+                        popularityScore: {
+                            $add: [
+                                { $ifNull: ['$views', 0] },
+                                { $ifNull: ['$likes', 0] },
+                                { $ifNull: ['$commentsCount', 0] },
+                            ],
+                        },
+                    },
+                },
+                { $sort: { popularityScore: -1 } },
+                { $limit: 1 },
+            ]),
+            Post.find({}).sort({ publish_date: -1 }).limit(3),
         ]);
-        const totalPosts = allPosts.length;
-        const draftCount = allPosts.filter(p => p.status === 'draft').length;
-        const totalViews = allPosts.reduce((sum, p) => sum + (p.views || 0), 0);
-        const mostViewedPost = allPosts.sort((a, b) => (b.views || 0) - (a.views || 0))[0];
+        const { totalPosts = 0, draftCount = 0, totalViews = 0 } = counts[0] || {};
 
         res.json({
             totalPosts,
             draftCount,
             publishedCount: totalPosts - draftCount,
             totalViews,
-            mostPopularPost: mostViewedPost ? mostViewedPost.title : 'Nenhuma postagem encontrada',
+            mostPopularPost: mostPopularPost ? mostPopularPost.title : 'Nenhuma postagem encontrada',
             recentPosts,
         });
     } catch (err) {
@@ -760,8 +782,15 @@ app.post('/guestbook', guestbookLimiter, [
 
 app.get('/guestbook', async (req, res) => {
     try {
-        const entries = await GuestbookEntry.find({ approved: true }).sort({ createdAt: -1 }).limit(20);
-        res.json(entries);
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+        const skip = (page - 1) * limit;
+        const filter = { approved: true, archived: { $ne: true } };
+        const [entries, total] = await Promise.all([
+            GuestbookEntry.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            GuestbookEntry.countDocuments(filter),
+        ]);
+        res.json({ entries, total, page, limit });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao buscar guestbook' });
     }
@@ -776,6 +805,25 @@ app.get('/admin/guestbook/pending', requireAuth, async (req, res) => {
     }
 });
 
+// Lista as mensagens já aprovadas (ativas e arquivadas) pra gestão no dashboard
+app.get('/admin/guestbook', requireAuth, async (req, res) => {
+    try {
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+        const skip = (page - 1) * limit;
+        const filter = { approved: true };
+        if (req.query.status === 'archived') filter.archived = true;
+        else if (req.query.status === 'active') filter.archived = { $ne: true };
+        const [entries, total] = await Promise.all([
+            GuestbookEntry.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            GuestbookEntry.countDocuments(filter),
+        ]);
+        res.json({ entries, total, page, limit });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar mensagens do guestbook' });
+    }
+});
+
 app.patch('/admin/guestbook/:id/approve', requireAuth, async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Mensagem inválida' });
@@ -784,6 +832,28 @@ app.patch('/admin/guestbook/:id/approve', requireAuth, async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao aprovar mensagem' });
+    }
+});
+
+app.patch('/admin/guestbook/:id/archive', requireAuth, async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Mensagem inválida' });
+        const entry = await GuestbookEntry.findByIdAndUpdate(req.params.id, { archived: true }, { new: true });
+        if (!entry) return res.status(404).json({ message: 'Mensagem não encontrada' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao arquivar mensagem' });
+    }
+});
+
+app.patch('/admin/guestbook/:id/unarchive', requireAuth, async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Mensagem inválida' });
+        const entry = await GuestbookEntry.findByIdAndUpdate(req.params.id, { archived: false }, { new: true });
+        if (!entry) return res.status(404).json({ message: 'Mensagem não encontrada' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao restaurar mensagem' });
     }
 });
 

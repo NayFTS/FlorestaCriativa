@@ -1741,6 +1741,15 @@ input.input-error, input.input-error:focus {
         max-height: 100%;
     }
 
+    /* Home no desktop não rola a página inteira — a lista de recados
+       precisa do próprio scroll interno pra não estourar a altura fixa. */
+    body.page-home .guestbook-entries-col {
+        max-height: 260px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 4px;
+    }
+
     /* Banner com altura fixa acima de posts + quick links */
     body.page-home .home-header-box {
         height: 220px;
@@ -1885,6 +1894,10 @@ input.input-error, input.input-error:focus {
     max-width: 420px;
 }
 
+@media (min-width: 769px) {
+    .guestbook-card { max-width: 640px; }
+}
+
 .guestbook-card h2 {
     margin: 0 0 2px;
     font-size: 0.92rem;
@@ -1957,19 +1970,33 @@ input.input-error, input.input-error:focus {
     min-height: 0;
 }
 
+.guestbook-entries-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+}
+
 .guestbook-entries {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    max-height: 90px;
-    overflow-y: auto;
-    padding-right: 4px;
+}
+
+#guestbookMoreBtn.guestbook-more-btn {
+    align-self: flex-start;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    border-radius: var(--radius-pill);
+    margin-top: 0;
 }
 
 .guestbook-entry {
     background: var(--color-bg-secondary);
     border-radius: var(--radius-card-sm);
     padding: 8px 10px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
 }
 
 .guestbook-entry strong { color: var(--color-text); }
@@ -1984,10 +2011,71 @@ input.input-error, input.input-error:focus {
     margin: 4px 0 0;
     color: var(--color-text-soft);
     font-size: 0.92rem;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 @media (max-width: 768px) {
     .guestbook-layout { grid-template-columns: 1fr; }
+}
+
+/* ===================== */
+/* LIVRO DE VISITAS — cartas do guestbook completo */
+/* ===================== */
+.letters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 28px 20px;
+    padding: 24px 4px 8px;
+}
+
+.letter-card {
+    position: relative;
+    background: var(--color-surface);
+    border: var(--border-card-width) dashed var(--color-border);
+    border-radius: var(--radius-card-sm);
+    padding: 18px 16px 14px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.letter-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px) rotate(0deg) !important;
+}
+
+.letter-card.tilt-a { transform: rotate(-1.4deg); }
+.letter-card.tilt-b { transform: rotate(1deg); }
+.letter-card.tilt-c { transform: rotate(-0.6deg); }
+.letter-card.tilt-d { transform: rotate(1.6deg); }
+
+.letter-postmark {
+    display: inline-block;
+    font-family: var(--font-code);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 2px 10px;
+    margin-bottom: 10px;
+}
+
+.letter-message {
+    font-family: var(--font-handwritten);
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--color-text);
+    margin: 0 0 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.letter-signature {
+    font-family: var(--font-handwritten);
+    font-size: 1.05rem;
+    color: var(--color-text-soft);
+    text-align: right;
+    margin: 0;
 }
 
 /* .leia-mais no carousel: texto simples, não botão verde */
@@ -4837,8 +4925,26 @@ select {
     color: white;
 }
 
+.btn-archive {
+    padding: 6px 16px;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-archive:hover:not(:disabled) {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
 .btn-approve:disabled,
-.btn-reject:disabled {
+.btn-reject:disabled,
+.btn-archive:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
