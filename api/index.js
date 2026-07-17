@@ -930,9 +930,11 @@ app.get('/spotify/now-playing', async (req, res) => {
 // Tratamento de erros do Multer
 app.use((err, req, res, next) => {
     if (err && err.name === 'MulterError') {
-        const msg = err.code === 'LIMIT_FILE_SIZE'
-            ? 'Imagem muito grande. O limite é 2 MB.'
-            : `Erro no upload: ${err.message}`;
+        let msg = `Erro no upload: ${err.message}`;
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            const fieldLabel = err.field === 'image' ? 'da imagem de capa' : 'da galeria';
+            msg = `Uma imagem ${fieldLabel} é muito grande. O limite é 2 MB por arquivo.`;
+        }
         return res.status(400).json({ success: false, message: msg });
     }
     if (err && err.message && err.message.includes('imagem')) {

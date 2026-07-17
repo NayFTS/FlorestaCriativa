@@ -127,7 +127,7 @@
       <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
     </div>
     <div class="page-banner-caption">
-      <h1>Publicar Post - TESTANDO</h1>
+      <h1>Publicar Post</h1>
     </div>
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
       <div class="search-overlay-box">
@@ -165,10 +165,13 @@
 
       <label for="image">Imagem de Capa:</label>
       <input type="file" id="image" name="image" accept="image/*"><br>
-      <img id="previewImage" class="image-preview" alt="Preview da imagem">
+      <div id="imagePreviewWrap" class="gallery-preview-item" style="display:none">
+        <img id="previewImage" class="image-preview" alt="Preview da imagem" style="display:block">
+        <button type="button" id="removeImageBtn" class="gallery-remove-btn" aria-label="Remover imagem">✕</button>
+      </div>
       <br>
 
-      <label style="margin-top:12px">Galeria de imagens <span style="font-weight:400;font-size:0.9em">(opcional — até 10 fotos)</span></label>
+      <label style="margin-top:12px">Galeria de imagens <span style="font-weight:400;font-size:0.9em">(opcional — até 10 fotos, máx. 2 MB cada)</span></label>
       <input type="file" id="galleryInput" name="gallery" accept="image/*" multiple>
       <div id="galleryPreview" class="gallery-preview-edit"></div>
       <br>
@@ -239,32 +242,91 @@
           document.getElementById('postForm').requestSubmit();
       });
 
+      const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // deve bater com o limite do multer no backend
+      let galleryFiles = [];
+
+      function formatSize(bytes) {
+          return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      }
+
+      function filesToFileList(files) {
+          const dt = new DataTransfer();
+          files.forEach(f => dt.items.add(f));
+          return dt.files;
+      }
+
       document.getElementById('image').addEventListener('change', function(event) {
           const file = event.target.files[0];
-          if (file) {
-              const reader = new FileReader();
-              reader.onload = function(e) {
-                  const preview = document.getElementById('previewImage');
-                  preview.src = e.target.result;
-                  preview.style.display = 'block';
-              };
-              reader.readAsDataURL(file);
+          const wrap = document.getElementById('imagePreviewWrap');
+          const preview = document.getElementById('previewImage');
+          const errorMsg = document.getElementById('errorMessage');
+          if (!file) {
+              wrap.style.display = 'none';
+              return;
           }
+          if (file.size > MAX_IMAGE_SIZE) {
+              errorMsg.textContent = `"${file.name}" tem ${formatSize(file.size)} e ultrapassa o limite de 2 MB.`;
+              this.value = '';
+              wrap.style.display = 'none';
+              return;
+          }
+          errorMsg.textContent = '';
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              preview.src = e.target.result;
+              wrap.style.display = 'inline-block';
+          };
+          reader.readAsDataURL(file);
       });
 
-      document.getElementById('galleryInput').addEventListener('change', function() {
+      document.getElementById('removeImageBtn').addEventListener('click', function() {
+          document.getElementById('image').value = '';
+          document.getElementById('previewImage').src = '';
+          document.getElementById('imagePreviewWrap').style.display = 'none';
+      });
+
+      function renderGalleryPreview() {
           const container = document.getElementById('galleryPreview');
           container.innerHTML = '';
-          Array.from(this.files).forEach(file => {
+          galleryFiles.forEach((file, idx) => {
+              const wrap = document.createElement('div');
+              wrap.className = 'gallery-preview-item';
+              const img = document.createElement('img');
+              img.className = 'gallery-preview-thumb';
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'gallery-remove-btn';
+              btn.textContent = '✕';
+              btn.setAttribute('aria-label', 'Remover imagem');
+              btn.addEventListener('click', () => {
+                  galleryFiles.splice(idx, 1);
+                  document.getElementById('galleryInput').files = filesToFileList(galleryFiles);
+                  renderGalleryPreview();
+              });
+              wrap.appendChild(img);
+              wrap.appendChild(btn);
+              container.appendChild(wrap);
+
               const reader = new FileReader();
-              reader.onload = e => {
-                  const img = document.createElement('img');
-                  img.src = e.target.result;
-                  img.className = 'gallery-preview-thumb';
-                  container.appendChild(img);
-              };
+              reader.onload = e => { img.src = e.target.result; };
               reader.readAsDataURL(file);
           });
+      }
+
+      document.getElementById('galleryInput').addEventListener('change', function() {
+          const errorMsg = document.getElementById('errorMessage');
+          const selected = Array.from(this.files);
+          const oversized = selected.filter(f => f.size > MAX_IMAGE_SIZE);
+          galleryFiles = selected.filter(f => f.size <= MAX_IMAGE_SIZE);
+
+          errorMsg.textContent = oversized.length
+              ? 'Imagem(ns) muito grande(s), removida(s) da galeria: ' +
+                oversized.map(f => `"${f.name}" (${formatSize(f.size)})`).join(', ') +
+                '. O limite é 2 MB por imagem.'
+              : '';
+
+          this.files = filesToFileList(galleryFiles);
+          renderGalleryPreview();
       });
 
       document.getElementById('postForm').addEventListener('submit', function(event) {
