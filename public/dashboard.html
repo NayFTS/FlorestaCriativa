@@ -430,7 +430,7 @@
                           ${e.archived
                               ? `<button class="btn-approve" onclick="unarchiveGuestbookEntry('${e._id}', this)">Restaurar</button>`
                               : `<button class="btn-archive" onclick="archiveGuestbookEntry('${e._id}', this)">Arquivar</button>`}
-                          <button class="btn-reject" onclick="deleteGuestbookEntry('${e._id}')">Excluir</button>
+                          <button class="btn-reject" onclick="deleteGuestbookEntry('${e._id}', this)">Excluir</button>
                       </div>
                   </div>`;
               }).join('');
@@ -500,14 +500,17 @@
       });
   }
 
-  async function deleteGuestbookEntry(id) {
+  async function deleteGuestbookEntry(id, btn) {
       const confirmed = await guestbookConfirmDelete();
       if (!confirmed) return;
+      btn.disabled = true;
       fetch(`${API_BASE}/admin/guestbook/${id}`, { method: 'DELETE' })
           .then(r => r.json())
           .then(data => {
               if (data.success) loadGuestbookAdmin(guestbookAdminPage);
-          });
+              else btn.disabled = false;
+          })
+          .catch(() => { btn.disabled = false; });
   }
 
   document.getElementById('guestbookAdminFilter').addEventListener('change', () => loadGuestbookAdmin(1));
