@@ -20,6 +20,10 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function uploadToCloudinary(buffer) {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -74,6 +78,10 @@ if (!mongoConnectPromise) {
     global.__mongoConnectPromise = mongoConnectPromise;
 }
 
+// Necessário pro Express enxergar corretamente req.secure (via X-Forwarded-Proto) atrás do
+// proxy da Vercel — sem isso, cookie.secure nunca é setado mesmo em produção HTTPS.
+app.set('trust proxy', 1);
+
 // Vercel passa o caminho completo (/api/login) ao Express; strip do prefixo antes do roteamento
 app.use((req, res, next) => {
     if (req.url.startsWith('/api/')) req.url = req.url.slice(4) || '/';
@@ -89,7 +97,11 @@ app.use(session({
         clientPromise: mongoConnectPromise.then(m => m.connection.getClient()),
         collectionName: 'sessions'
     }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+    }
 }));
 
 // Definir modelos do MongoDB
@@ -556,9 +568,10 @@ app.get('/search', async (req, res) => {
         // Cria o filtro de busca
         const filter = {};
         if (q) {
+            const safeQ = escapeRegex(q);
             filter.$or = [
-                { title: { $regex: q, $options: 'i' } }, // Busca por título
-                { content: { $regex: q, $options: 'i' } } // Busca por conteúdo
+                { title: { $regex: safeQ, $options: 'i' } }, // Busca por título
+                { content: { $regex: safeQ, $options: 'i' } } // Busca por conteúdo
             ];
         }
         if (category) {

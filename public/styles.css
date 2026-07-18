@@ -3432,6 +3432,32 @@ select {
     color: var(--color-text);
 }
 
+.search-overlay-box form button {
+    padding: 8px 18px;
+    font-size: 0.95em;
+    font-family: var(--font-body);
+    font-weight: 700;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.search-overlay-box form button[type="submit"] {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+}
+
+.search-overlay-box form button[type="submit"]:hover { background: var(--color-accent-dark); }
+
+.search-overlay-box form button[type="button"] {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.search-overlay-box form button[type="button"]:hover { background: var(--color-border); }
+
 .search-overlay-box #advancedFilters {
     margin-top: 12px;
     padding-top: 12px;
