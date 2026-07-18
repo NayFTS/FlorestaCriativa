@@ -88,7 +88,7 @@
           <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon">Sapo Imaginário</a>
           <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon">Rascunhos da Floresta</a>
           <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon">Sobre Mim</a>
-          <a href="#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
+          <a href="index.html#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
         </div>
         <div class="sidebar-widgets drawer-widgets">
           <div class="currently-widget">
@@ -144,11 +144,7 @@
         </form>
         <div id="advancedFilters" style="display:none;">
           <p>Categorias:</p>
-          <label><input type="checkbox" class="category" value="Escrita" name="category[]"> Escrita</label>
-          <label><input type="checkbox" class="category" value="Projetos" name="category[]"> Projetos</label>
-          <label><input type="checkbox" class="category" value="Animes" name="category[]"> Animes</label>
-          <label><input type="checkbox" class="category" value="Jogos" name="category[]"> Jogos</label>
-          <label><input type="checkbox" class="category" value="Slice of Life" name="category[]"> Slice of Life</label>
+          <div id="searchCategoryFilters" class="search-category-filters"></div>
           <input type="date" id="startDate" name="startDate">
           <input type="date" id="endDate" name="endDate">
         </div>
@@ -156,26 +152,73 @@
       </div>
     </div>
         <div style="height:40px"></div>
-<section id="rascunhos-da-floresta">
-      <div class="listing-controls" id="post-list-controls">
-        <div class="listing-pills" role="group" aria-label="Filtrar por categoria">
-          <button type="button" class="filter-pill active" data-category="">Todos</button>
+<section id="rascunhos-da-floresta" style="padding: 0 16px;">
+      <div class="portfolio-layout">
+        <div class="portfolio-main">
+          <div class="listing-controls" id="post-list-controls">
+            <div class="listing-pills" role="group" aria-label="Filtrar por categoria">
+              <button type="button" class="filter-pill active" data-category="">Todos</button>
+            </div>
+            <select class="listing-sort" aria-label="Ordenar posts">
+              <option value="latest">Mais recentes</option>
+              <option value="oldest">Mais antigos</option>
+              <option value="likes">Mais curtidos</option>
+              <option value="views">Mais vistos</option>
+            </select>
+          </div>
+          <div id="post-list"></div>
+          <div class="listing-pagination" id="post-list-pagination"></div>
         </div>
-        <select class="listing-sort" aria-label="Ordenar posts">
-          <option value="latest">Mais recentes</option>
-          <option value="oldest">Mais antigos</option>
-          <option value="likes">Mais curtidos</option>
-          <option value="views">Mais vistos</option>
-        </select>
+
+        <aside class="portfolio-sidebar">
+          <div class="widget-card sticker-card sticker-card--sm widget-featured">
+            <div class="widget-window-header">
+              <h3>📌 Featured Post</h3>
+              <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
+            </div>
+            <div id="featuredProject">Carregando...</div>
+          </div>
+
+          <div class="widget-card sticker-card sticker-card--sm">
+            <div class="widget-window-header">
+              <h3>🛠️ Tools I Use</h3>
+              <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
+            </div>
+            <ul class="widget-list widget-tools-list" id="toolsList">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+
+          <div class="widget-card sticker-card sticker-card--sm">
+            <div class="widget-window-header">
+              <h3>✨ Skills &amp; Services</h3>
+              <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
+            </div>
+            <div class="category-chip-list" id="skillsList">
+              <span class="category-chip">Carregando...</span>
+            </div>
+          </div>
+
+          <div class="widget-card sticker-card sticker-card--sm widget-gardenlog">
+            <div class="widget-window-header">
+              <h3>🪵 Recent Updates</h3>
+              <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
+            </div>
+            <ul class="widget-list" id="portfolioRecentUpdates">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+        </aside>
       </div>
-      <div id="post-list"></div>
-      <div class="listing-pagination" id="post-list-pagination"></div>
     </section>
     <script src="i18n.js"></script>
     <script src="mood-weather.js"></script>
     <script src="search.js"></script>
     <script>
-      window.onload = () => initPostListing('rascunhos-da-floresta.html', 'post-list');
+      window.onload = () => {
+          initPostListing('rascunhos-da-floresta.html', 'post-list');
+          _loadListingSidebar('rascunhos-da-floresta.html', { emptyFeatured: 'Nenhum rascunho ainda.', ctaLabel: 'Ler post →' });
+      };
     </script>
       </main>
     </div>

@@ -34,6 +34,24 @@ function uploadToCloudinary(buffer) {
     });
 }
 
+function getCloudinaryPublicId(url) {
+    if (typeof url !== 'string') return null;
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+(?:\?.*)?$/);
+    return match ? match[1] : null;
+}
+
+// Apaga uma imagem no Cloudinary a partir da sua secure_url. Nunca lança — uma falha aqui não
+// pode derrubar a operação de post que a chamou (o registro no Mongo já mudou/sumiu).
+async function deleteFromCloudinary(url) {
+    const publicId = getCloudinaryPublicId(url);
+    if (!publicId) return;
+    try {
+        await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+        console.error('Erro ao apagar imagem do Cloudinary:', publicId, err);
+    }
+}
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -406,17 +424,24 @@ app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req
         if (status === 'published' || status === 'draft') post.status = status;
 
         const imageFile = req.files?.['image']?.[0];
+        let oldImagePath = null;
         if (imageFile) {
+            oldImagePath = post.image_path;
             post.image_path = await uploadToCloudinary(imageFile.buffer);
         }
 
         let keepGallery = [];
         try { keepGallery = JSON.parse(req.body.gallery_keep || '[]'); } catch(e) {}
+        const removedGalleryUrls = post.gallery.filter(url => !keepGallery.includes(url));
         const newGalleryFiles = req.files?.['gallery'] || [];
         const newGalleryUrls = await Promise.all(newGalleryFiles.map(f => uploadToCloudinary(f.buffer)));
         post.gallery = [...keepGallery, ...newGalleryUrls];
 
         await post.save();
+
+        const staleImages = oldImagePath ? [...removedGalleryUrls, oldImagePath] : removedGalleryUrls;
+        await Promise.all(staleImages.map(deleteFromCloudinary));
+
         res.json({ success: true, message: 'Post atualizado com sucesso!' });
     } catch (err) {
         console.error('Erro ao atualizar post:', err);
@@ -480,13 +505,22 @@ app.get('/posts/categories', async (req, res) => {
 app.get('/post/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        let post;
-        if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
-            post = await Post.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true });
-        } else {
-            post = await Post.findOneAndUpdate({ slug: id }, { $inc: { views: 1 } }, { new: true });
-        }
+        const filter = (mongoose.Types.ObjectId.isValid(id) && id.length === 24)
+            ? { _id: id }
+            : { slug: id };
+
+        let post = await Post.findOne(filter);
         if (!post) return res.status(404).json({ success: false, message: 'Post não encontrado' });
+
+        // Dedupe por sessão, mesmo padrão do like — sem isso, chamar essa rota em loop infla
+        // views artificialmente e distorce o "mais popular" (views + likes + commentsCount).
+        const viewedPosts = req.session.viewedPosts || [];
+        const postIdStr = post._id.toString();
+        if (!viewedPosts.includes(postIdStr)) {
+            post = await Post.findByIdAndUpdate(post._id, { $inc: { views: 1 } }, { new: true });
+            req.session.viewedPosts = [...viewedPosts, postIdStr];
+        }
+
         res.json(post);
     } catch (err) {
         console.error('Erro ao buscar post:', err);
@@ -545,6 +579,10 @@ app.delete('/posts/:id', requireAuth, async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
         await Post.findByIdAndDelete(req.params.id);
+
+        const staleImages = post.image_path ? [...post.gallery, post.image_path] : post.gallery;
+        await Promise.all(staleImages.map(deleteFromCloudinary));
+
         res.json({ message: 'Postagem excluída com sucesso' });
     } catch (err) {
         res.status(500).json({ message: 'Erro no servidor' });
@@ -730,6 +768,9 @@ app.post('/comments', commentLimiter, [
     const { postId, author, content } = req.body;
     if (!mongoose.Types.ObjectId.isValid(postId)) return res.status(400).json({ message: 'Post inválido' });
     try {
+        const postExists = await Post.exists({ _id: postId });
+        if (!postExists) return res.status(404).json({ message: 'Post não encontrado' });
+
         const comment = new Comment({ post: postId, author: author.trim(), content: content.trim() });
         await comment.save();
         res.json({ success: true, message: 'Comentário enviado para moderação!' });

@@ -200,6 +200,53 @@ function _renderChipListInto(el, items) {
         : '';
 }
 
+// Popula os widgets "Featured" e "Recent Updates" da sidebar de listagem (mesmo padrão usado
+// inline em sapo-imaginario.html), reutilizável por qualquer página de listagem de posts.
+function _loadListingSidebar(pageUrl, opts = {}) {
+    const featuredEl = document.getElementById(opts.featuredElId || 'featuredProject');
+    const updatesEl = document.getElementById(opts.updatesElId || 'portfolioRecentUpdates');
+    const emptyFeatured = opts.emptyFeatured || 'Nenhum post ainda.';
+    const ctaLabel = opts.ctaLabel || 'Ler mais →';
+
+    if (featuredEl) {
+        fetch(`${API_BASE}/posts?url=${encodeURIComponent(pageUrl)}&page=1&limit=1&sort=likes`)
+            .then(r => r.json())
+            .then(data => {
+                const post = (data.posts || [])[0];
+                if (!post) {
+                    featuredEl.innerHTML = `<p>${emptyFeatured}</p>`;
+                    return;
+                }
+                const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
+                const imgSrc = post.image_path
+                    ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
+                    : null;
+                const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy">` : '';
+                featuredEl.innerHTML = `${imgHtml}
+                    <p><strong>${_escapeHtmlGlobal(post.title)}</strong></p>
+                    <a href="${link}" class="leia-mais">${ctaLabel}</a>`;
+            })
+            .catch(() => { featuredEl.innerHTML = '<p>Não foi possível carregar.</p>'; });
+    }
+
+    if (updatesEl) {
+        fetch(`${API_BASE}/posts?url=${encodeURIComponent(pageUrl)}&page=1&limit=4&sort=latest`)
+            .then(r => r.json())
+            .then(data => {
+                const posts = data.posts || [];
+                if (!posts.length) {
+                    updatesEl.innerHTML = '<li>Nenhuma atualização ainda.</li>';
+                    return;
+                }
+                const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+                updatesEl.innerHTML = posts.map(post =>
+                    `<li>📝 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(post.title)}</a>"</li>`
+                ).join('');
+            })
+            .catch(() => { updatesEl.innerHTML = '<li>Não foi possível carregar.</li>'; });
+    }
+}
+
 function loadSiteSettings() {
     const currentlyLists = document.querySelectorAll('.js-currently-list');
     const nowPlayingTrack = document.getElementById('nowPlayingTrack');
@@ -232,6 +279,31 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadSiteSettings);
 } else {
     loadSiteSettings();
+}
+
+// Categorias do filtro avançado de busca vinham fixas no HTML (5 categorias hardcoded) e não
+// incluíam categorias personalizadas criadas em editPost/publicar. Busca todas as categorias
+// existentes (sem filtrar por página) e monta os checkboxes dinamicamente.
+function loadSearchCategoryFilters() {
+    const container = document.getElementById('searchCategoryFilters');
+    if (!container) return;
+
+    fetch(`${API_BASE}/posts/categories`)
+        .then(r => r.json())
+        .then(categories => {
+            container.innerHTML = (categories || []).map((cat, i) => {
+                const id = `searchCat${i}`;
+                const safeCat = _escapeHtmlGlobal(cat);
+                return `<label for="${id}"><input type="checkbox" class="category" value="${safeCat}" name="category[]" id="${id}"> ${safeCat}</label>`;
+            }).join('');
+        })
+        .catch(() => {});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadSearchCategoryFilters);
+} else {
+    loadSearchCategoryFilters();
 }
 
 function _formatMsAsTime(ms) {

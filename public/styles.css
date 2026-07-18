@@ -3484,6 +3484,13 @@ select {
     cursor: pointer;
 }
 
+.search-overlay-box .search-category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    width: 100%;
+}
+
 .search-overlay-box #advancedFilters input[type="date"] {
     padding: 6px 10px;
     border: 1px solid var(--color-border);

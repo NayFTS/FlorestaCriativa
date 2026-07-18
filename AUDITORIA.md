@@ -61,10 +61,8 @@ retorna 400 em vez de 500 genérico.
 
 ## 2. Bugs de frontend/JS
 
-### Baixa
-1. **`styles.css:1563-1635` (Now Playing)** — Controles `.np-control--prev`/`.np-control--next`
-   (`index.html:421,428`) continuam sem `addEventListener` — `search.js:269` só liga o ícone de
-   play/pause ao estado real do Spotify, prev/next são puramente decorativos.
+Nenhuma pendência aberta no momento — o item de baixa prioridade (controles decorativos do Now
+Playing) foi resolvido, ver "Resolvido" abaixo.
 
 **Resolvido nesta sessão:** tags de tecnologia em `editPost.html`/`publicar.html` agora passam
 por `escapeHtml()` antes de entrar via `innerHTML`, mesmo padrão já usado pro título do post.
@@ -86,11 +84,11 @@ foi resolvida — ver seção "Resolvido" acima.
 
 ## 4. Funcionalidade faltando / incompleta
 
-### Média
-1. **`sapo-imaginario.html:195` "Tools I Use"/"Skills & Services"** — Conteúdo fixo no HTML, não
-   vem de `/settings` como Currently/Now Playing. Implementação parcial se a intenção era ficar
-   editável pelo dashboard.
-2. **`sobre-mim.html:294,305` "My Tools"/"Things That Matter"** — Mesmo padrão, conteúdo fixo.
+**Resolvido desde a última auditoria:** "Tools I Use"/"Skills & Services" (`sapo-imaginario.html`)
+e "My Tools"/"Things That Matter" (`sobre-mim.html`) agora carregam via `/settings` e são
+editáveis pelo dashboard (commits `738a76a` e `0ffead0`), mesmo padrão de Currently/Now Playing.
+Como parte do mesmo trabalho, os controles decorativos `.np-control--prev`/`.np-control--next` do
+Now Playing (item da seção 2 na auditoria anterior) foram removidos.
 
 ### Baixa
 3. **`post.html` mobile** — `.back-button-container` (`styles.css:2262-2269`) segue com
@@ -252,10 +250,16 @@ existe (clima real no mood card, cartas do guestbook, Garden Log automático):
 
 ## Resumo de prioridade sugerida (17/07)
 
-1. Escapar `q` no `/search` antes do `$regex` (Alta).
-2. `secure`/`sameSite` no cookie de sessão (Alta).
+1. ~~Escapar `q` no `/search` antes do `$regex` (Alta).~~ Resolvido no commit `2617fde`
+   (`escapeRegex()` aplicado antes de montar o filtro `$or`).
+2. ~~`secure`/`sameSite` no cookie de sessão (Alta).~~ Resolvido no commit `2617fde`
+   (`trust proxy` habilitado, cookie com `secure: NODE_ENV === 'production'` e `sameSite: 'lax'`).
 3. Corrigir os 10 links `#guestbook` quebrados no menu mobile (Média, mecânico).
 4. `cloudinary.uploader.destroy` ao apagar/trocar imagem (Média).
 5. Rate limit/dedupe em views, ou aceitar que "mais popular" é manipulável (Média).
 6. Validar existência do post em `POST /comments` (Média).
 7. Resto por ordem de interesse — nada aqui é urgente.
+
+**Bônus não listado como prioridade, mas também resolvido:** botões "Pesquisar"/"Filtros"/
+"Limpar" do overlay de busca usavam o estilo padrão do navegador (cinza, quadrado); agora seguem
+a identidade visual do site (`public/styles.css`, commit `2617fde`).
