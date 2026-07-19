@@ -15,6 +15,8 @@
     const MAX_FLIES = 4;
     const SPAWN_MARGIN = 30;
     const GAME_DURATION = 60;
+    const FROG_AVOID_PADDING = 16; // margem extra ao redor do sapo onde mosca não pode nascer
+    const SPAWN_MAX_ATTEMPTS = 20;
     const FROG_IDLE_SRC = 'assets/sapo-idle.png';
     const FROG_OPEN_SRC = 'assets/sapo-boca-aberta.png';
     const MOUTH_TOP_RATIO = 0.36; // posição da boca na arte (mesmo valor do "top" da .tongue no style.css)
@@ -48,10 +50,33 @@
     attachSpriteFallback(frogBody, '🐸');
     attachSpriteFallback(hudFlyIcon, '🪰');
 
+    // Área do sapo (em coordenadas relativas ao .sky), com uma margem extra ao redor,
+    // pra sortear posição de mosca fora dela.
+    function getFrogExclusionZone() {
+        const skyRect = sky.getBoundingClientRect();
+        const frogRect = frog.getBoundingClientRect();
+        return {
+            left: frogRect.left - skyRect.left - FROG_AVOID_PADDING,
+            top: frogRect.top - skyRect.top - FROG_AVOID_PADDING,
+            right: frogRect.right - skyRect.left + FROG_AVOID_PADDING,
+            bottom: frogRect.bottom - skyRect.top + FROG_AVOID_PADDING,
+        };
+    }
+
+    function isInsideZone(x, y, zone) {
+        return x >= zone.left && x <= zone.right && y >= zone.top && y <= zone.bottom;
+    }
+
     function spawnFly() {
         const rect = sky.getBoundingClientRect();
-        const x = randRange(SPAWN_MARGIN, Math.max(SPAWN_MARGIN, rect.width - SPAWN_MARGIN));
-        const y = randRange(SPAWN_MARGIN, Math.max(SPAWN_MARGIN, rect.height - SPAWN_MARGIN));
+        const frogZone = getFrogExclusionZone();
+
+        let x, y, attempts = 0;
+        do {
+            x = randRange(SPAWN_MARGIN, Math.max(SPAWN_MARGIN, rect.width - SPAWN_MARGIN));
+            y = randRange(SPAWN_MARGIN, Math.max(SPAWN_MARGIN, rect.height - SPAWN_MARGIN));
+            attempts += 1;
+        } while (isInsideZone(x, y, frogZone) && attempts < SPAWN_MAX_ATTEMPTS);
 
         const fly = document.createElement('button');
         fly.type = 'button';

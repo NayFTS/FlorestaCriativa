@@ -36,10 +36,25 @@ html, body {
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Letterbox atrás do "celular" quando a janela é mais larga que um telefone (PC) */
+    background: #0d1117;
+}
+
 .game {
     position: relative;
-    width: 100vw;
-    height: 100dvh;
+    /* Trava numa resolução de celular mesmo em telas largas de PC; em telas de
+       celular de verdade (menores que isso) simplesmente ocupa 100% como antes. */
+    width: min(430px, 100vw);
+    height: min(932px, 100dvh);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    /* Habilita unidades cqw nos filhos (frog, etc.) relativas à largura do "celular",
+       não à largura real da janela — é isso que evita o sapo/fundo explodirem no PC. */
+    container-type: inline-size;
     /* Camadas: fundo-dia/noite.png por cima, gradiente por baixo — se o arquivo não
        existir ainda (ou não carregar), o navegador só mostra o gradiente sozinho. */
     background: var(--bg-scene) center bottom / cover no-repeat,
@@ -135,28 +150,31 @@ span.fly-sprite {
 
 .frog {
     position: absolute;
-    /* 52vw = onde a superfície da vitória-régia cai em fundo-dia/noite.png (medido por
-       pixel: topo do "prato" a ~76% da altura da imagem). Usa vw, não %, porque o fundo
-       escala pela LARGURA da tela (background-size: cover, center bottom) — só assim o
-       sapo acompanha a folha em qualquer proporção de celular. */
-    bottom: 52vw;
+    /* 52cqw = onde a superfície da vitória-régia cai em fundo-dia/noite.png (medido por
+       pixel: topo do "prato" a ~76% da altura da imagem). Usa cqw (relativo à largura
+       do .game, não da janela) porque o fundo escala pela LARGURA da tela
+       (background-size: cover, center bottom) — só assim o sapo acompanha a folha em
+       qualquer proporção de celular, e continua correto mesmo com o jogo em moldura
+       fixa dentro de uma janela larga de PC. */
+    bottom: 52cqw;
     left: 50%;
     transform: translateX(-50%);
     z-index: 5;
 }
 
-/* Espera assets/sapo-idle.png (PNG transparente, canvas quadrado). Largura em vw pra
-   acompanhar a escala da vitória-régia (~91.5vw de largura no fundo) — o sapo fica com
-   uns 45% da largura da folha. */
+/* Espera assets/sapo-idle.png (PNG transparente, canvas quadrado). Largura em cqw pra
+   acompanhar a escala da vitória-régia (~91.5cqw de largura no fundo) — o sapo fica com
+   uns 45% da largura da folha. cqw (não vw) pra continuar correto mesmo com o jogo em
+   moldura fixa dentro de uma janela larga de PC. */
 img.frog-body {
     display: block;
-    width: clamp(130px, 41vw, 220px);
+    width: clamp(130px, 41cqw, 220px);
     height: auto;
 }
 
 /* Fallback em emoji enquanto o arquivo não existir (attachSpriteFallback no script.js) */
 span.frog-body {
-    font-size: clamp(3.5rem, 18vw, 5.5rem);
+    font-size: clamp(3.5rem, 18cqw, 5.5rem);
     line-height: 1;
     display: block;
 }
