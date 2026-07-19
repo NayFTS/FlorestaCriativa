@@ -173,18 +173,24 @@ prioridade depois.
 
 ### Baixa
 
-6. `/search` não dá `trim()`/`filter()` nas categorias como `/posts` já faz — filtrar com espaço
-   depois da vírgula funciona num endpoint e falha silenciosamente no outro.
-7. `/search` não pagina (`/posts` sim) — devolve a lista inteira sempre.
+6. ~~`/search` não dá `trim()`/`filter()` nas categorias como `/posts` já faz.~~ Resolvido em
+   19/07: mesmo padrão de `/posts` aplicado.
+7. ~~`/search` não pagina (`/posts` sim).~~ Resolvido em 19/07: paginação opcional (`page`/`limit`)
+   no mesmo padrão de `/posts`, sem quebrar o overlay de busca atual (que não envia esses params).
 8. `POST /editPost/:id` nunca regenera o `slug` ao mudar o título — pode ser proposital (não
    quebrar links antigos), vale só confirmar que é intencional.
-9. `SESSION_SECRET` tem fallback hardcoded (`'fallback_secret'`) se a env var não estiver setada —
-   defesa fraca caso o deploy esqueça de configurar.
-10. `getSettingsWithSpotifyToken`/`isSpotifyConnected` fazem a mesma query duas vezes de formas
-    ligeiramente diferentes — dava pra ser uma função só.
-11. **Comments não tem archive/restore como Guestbook ganhou** — só `approve` e delete definitivo.
-12. Filas de pendentes (`/admin/comments/pending`, `/admin/guestbook/pending`) não paginam,
-    diferente da lista de aprovados do guestbook (que já pagina).
+9. ~~`SESSION_SECRET` tem fallback hardcoded (`'fallback_secret'`).~~ Resolvido em 19/07: o servidor
+   agora falha rápido (`throw`) no boot se a env var não estiver setada, em vez de usar segredo
+   fraco.
+10. ~~`getSettingsWithSpotifyToken`/`isSpotifyConnected` fazem a mesma query duas vezes.~~ Resolvido
+    em 19/07: `isSpotifyConnected` agora reaproveita `getSettingsWithSpotifyToken`.
+11. ~~Comments não tem archive/restore como Guestbook ganhou.~~ Resolvido em 19/07: schema ganhou
+    `archived`, rotas `PATCH /admin/comments/:id/archive|unarchive` e `GET /admin/comments`
+    (paginado, com filtro `status`), mesmo padrão do guestbook. Seção "Gerenciar Comentários" nova
+    no dashboard.
+12. ~~Filas de pendentes não paginam.~~ Resolvido em 19/07: `/admin/comments/pending` e
+    `/admin/guestbook/pending` ganharam paginação opcional (`page`/`limit`), sem quebrar o
+    consumidor atual do dashboard (que não envia esses params e continua recebendo array plano).
 13. `/user-posts` ainda carrega a coleção inteira sem paginação (carryover do audit de 14/07).
 
 ## 2. Frontend (HTML/CSS/JS)
@@ -213,16 +219,22 @@ prioridade depois.
 
 ### Baixa
 
-6. `publicar.html`/`editPost.html` sem favicon/manifest no `<head>` (as outras 10 páginas têm).
-7. CSS morto: `.post-categories` (`styles.css:3548`) e `.no-comments` (`styles.css:4650`) sem
-   elemento correspondente.
-8. Lógica de logo dia/noite duplicada em 3 lugares (`.topbar-sign`, `.sidebar-logo`,
-   `.mobile-topbar-sign`) — poderia ser uma classe utilitária única.
+6. ~~`publicar.html`/`editPost.html` sem favicon/manifest no `<head>`.~~ Resolvido em 19/07.
+7. ~~CSS morto: `.post-categories` e `.no-comments` sem elemento correspondente.~~ Resolvido em
+   19/07 (junto com `.hamburger` e `#registerLink`, itens mortos identificados na auditoria de
+   14/07 e ainda pendentes).
+8. ~~Lógica de logo dia/noite duplicada em 3 lugares.~~ Resolvido em 19/07: consolidada em duas
+   classes utilitárias (uma pro par sempre-visível `.topbar-sign`/`.sidebar-logo`, outra pro par
+   mobile `.mobile-topbar-sign`/`.bottom-nav-center`, que também tinha a mesma duplicação e não
+   tinha sido listado na auditoria original).
 9. **i18n é praticamente decorativo** — o botão de idioma aparece em todas as páginas, mas o
    dicionário de traduções só cobre o overlay de busca e o widget de mood; clicar em "EN" não
-   traduz nav, títulos, formulários etc. Parece fazer mais do que faz.
-10. **RSS (`/feed.xml`) existe no backend mas não tem nenhum link visível em lugar nenhum do
-    site** — quem não souber a URL de cor nunca vai descobrir que a feature existe.
+   traduz nav, títulos, formulários etc. Parece fazer mais do que faz. **Deixado de propósito**
+   (decisão consciente em 19/07): traduzir o site inteiro é tarefa grande o bastante pra merecer
+   sessão própria, não uma rodada de auditoria.
+10. ~~RSS (`/feed.xml`) existe no backend mas não tem nenhum link visível.~~ Resolvido em 19/07:
+    ícone 📡 adicionado ao lado do GitHub em `.sidebar-social` (desktop + drawer mobile) nas 8
+    páginas públicas reais, linkando pra `/api/feed.xml`.
 
 ## 3. Ideias de melhorias e diversão
 
@@ -243,8 +255,7 @@ existe (clima real no mood card, cartas do guestbook, Garden Log automático):
 6. **Estações do ano sutis no visual** — já existe clima real influenciando o mood card; dava pra
    estender isso com detalhezinhos de CSS (folhas caindo, vagalumes à noite) casando com a estação
    atual, sem exigir nada novo de infra.
-7. **Divulgar o RSS** — já existe (`/feed.xml`), só falta um ícone/link em algum canto (rodapé ou
-   sidebar) pra quem usa leitor de feed encontrar.
+7. ~~Divulgar o RSS~~ — resolvido em 19/07, ver item 10 da seção "Baixa" acima.
 8. **Transição de página com uma pegada de sapinho saltando** — polimento visual barato,
    reforçando a identidade sem precisar de biblioteca nova.
 
@@ -254,11 +265,30 @@ existe (clima real no mood card, cartas do guestbook, Garden Log automático):
    (`escapeRegex()` aplicado antes de montar o filtro `$or`).
 2. ~~`secure`/`sameSite` no cookie de sessão (Alta).~~ Resolvido no commit `2617fde`
    (`trust proxy` habilitado, cookie com `secure: NODE_ENV === 'production'` e `sameSite: 'lax'`).
-3. Corrigir os 10 links `#guestbook` quebrados no menu mobile (Média, mecânico).
-4. `cloudinary.uploader.destroy` ao apagar/trocar imagem (Média).
-5. Rate limit/dedupe em views, ou aceitar que "mais popular" é manipulável (Média).
-6. Validar existência do post em `POST /comments` (Média).
+3. ~~Corrigir os 10 links `#guestbook` quebrados no menu mobile (Média, mecânico).~~ Resolvido no
+   commit `8e9d652`.
+4. ~~`cloudinary.uploader.destroy` ao apagar/trocar imagem (Média).~~ Resolvido no commit `8e9d652`.
+5. ~~Rate limit/dedupe em views (Média).~~ Resolvido no commit `8e9d652` (dedupe por sessão, mesmo
+   padrão do like).
+6. ~~Validar existência do post em `POST /comments` (Média).~~ Resolvido no commit `8e9d652`.
 7. Resto por ordem de interesse — nada aqui é urgente.
+
+---
+
+## Sessão de 19 jul — pendências de baixa prioridade + favicon
+
+Todos os itens de baixa prioridade abertos na auditoria de 17/07 foram resolvidos (ver
+strikethrough acima), exceto o i18n decorativo, deixado de propósito por decisão consciente (é
+tarefa grande o bastante pra merecer sessão própria). `/user-posts` sem paginação (item 13,
+carryover do audit de 14/07) e a regeneração de slug em `POST /editPost/:id` (item 8, possivelmente
+intencional) também seguem em aberto — nenhum dos dois é bug, só limpeza futura.
+
+**Fora do escopo da auditoria, a pedido do usuário:** todos os favicons (`favicon-16x16.png`,
+`favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`,
+`android-chrome-512x512.png`, `favicon.ico`) foram regenerados a partir de
+`public/imagens/UX Design/asset-caneca-sapo.png` (279×279px original), substituindo o antigo
+`favicon_io` em todas as páginas — incluindo `publicar.html`/`editPost.html`, que não tinham
+favicon nenhum antes (ver item 6 da seção "Baixa" de frontend).
 
 **Bônus não listado como prioridade, mas também resolvido:** botões "Pesquisar"/"Filtros"/
 "Limpar" do overlay de busca usavam o estilo padrão do navegador (cinza, quadrado); agora seguem

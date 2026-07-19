@@ -205,6 +205,31 @@
     </div>
 
     <div class="dashboard-recent-posts">
+      <h3>Gerenciar Comentários</h3>
+      <p class="settings-hint">Comentários já aprovados dos posts. Arquive pra tirar da exibição pública sem apagar, ou exclua de vez.</p>
+      <div class="listing-controls">
+        <select id="commentsAdminFilter">
+          <option value="active">Ativos</option>
+          <option value="archived">Arquivados</option>
+          <option value="all">Todos</option>
+        </select>
+      </div>
+      <div id="commentsAdminList"></div>
+      <div class="listing-pagination" id="commentsAdminPagination"></div>
+    </div>
+
+    <!-- Modal de confirmação de exclusão (comentários) -->
+    <div id="commentsDeleteModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <p>Tem certeza que deseja excluir este comentário? Essa ação não pode ser desfeita.</p>
+        <div class="modal-actions">
+          <button id="commentsModalCancel" class="btn-secondary">Cancelar</button>
+          <button id="commentsModalConfirm" class="btn-danger">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-recent-posts">
       <h3>Configurações do site</h3>
       <p class="settings-hint">Edite o "Currently" e "Now Playing" que aparecem na home — sem precisar mexer no código. O card "Mood" agora é automático, baseado no clima.</p>
       <form id="settingsForm" class="settings-form">
@@ -511,6 +536,124 @@
 
   document.getElementById('guestbookAdminFilter').addEventListener('change', () => loadGuestbookAdmin(1));
   loadGuestbookAdmin(1);
+
+  // ── Gerenciar Comentários (já aprovados) ─────────────────
+  let commentsAdminPage = 1;
+
+  function loadCommentsAdmin(page) {
+      commentsAdminPage = page;
+      const status = document.getElementById('commentsAdminFilter').value;
+      const list = document.getElementById('commentsAdminList');
+      list.innerHTML = '<p class="widget-hint">Carregando...</p>';
+      fetch(`${API_BASE}/admin/comments?status=${status}&page=${page}&limit=10`)
+          .then(r => r.json())
+          .then(({ comments, total, limit }) => {
+              if (!comments.length) {
+                  list.innerHTML = '<p class="widget-hint">Nenhum comentário encontrado.</p>';
+                  renderCommentsAdminPagination(0, 0);
+                  return;
+              }
+              list.innerHTML = comments.map(c => {
+                  const date = new Date(c.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+                  const postTitle = c.post ? escapeHtml(c.post.title) : 'Post removido';
+                  const postLink = c.post ? (c.post.slug ? `post.html?slug=${c.post.slug}` : `post.html?id=${c.post._id}`) : '#';
+                  return `<div class="pending-comment-item" data-id="${c._id}">
+                      <div class="pending-comment-meta">
+                          <span class="moderation-type-badge">${c.archived ? '📦 Arquivado' : '💬 Comentário'}</span>
+                          <strong>${escapeHtml(c.author)}</strong>
+                          <time>${date}</time>
+                          <span>em <a href="${postLink}">${postTitle}</a></span>
+                      </div>
+                      <p class="pending-comment-body">${escapeHtml(c.content)}</p>
+                      <div class="pending-comment-actions">
+                          ${c.archived
+                              ? `<button class="btn-approve" onclick="unarchiveCommentEntry('${c._id}', this)">Restaurar</button>`
+                              : `<button class="btn-archive" onclick="archiveCommentEntry('${c._id}', this)">Arquivar</button>`}
+                          <button class="btn-reject" onclick="deleteCommentEntry('${c._id}', this)">Excluir</button>
+                      </div>
+                  </div>`;
+              }).join('');
+              renderCommentsAdminPagination(page, Math.ceil(total / limit));
+          })
+          .catch(() => {
+              list.innerHTML = '<p class="widget-hint">Não foi possível carregar os comentários.</p>';
+          });
+  }
+
+  function renderCommentsAdminPagination(page, totalPages) {
+      const container = document.getElementById('commentsAdminPagination');
+      container.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '← Anterior';
+      prevBtn.disabled = page <= 1;
+      prevBtn.onclick = () => loadCommentsAdmin(page - 1);
+      container.appendChild(prevBtn);
+
+      const info = document.createElement('span');
+      info.textContent = `Página ${page} de ${totalPages}`;
+      container.appendChild(info);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = 'Próxima →';
+      nextBtn.disabled = page >= totalPages;
+      nextBtn.onclick = () => loadCommentsAdmin(page + 1);
+      container.appendChild(nextBtn);
+  }
+
+  function archiveCommentEntry(id, btn) {
+      btn.disabled = true;
+      fetch(`${API_BASE}/admin/comments/${id}/archive`, { method: 'PATCH' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) loadCommentsAdmin(commentsAdminPage);
+              else btn.disabled = false;
+          })
+          .catch(() => { btn.disabled = false; });
+  }
+
+  function unarchiveCommentEntry(id, btn) {
+      btn.disabled = true;
+      fetch(`${API_BASE}/admin/comments/${id}/unarchive`, { method: 'PATCH' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) loadCommentsAdmin(commentsAdminPage);
+              else btn.disabled = false;
+          })
+          .catch(() => { btn.disabled = false; });
+  }
+
+  function commentsConfirmDelete() {
+      return new Promise(resolve => {
+          const modal = document.getElementById('commentsDeleteModal');
+          modal.style.display = 'flex';
+          document.getElementById('commentsModalConfirm').onclick = () => {
+              modal.style.display = 'none';
+              resolve(true);
+          };
+          document.getElementById('commentsModalCancel').onclick = () => {
+              modal.style.display = 'none';
+              resolve(false);
+          };
+      });
+  }
+
+  async function deleteCommentEntry(id, btn) {
+      const confirmed = await commentsConfirmDelete();
+      if (!confirmed) return;
+      btn.disabled = true;
+      fetch(`${API_BASE}/admin/comments/${id}`, { method: 'DELETE' })
+          .then(r => r.json())
+          .then(data => {
+              if (data.success) loadCommentsAdmin(commentsAdminPage);
+              else btn.disabled = false;
+          })
+          .catch(() => { btn.disabled = false; });
+  }
+
+  document.getElementById('commentsAdminFilter').addEventListener('change', () => loadCommentsAdmin(1));
+  loadCommentsAdmin(1);
 
   // ── Configurações do site ────────────────────────────────
   function loadSettings() {

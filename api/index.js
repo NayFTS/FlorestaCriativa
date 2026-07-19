@@ -1,6 +1,10 @@
 require('dotenv').config();
 
-const express = require('express'); 
+if (!process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET não está configurada — defina a variável de ambiente antes de subir o servidor.');
+}
+
+const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -108,7 +112,7 @@ app.use((req, res, next) => {
 
 // Configuração de sessão
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback_secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -146,7 +150,8 @@ const Comment = mongoose.model('Comment', new mongoose.Schema({
     author: { type: String, required: true, maxlength: 60 },
     content: { type: String, required: true, maxlength: 1000 },
     createdAt: { type: Date, default: Date.now },
-    approved: { type: Boolean, default: false }
+    approved: { type: Boolean, default: false },
+    archived: { type: Boolean, default: false }
 }));
 
 const GuestbookEntry = mongoose.model('GuestbookEntry', new mongoose.Schema({
@@ -201,8 +206,8 @@ async function getSettingsWithSpotifyToken() {
 }
 
 async function isSpotifyConnected() {
-    const s = await SiteSettings.findOne().select('+spotifyRefreshToken').lean();
-    return !!(s && s.spotifyRefreshToken);
+    const settings = await getSettingsWithSpotifyToken();
+    return !!settings.spotifyRefreshToken;
 }
 
 // Token de acesso do Spotify expira em ~1h; cacheado em memória entre requisições
@@ -601,7 +606,7 @@ app.get('/recent-posts', async (req, res) => {
 
 app.get('/search', async (req, res) => {
     try {
-        const { q, category, startDate, endDate } = req.query;
+        const { q, category, startDate, endDate, page, limit } = req.query;
 
         // Cria o filtro de busca
         const filter = {};
@@ -613,8 +618,8 @@ app.get('/search', async (req, res) => {
             ];
         }
         if (category) {
-            const categories = category.split(','); // Converte para array
-            filter.categories = { $in: categories }; // Filtra pelas categorias
+            const categories = category.split(',').map(c => c.trim()).filter(Boolean); // Converte para array
+            if (categories.length) filter.categories = { $in: categories }; // Filtra pelas categorias
         }
         if (startDate || endDate) {
             filter.publish_date = {};
@@ -623,6 +628,18 @@ app.get('/search', async (req, res) => {
         }
 
         filter.status = { $ne: 'draft' };
+
+        if (page && limit) {
+            const pageNum = Math.max(1, parseInt(page) || 1);
+            const limitNum = Math.min(50, parseInt(limit) || 5);
+            const skip = (pageNum - 1) * limitNum;
+            const [posts, total] = await Promise.all([
+                Post.find(filter).skip(skip).limit(limitNum),
+                Post.countDocuments(filter)
+            ]);
+            return res.json({ posts, total });
+        }
+
         const posts = await Post.find(filter);
         res.json(posts);
     } catch (err) {
@@ -792,12 +809,43 @@ app.get('/comments/:postId', async (req, res) => {
 
 app.get('/admin/comments/pending', requireAuth, async (req, res) => {
     try {
-        const comments = await Comment.find({ approved: false })
+        const { page, limit } = req.query;
+        const filter = { approved: false };
+        if (page && limit) {
+            const pageNum = Math.max(1, parseInt(page) || 1);
+            const limitNum = Math.min(50, parseInt(limit) || 20);
+            const skip = (pageNum - 1) * limitNum;
+            const [comments, total] = await Promise.all([
+                Comment.find(filter).populate('post', 'title slug _id').sort({ createdAt: -1 }).skip(skip).limit(limitNum),
+                Comment.countDocuments(filter)
+            ]);
+            return res.json({ comments, total, page: pageNum, limit: limitNum });
+        }
+        const comments = await Comment.find(filter)
             .populate('post', 'title slug _id')
             .sort({ createdAt: -1 });
         res.json(comments);
     } catch (err) {
         res.status(500).json({ message: 'Erro ao buscar comentários pendentes' });
+    }
+});
+
+// Lista os comentários já aprovados (ativos e arquivados) pra gestão no dashboard
+app.get('/admin/comments', requireAuth, async (req, res) => {
+    try {
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+        const skip = (page - 1) * limit;
+        const filter = { approved: true };
+        if (req.query.status === 'archived') filter.archived = true;
+        else if (req.query.status === 'active') filter.archived = { $ne: true };
+        const [comments, total] = await Promise.all([
+            Comment.find(filter).populate('post', 'title slug _id').sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Comment.countDocuments(filter),
+        ]);
+        res.json({ comments, total, page, limit });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar comentários' });
     }
 });
 
@@ -814,6 +862,28 @@ app.patch('/admin/comments/:id/approve', requireAuth, async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ message: 'Erro ao aprovar comentário' });
+    }
+});
+
+app.patch('/admin/comments/:id/archive', requireAuth, async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Comentário inválido' });
+        const comment = await Comment.findByIdAndUpdate(req.params.id, { archived: true }, { new: true });
+        if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao arquivar comentário' });
+    }
+});
+
+app.patch('/admin/comments/:id/unarchive', requireAuth, async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Comentário inválido' });
+        const comment = await Comment.findByIdAndUpdate(req.params.id, { archived: false }, { new: true });
+        if (!comment) return res.status(404).json({ message: 'Comentário não encontrado' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao restaurar comentário' });
     }
 });
 
@@ -871,7 +941,19 @@ app.get('/guestbook', async (req, res) => {
 
 app.get('/admin/guestbook/pending', requireAuth, async (req, res) => {
     try {
-        const entries = await GuestbookEntry.find({ approved: false }).sort({ createdAt: -1 });
+        const { page, limit } = req.query;
+        const filter = { approved: false };
+        if (page && limit) {
+            const pageNum = Math.max(1, parseInt(page) || 1);
+            const limitNum = Math.min(50, parseInt(limit) || 20);
+            const skip = (pageNum - 1) * limitNum;
+            const [entries, total] = await Promise.all([
+                GuestbookEntry.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limitNum),
+                GuestbookEntry.countDocuments(filter)
+            ]);
+            return res.json({ entries, total, page: pageNum, limit: limitNum });
+        }
+        const entries = await GuestbookEntry.find(filter).sort({ createdAt: -1 });
         res.json(entries);
     } catch (err) {
         res.status(500).json({ message: 'Erro ao buscar mensagens pendentes' });

@@ -213,11 +213,6 @@ a:hover {
     display: block;
 }
 
-.topbar-sign img.topbar-sign-night { display: none; }
-
-[data-theme="dark"] .topbar-sign img.topbar-sign-day { display: none; }
-[data-theme="dark"] .topbar-sign img.topbar-sign-night { display: block; }
-
 .corner-vine {
     position: absolute;
     width: 110px;
@@ -422,9 +417,14 @@ body.page-public .site-main {
     display: block;
 }
 
+/* Alternância dia/noite dos logos (topbar-sign e sidebar-logo), classe utilitária única */
+.topbar-sign img.topbar-sign-night,
 .sidebar-logo img.sidebar-logo-night { display: none; }
 
+[data-theme="dark"] .topbar-sign img.topbar-sign-day,
 [data-theme="dark"] .sidebar-logo img.sidebar-logo-day { display: none; }
+
+[data-theme="dark"] .topbar-sign img.topbar-sign-night,
 [data-theme="dark"] .sidebar-logo img.sidebar-logo-night { display: block; }
 
 .sidebar-nav {
@@ -774,11 +774,6 @@ body.page-public .site-main {
         display: block;
     }
 
-    .mobile-topbar-sign img.mobile-topbar-sign-night { display: none; }
-
-    [data-theme="dark"] .mobile-topbar-sign img.mobile-topbar-sign-day { display: none; }
-    [data-theme="dark"] .mobile-topbar-sign img.mobile-topbar-sign-night { display: block; }
-
     .mobile-topbar-search {
         display: flex;
         align-items: center;
@@ -937,8 +932,14 @@ body.page-public .site-main {
         border-radius: 50%;
     }
 
-    [data-theme="dark"] .bottom-nav-center img.bottom-nav-center-day { display: none; }
+    /* Alternância dia/noite dos logos mobile (mobile-topbar-sign e bottom-nav-center), classe utilitária única */
+    .mobile-topbar-sign img.mobile-topbar-sign-night,
     .bottom-nav-center img.bottom-nav-center-night { display: none; }
+
+    [data-theme="dark"] .mobile-topbar-sign img.mobile-topbar-sign-day,
+    [data-theme="dark"] .bottom-nav-center img.bottom-nav-center-day { display: none; }
+
+    [data-theme="dark"] .mobile-topbar-sign img.mobile-topbar-sign-night,
     [data-theme="dark"] .bottom-nav-center img.bottom-nav-center-night { display: block; }
 
     .bottom-nav-center:hover { background: var(--color-accent-dark); }
@@ -1366,6 +1367,7 @@ input.input-error, input.input-error:focus {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 0;
 }
 
 .home-widgets {
@@ -1373,6 +1375,7 @@ input.input-error, input.input-error:focus {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 0;
 }
 
 #guestbook.container {
@@ -1444,6 +1447,13 @@ input.input-error, input.input-error:focus {
     height: 36px;
     object-fit: contain;
     flex-shrink: 0;
+}
+
+/* Sem isso, o item flex não encolhe abaixo da largura do texto sem quebra
+   (comportamento padrão de flexbox) e estoura a largura em telas estreitas. */
+.quicklink-text {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .quicklink-text strong {
@@ -1740,6 +1750,7 @@ input.input-error, input.input-error:focus {
         text-align: center;
         gap: 6px;
         padding: 12px 6px;
+        min-width: 0;
     }
 
     /* Featured e Garden Log só aparecem no desktop; Now Playing fica sozinho, full-width */
@@ -2292,19 +2303,6 @@ input.input-error, input.input-error:focus {
 
 .back-button-container button:active {
     transform: translateY(0); /* Retira o efeito de elevação ao clicar */
-}
-
-
-#registerLink {
-    display: inline-block;
-    margin-top: 10px;
-    color: var(--color-accent);
-    font-weight: bold;
-    text-decoration: none;
-}
-
-#registerLink:hover {
-    text-decoration: underline;
 }
 
 
@@ -3578,7 +3576,7 @@ select {
 .lang-toggle-btn:hover { background-color: var(--color-surface-alt); }
 
 /* Meta info do post */
-.post-meta, .post-categories {
+.post-meta {
     font-size: 0.9em;
     color: var(--color-text-secondary);
     margin: 6px 0;
@@ -3893,15 +3891,6 @@ select {
     header { padding: 20px 12px; }
     header h1 { font-size: 1.3em; }
     header p  { font-size: 0.85em; }
-
-    /* Hambúrguer: área de toque 44px mínimo */
-    .hamburger {
-        min-height: 44px;
-        min-width: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
 
     /* Search overlay: não descer demais em telas curtas/landscape */
     .search-overlay { padding-top: 16px; }
@@ -4496,6 +4485,9 @@ select {
 
 .post-gallery-grid {
     display: grid;
+    /* minmax(0, 1fr), não só 1fr: sem o mínimo explícito, a coluna não encolhe
+       abaixo do tamanho natural da <img> dentro do thumb (que pode ter milhares
+       de px), estourando a largura da página inteira em posts com galeria. */
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
@@ -4678,12 +4670,6 @@ select {
     font-weight: 600;
     margin-bottom: 16px;
     color: var(--color-text);
-}
-
-.no-comments {
-    color: var(--color-text-secondary);
-    font-style: italic;
-    margin-bottom: 24px;
 }
 
 .comment-item {
