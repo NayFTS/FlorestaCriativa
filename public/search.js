@@ -693,10 +693,12 @@ function toggleGamePopup(e) {
     if (isOpen) {
         popup.classList.remove('open');
         overlay.classList.remove('open');
+        document.body.classList.remove('game-popup-active');
         setTimeout(() => { iframe.src = ''; }, 300);
     } else {
         iframe.src = 'jogo-sapinho/index.html';
         popup.classList.add('open');
         overlay.classList.add('open');
+        document.body.classList.add('game-popup-active');
     }
 }

@@ -4239,6 +4239,14 @@ select {
    altura) — o overlay e o card param ANTES do bottom-nav, que segue visível e
    clicável pra fechar o jogo clicando no mesmo botão de novo. Inerte em telas onde o
    botão que dispara não existe (desktop), então não precisa de media query própria. */
+/* .mobile-topbar tem z-index maior que o popup (pra ficar sticky por cima do
+   conteúdo normal da página), então com o jogo aberto ela precisa sumir pra não
+   tampar a parte de cima do jogo — só o bottom-nav continua visível. */
+body.game-popup-active .mobile-topbar {
+    display: none;
+}
+
+
 .game-popup-overlay {
     position: fixed;
     inset: 0;
