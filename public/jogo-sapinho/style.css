@@ -1,0 +1,233 @@
+:root {
+    --color-sky-top: #cdeffd;
+    --color-sky-bottom: #eafff0;
+    --color-tongue: #f4a3ad;
+    --color-hud-bg: rgba(255, 255, 255, 0.85);
+    --color-text: #2c3e2d;
+    /* Espera assets/fundo-dia.png (1080x2340, retrato, vitória-régia nos ~20-25% inferiores) */
+    --bg-scene: url('assets/fundo-dia.png');
+    --start-banner: url('assets/game-start-dia.png');
+    --gameover-banner: url('assets/game-over-dia.png');
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-sky-top: #16212b;
+        --color-sky-bottom: #17261c;
+        --color-hud-bg: rgba(20, 24, 20, 0.75);
+        --color-text: #eaf5ea;
+        /* Espera assets/fundo-noite.png, mesma composição da versão dia */
+        --bg-scene: url('assets/fundo-noite.png');
+        --start-banner: url('assets/game-start-noite.png');
+        --gameover-banner: url('assets/game-over-noite.png');
+    }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.game {
+    position: relative;
+    width: 100vw;
+    height: 100dvh;
+    /* Camadas: fundo-dia/noite.png por cima, gradiente por baixo — se o arquivo não
+       existir ainda (ou não carregar), o navegador só mostra o gradiente sozinho. */
+    background: var(--bg-scene) center bottom / cover no-repeat,
+                linear-gradient(to bottom, var(--color-sky-top), var(--color-sky-bottom));
+}
+
+.hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+}
+
+.hud-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-hud-bg);
+    color: var(--color-text);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.hud-fly-icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Fallback em emoji enquanto assets/mosca.png não carregar (attachSpriteFallback no script.js) */
+span.hud-fly-icon {
+    width: auto;
+    height: auto;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.sky {
+    position: absolute;
+    inset: 0;
+    bottom: 22%;
+}
+
+.fly {
+    position: absolute;
+    background: none;
+    border: none;
+    padding: 10px;
+    margin: -10px;
+    cursor: pointer;
+    animation: fly-wobble 1.4s ease-in-out infinite;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Espera assets/mosca.png (PNG transparente, canvas quadrado) */
+.fly-sprite {
+    display: block;
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+}
+
+/* Fallback em emoji enquanto o arquivo não existir (attachSpriteFallback no script.js) */
+span.fly-sprite {
+    width: auto;
+    height: auto;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.fly.caught {
+    animation: none;
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+}
+
+@keyframes fly-wobble {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(4px, -3px); }
+    50% { transform: translate(-3px, 2px); }
+    75% { transform: translate(3px, 3px); }
+}
+
+.frog {
+    position: absolute;
+    /* 52vw = onde a superfície da vitória-régia cai em fundo-dia/noite.png (medido por
+       pixel: topo do "prato" a ~76% da altura da imagem). Usa vw, não %, porque o fundo
+       escala pela LARGURA da tela (background-size: cover, center bottom) — só assim o
+       sapo acompanha a folha em qualquer proporção de celular. */
+    bottom: 52vw;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+/* Espera assets/sapo-idle.png (PNG transparente, canvas quadrado). Largura em vw pra
+   acompanhar a escala da vitória-régia (~91.5vw de largura no fundo) — o sapo fica com
+   uns 45% da largura da folha. */
+img.frog-body {
+    display: block;
+    width: clamp(130px, 41vw, 220px);
+    height: auto;
+}
+
+/* Fallback em emoji enquanto o arquivo não existir (attachSpriteFallback no script.js) */
+span.frog-body {
+    font-size: clamp(3.5rem, 18vw, 5.5rem);
+    line-height: 1;
+    display: block;
+}
+
+.tongue {
+    position: absolute;
+    top: 36%; /* posição da boca em sapo-idle.png/sapo-boca-aberta.png, mesmo valor usado no script.js */
+    left: 50%;
+    width: 6px;
+    height: 0;
+    background: var(--color-tongue);
+    border-radius: 4px;
+    transform-origin: top center;
+    transform: translateX(-50%) rotate(0deg);
+    transition: height 0.12s ease-out, transform 0.12s ease-out;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 24px;
+}
+
+.overlay[hidden] { display: none; }
+
+.overlay-card {
+    background: var(--color-hud-bg);
+    color: var(--color-text);
+    border-radius: 20px;
+    padding: 28px 24px;
+    max-width: 320px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Espera assets/game-start-dia|noite.png e assets/game-over-dia|noite.png (1024x576) */
+.overlay-banner {
+    width: 100%;
+    aspect-ratio: 1024 / 576;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 0 8px;
+}
+
+.overlay-banner--start { background-image: var(--start-banner); }
+.overlay-banner--gameover { background-image: var(--gameover-banner); }
+
+.overlay-card p {
+    margin: 0 0 20px;
+    font-size: 1rem;
+    opacity: 0.85;
+}
+
+.overlay-btn {
+    border: none;
+    background: var(--color-tongue);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.overlay-btn:active { transform: scale(0.96); }

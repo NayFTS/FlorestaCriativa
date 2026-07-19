@@ -1,0 +1,180 @@
+(function () {
+    const sky = document.getElementById('sky');
+    const frog = document.getElementById('frog');
+    const tongue = document.getElementById('tongue');
+    const scoreEl = document.getElementById('score');
+    const frogBody = document.getElementById('frogBody');
+    const hudFlyIcon = document.getElementById('hudFlyIcon');
+    const timerEl = document.getElementById('hudTimer');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const finalScoreEl = document.getElementById('finalScore');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    const MAX_FLIES = 4;
+    const SPAWN_MARGIN = 30;
+    const GAME_DURATION = 60;
+    const FROG_IDLE_SRC = 'assets/sapo-idle.png';
+    const FROG_OPEN_SRC = 'assets/sapo-boca-aberta.png';
+    const MOUTH_TOP_RATIO = 0.36; // posição da boca na arte (mesmo valor do "top" da .tongue no style.css)
+
+    let score = 0;
+    let timeLeft = GAME_DURATION;
+    let isPlaying = false;
+    let mouthTimeoutId = null;
+    let spawnTimeoutId = null;
+    let countdownIntervalId = null;
+    const flies = new Set();
+
+    function randRange(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    // Troca o <img> por um <span> com o emoji equivalente se o arquivo de sprite
+    // ainda não existir em assets/ — assim o jogo continua jogável enquanto a arte
+    // definitiva não chega, sem precisar mexer em mais nada depois.
+    function attachSpriteFallback(imgEl, emoji) {
+        imgEl.addEventListener('error', () => {
+            const span = document.createElement('span');
+            span.className = imgEl.className;
+            span.textContent = emoji;
+            span.setAttribute('role', 'img');
+            span.setAttribute('aria-label', imgEl.alt || '');
+            imgEl.replaceWith(span);
+        }, { once: true });
+    }
+
+    attachSpriteFallback(frogBody, '🐸');
+    attachSpriteFallback(hudFlyIcon, '🪰');
+
+    function spawnFly() {
+        const rect = sky.getBoundingClientRect();
+        const x = randRange(SPAWN_MARGIN, Math.max(SPAWN_MARGIN, rect.width - SPAWN_MARGIN));
+        const y = randRange(SPAWN_MARGIN, Math.max(SPAWN_MARGIN, rect.height - SPAWN_MARGIN));
+
+        const fly = document.createElement('button');
+        fly.type = 'button';
+        fly.className = 'fly';
+        fly.setAttribute('aria-label', 'Mosca');
+        fly.style.left = x + 'px';
+        fly.style.top = y + 'px';
+
+        const flySprite = document.createElement('img');
+        flySprite.className = 'fly-sprite';
+        flySprite.src = 'assets/mosca.png';
+        flySprite.alt = '';
+        attachSpriteFallback(flySprite, '🪰');
+        fly.appendChild(flySprite);
+
+        const timeoutId = setTimeout(() => removeFly(fly), randRange(3500, 5500));
+        fly.addEventListener('click', () => catchFly(fly, timeoutId));
+
+        sky.appendChild(fly);
+        flies.add(fly);
+    }
+
+    function removeFly(fly) {
+        if (!flies.has(fly)) return;
+        flies.delete(fly);
+        fly.remove();
+    }
+
+    function clearAllFlies() {
+        flies.forEach(fly => fly.remove());
+        flies.clear();
+    }
+
+    function catchFly(fly, timeoutId) {
+        if (!isPlaying || fly.classList.contains('caught')) return;
+        clearTimeout(timeoutId);
+        fly.classList.add('caught');
+
+        shootTongue(fly);
+        bounceFrogMouth();
+
+        score += 1;
+        scoreEl.textContent = score;
+
+        setTimeout(() => removeFly(fly), 150);
+    }
+
+    // Abre a boca (assets/sapo-boca-aberta.png) durante a mordida e volta pro idle
+    // depois — só troca se o sprite estiver carregado (não faz nada no fallback em emoji).
+    function bounceFrogMouth() {
+        if (frogBody.tagName !== 'IMG') return;
+        frogBody.src = FROG_OPEN_SRC;
+        clearTimeout(mouthTimeoutId);
+        mouthTimeoutId = setTimeout(() => {
+            frogBody.src = FROG_IDLE_SRC;
+        }, 220);
+    }
+
+    // Língua aponta pra baixo por padrão (rotate 0deg); a fórmula converte o vetor
+    // até a mosca pro ângulo de rotação equivalente nesse sistema (CSS rotate() é
+    // horário em coordenadas de tela, por isso o sinal invertido em dx).
+    function shootTongue(fly) {
+        const flyRect = fly.getBoundingClientRect();
+        const frogRect = frog.getBoundingClientRect();
+
+        const originX = frogRect.left + frogRect.width / 2;
+        const originY = frogRect.top + frogRect.height * MOUTH_TOP_RATIO;
+
+        const targetX = flyRect.left + flyRect.width / 2;
+        const targetY = flyRect.top + flyRect.height / 2;
+
+        const dx = targetX - originX;
+        const dy = targetY - originY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(-dx, dy) * (180 / Math.PI);
+
+        tongue.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+        tongue.style.height = distance + 'px';
+
+        setTimeout(() => {
+            tongue.style.height = '0px';
+        }, 140);
+    }
+
+    function spawnLoop() {
+        if (!isPlaying) return;
+        if (flies.size < MAX_FLIES) spawnFly();
+        spawnTimeoutId = setTimeout(spawnLoop, randRange(900, 1600));
+    }
+
+    function tickTimer() {
+        timeLeft -= 1;
+        timerEl.textContent = `⏱ ${timeLeft}`;
+        if (timeLeft <= 0) endGame();
+    }
+
+    function startGame() {
+        score = 0;
+        timeLeft = GAME_DURATION;
+        scoreEl.textContent = score;
+        timerEl.textContent = `⏱ ${timeLeft}`;
+        clearAllFlies();
+        clearTimeout(spawnTimeoutId);
+        clearInterval(countdownIntervalId);
+
+        startOverlay.hidden = true;
+        gameOverOverlay.hidden = true;
+        isPlaying = true;
+
+        spawnLoop();
+        countdownIntervalId = setInterval(tickTimer, 1000);
+    }
+
+    function endGame() {
+        isPlaying = false;
+        clearTimeout(spawnTimeoutId);
+        clearInterval(countdownIntervalId);
+        clearAllFlies();
+
+        finalScoreEl.textContent = score;
+        gameOverOverlay.hidden = false;
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+})();

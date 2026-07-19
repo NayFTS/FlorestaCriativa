@@ -678,3 +678,25 @@ function initPostListing(pageUrl, containerId) {
 
     render();
 }
+
+// Pop-up do jogo do sapinho, aberto pelo botão central do bottom-nav mobile.
+// Fica sobreposto ao conteúdo mas para ANTES do bottom-nav (que segue clicável, pra
+// dar pra fechar clicando no mesmo botão de novo).
+function toggleGamePopup(e) {
+    if (e) e.preventDefault();
+    const popup = document.getElementById('gamePopup');
+    const overlay = document.getElementById('gamePopupOverlay');
+    const iframe = document.getElementById('gamePopupIframe');
+    if (!popup || !overlay || !iframe) return;
+
+    const isOpen = popup.classList.contains('open');
+    if (isOpen) {
+        popup.classList.remove('open');
+        overlay.classList.remove('open');
+        setTimeout(() => { iframe.src = ''; }, 300);
+    } else {
+        iframe.src = 'jogo-sapinho/index.html';
+        popup.classList.add('open');
+        overlay.classList.add('open');
+    }
+}

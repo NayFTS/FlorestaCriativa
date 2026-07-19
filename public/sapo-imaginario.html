@@ -116,7 +116,7 @@
       <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
         <a href="index.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-home.png" alt=""></span>Home</a>
         <a href="verde-inspiracao.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-arte-paleta.png" alt=""></span>Blog</a>
-        <a href="index.html" class="bottom-nav-center" aria-label="Ir para a Home"><img src="imagens/decor/bottom-button-navbar.png" alt="" class="bottom-nav-center-day"><img src="imagens/decor/bottom-button-navbar-noturno.png" alt="" class="bottom-nav-center-night"></a>
+        <a href="jogo-sapinho/index.html" target="_blank" rel="noopener" class="bottom-nav-center" aria-label="Jogar: Sapo e a Mosca" onclick="toggleGamePopup(event)"><img src="imagens/decor/bottom-button-navbar.png" alt="" class="bottom-nav-center-day"><img src="imagens/decor/bottom-button-navbar-noturno.png" alt="" class="bottom-nav-center-night"></a>
         <a href="sapo-imaginario.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-projetos-codigo.png" alt=""></span>Projetos</a>
         <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-blog-livro.png" alt=""></span>Escrita</a>
       </div>
@@ -454,6 +454,12 @@
     </script>
 
       </main>
+    </div>
+
+    <!-- Pop-up do jogo do sapinho (botão central do bottom-nav mobile) -->
+    <div id="gamePopupOverlay" class="game-popup-overlay" onclick="toggleGamePopup()"></div>
+    <div id="gamePopup" class="game-popup" role="dialog" aria-modal="true" aria-label="Jogo: Sapo e a Mosca">
+      <iframe id="gamePopupIframe" src="" title="Jogo do Sapinho"></iframe>
     </div>
   </body>
 </html>
