@@ -1888,11 +1888,7 @@ input.input-error, input.input-error:focus {
     position: relative;
     overflow: visible;
     padding: 8px 12px;
-    max-width: 420px;
-}
-
-@media (min-width: 769px) {
-    .guestbook-card { max-width: 640px; }
+    width: 100%;
 }
 
 .guestbook-card h2 {
@@ -1908,8 +1904,8 @@ input.input-error, input.input-error:focus {
 
 .guestbook-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: minmax(220px, 360px) 1fr;
+    gap: 16px;
     align-items: start;
 }
 
