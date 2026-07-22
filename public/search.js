@@ -679,6 +679,68 @@ function initPostListing(pageUrl, containerId) {
     render();
 }
 
+// Botão "envelope" na sidebar/drawer que abre um mini formulário de e-mail
+// (substitui o antigo link direto pro /api/feed.xml, que expunha XML cru pro visitante).
+function toggleSubscribeForm(btn) {
+    const popover = btn.closest('.sidebar-social').querySelector('.subscribe-popover');
+    if (!popover) return;
+    const opening = !popover.classList.contains('open');
+
+    document.querySelectorAll('.subscribe-popover.open').forEach(p => {
+        if (p !== popover) p.classList.remove('open');
+    });
+
+    popover.classList.toggle('open', opening);
+    btn.setAttribute('aria-expanded', String(opening));
+    if (opening) setTimeout(() => popover.querySelector('input[type="email"]')?.focus(), 50);
+}
+
+document.addEventListener('click', (e) => {
+    document.querySelectorAll('.subscribe-popover.open').forEach(popover => {
+        if (popover.contains(e.target) || popover.previousElementSibling?.contains(e.target)) return;
+        popover.classList.remove('open');
+    });
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.subscribe-popover.open').forEach(p => p.classList.remove('open'));
+});
+
+function submitSubscribeForm(event, form) {
+    event.preventDefault();
+    const input = form.querySelector('input[type="email"]');
+    const feedback = form.querySelector('.subscribe-feedback');
+    const btn = form.querySelector('button[type="submit"]');
+    const email = input.value.trim();
+    if (!email) return false;
+
+    btn.disabled = true;
+    feedback.textContent = '';
+
+    fetch(`${API_BASE}/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+            btn.disabled = false;
+            if (ok) {
+                feedback.textContent = data.message;
+                form.reset();
+            } else {
+                feedback.textContent = data.errors?.[0]?.msg || data.message || 'Erro ao se inscrever.';
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            feedback.textContent = 'Erro ao se inscrever.';
+        });
+
+    return false;
+}
+
 // Pop-up do jogo do sapinho, aberto pelo botão central do bottom-nav mobile.
 // Fica sobreposto ao conteúdo mas para ANTES do bottom-nav (que segue clicável, pra
 // dar pra fechar clicando no mesmo botão de novo).

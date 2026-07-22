@@ -638,21 +638,7 @@ body.page-public .site-main {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding-top: 24px;
-}
-
-.sidebar-footer::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 88%;
-    height: 20px;
-    background-image: url('imagens/decor/divisor-coracao-setas-folha.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    padding-top: 8px;
 }
 
 .sidebar-footer .login-link {
@@ -683,7 +669,10 @@ body.page-public .site-main {
 .sidebar-social {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+    width: 100%;
+    position: relative;
 }
 
 .sidebar-social a {
@@ -698,6 +687,85 @@ body.page-public .site-main {
 .sidebar-social a:hover { transform: scale(1.15); }
 
 .sidebar-social-drawer { margin-top: 10px; }
+
+.icon-github {
+    width: 34px;
+    height: 34px;
+    display: block;
+}
+
+.subscribe-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.subscribe-btn:hover { transform: scale(1.15); }
+
+.subscribe-btn-icon {
+    width: 34px;
+    height: 34px;
+    display: block;
+}
+
+.subscribe-popover {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 210px;
+    max-width: calc(100vw - 40px);
+    background: var(--color-surface);
+    border: var(--border-card-width) solid var(--color-border);
+    border-radius: var(--radius-card-sm);
+    padding: 12px;
+    box-shadow: var(--shadow-card-hover);
+    z-index: 20;
+}
+
+.subscribe-popover.open { display: flex; }
+
+.subscribe-popover-title {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.subscribe-popover input {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    border: var(--border-card-width) solid var(--color-border);
+    border-radius: var(--radius-card-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+.subscribe-popover button[type="submit"] {
+    align-self: flex-start;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+}
+
+.subscribe-popover button[type="submit"]:hover { background: var(--color-accent-dark); }
+.subscribe-popover button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+
+.subscribe-feedback {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-text-soft);
+    min-height: 1.1em;
+}
 
 .mobile-topbar, .drawer-overlay, .nav-drawer, .bottom-nav { display: none; }
 

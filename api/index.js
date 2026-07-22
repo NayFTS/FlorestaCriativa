@@ -165,6 +165,11 @@ const GuestbookEntry = mongoose.model('GuestbookEntry', new mongoose.Schema({
     archived: { type: Boolean, default: false }
 }));
 
+const Subscriber = mongoose.model('Subscriber', new mongoose.Schema({
+    email: { type: String, required: true, unique: true, maxlength: 200 },
+    createdAt: { type: Date, default: Date.now }
+}));
+
 const SiteSettings = mongoose.model('SiteSettings', new mongoose.Schema({
     currently: {
         type: [String],
@@ -307,6 +312,14 @@ const likeLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 30,
     message: { message: 'Muitas curtidas. Tente novamente em 1 hora.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const subscribeLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: { message: 'Muitas tentativas de inscrição. Tente novamente em 1 hora.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -860,6 +873,23 @@ ${items}
     } catch (err) {
         console.error('Erro ao gerar feed RSS:', err);
         res.status(500).send('Erro ao gerar feed');
+    }
+});
+
+// Inscrição por e-mail
+app.post('/subscribe', subscribeLimiter, [
+    body('email').trim().isEmail().withMessage('E-mail inválido')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+        const email = req.body.email.trim().toLowerCase();
+        const exists = await Subscriber.exists({ email });
+        if (exists) return res.json({ success: true, message: 'Você já está inscrito(a)!' });
+        await Subscriber.create({ email });
+        res.json({ success: true, message: 'Inscrição confirmada! Obrigado por acompanhar 🐸' });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao salvar inscrição' });
     }
 });
 
