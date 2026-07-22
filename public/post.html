@@ -497,6 +497,56 @@ function fetchPost() {
                 `;
             }
 
+            if (data.postType === 'story_index') {
+                const chapterListEl = document.createElement('div');
+                chapterListEl.className = 'story-chapter-list';
+                chapterListEl.innerHTML = '<p class="widget-hint">Carregando capítulos...</p>';
+                postContainer.insertBefore(chapterListEl, postContainer.querySelector('.post-actions'));
+                fetch(`${API_BASE}/posts?storyId=${data._id}`)
+                    .then(r => r.json())
+                    .then(chapters => {
+                        const list = (Array.isArray(chapters) ? chapters : [])
+                            .slice().sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+                        chapterListEl.innerHTML = list.length
+                            ? `<h3>Capítulos</h3><ol class="chapter-links">${list.map(c => {
+                                  const link = c.slug ? `post.html?slug=${c.slug}` : `post.html?id=${c._id}`;
+                                  const label = c.chapterNumber != null ? `Capítulo ${c.chapterNumber} — ${escapeHtml(c.title)}` : escapeHtml(c.title);
+                                  return `<li><a href="${link}">${label}</a></li>`;
+                              }).join('')}</ol>`
+                            : '<p class="widget-hint">Nenhum capítulo publicado ainda.</p>';
+                    })
+                    .catch(() => { chapterListEl.innerHTML = ''; });
+            }
+
+            if (data.postType === 'chapter') {
+                const chapterNavEl = document.createElement('div');
+                chapterNavEl.className = 'chapter-nav';
+                postContainer.insertBefore(chapterNavEl, postContainer.querySelector('.post-actions'));
+
+                Promise.all([
+                    fetch(`${API_BASE}/posts?storyId=${data.storyId}`).then(r => r.json()),
+                    fetch(`${API_BASE}/posts/${data.storyId}/brief`).then(r => r.ok ? r.json() : null).catch(() => null)
+                ]).then(([siblingsRaw, story]) => {
+                    const siblings = (Array.isArray(siblingsRaw) ? siblingsRaw : [])
+                        .slice().sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+                    // Navega pelo índice no array ordenado, não por aritmética sobre chapterNumber —
+                    // assim não quebra se houver buracos ou duplicatas na numeração.
+                    const idx = siblings.findIndex(c => String(c._id) === String(data._id));
+                    const prev = idx > 0 ? siblings[idx - 1] : null;
+                    const next = (idx >= 0 && idx < siblings.length - 1) ? siblings[idx + 1] : null;
+                    const chapterLink = c => c.slug ? `post.html?slug=${c.slug}` : `post.html?id=${c._id}`;
+                    const storyLink = story ? (story.slug ? `post.html?slug=${story.slug}` : `post.html?id=${story._id}`) : null;
+
+                    chapterNavEl.innerHTML = `
+                        <div class="chapter-nav-row">
+                            ${prev ? `<a class="chapter-nav-link chapter-nav-prev" href="${chapterLink(prev)}">← Capítulo Anterior</a>` : '<span></span>'}
+                            ${storyLink ? `<a class="chapter-nav-link chapter-nav-index" href="${storyLink}">Índice: ${escapeHtml(story.title)}</a>` : '<span></span>'}
+                            ${next ? `<a class="chapter-nav-link chapter-nav-next" href="${chapterLink(next)}">Próximo Capítulo →</a>` : '<span></span>'}
+                        </div>
+                    `;
+                }).catch(() => {});
+            }
+
             const galleryEl = buildGallery(gallery);
             if (galleryEl) {
                 const actions = postContainer.querySelector('.post-actions');

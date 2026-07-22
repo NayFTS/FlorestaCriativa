@@ -177,13 +177,33 @@
       <input type="hidden" id="galleryKeep" name="gallery_keep" value="[]">
       <br>
 
-      <label for="url">Página de destino:</label>
-      <select id="url" name="url" required>
-        <option value="">escolha uma das opções</option>
-        <option value="verde-inspiracao.html">Hobbies, animes, jogos e leituras</option>
-        <option value="sapo-imaginario.html">portfolio e projetos</option>
-        <option value="rascunhos-da-floresta.html">eu que escrevi</option>
+      <label for="postType">Tipo de post:</label>
+      <select id="postType" name="postType">
+        <option value="post">Post normal</option>
+        <option value="story_index">Índice de História</option>
+        <option value="chapter">Capítulo</option>
       </select>
+      <br><br>
+
+      <div id="chapterFields" style="display:none">
+        <label for="storySelect">História:</label>
+        <select id="storySelect" name="storyId">
+          <option value="">carregando histórias...</option>
+        </select>
+        <label for="chapterNumber" style="margin-top:12px">Número do capítulo:</label>
+        <input type="number" id="chapterNumber" name="chapterNumber" min="1">
+        <br><br>
+      </div>
+
+      <div id="urlFieldWrap">
+        <label for="url">Página de destino:</label>
+        <select id="url" name="url" required>
+          <option value="">escolha uma das opções</option>
+          <option value="verde-inspiracao.html">Hobbies, animes, jogos e leituras</option>
+          <option value="sapo-imaginario.html">portfolio e projetos</option>
+          <option value="rascunhos-da-floresta.html">eu que escrevi</option>
+        </select>
+      </div>
 
       <label for="status">Status:</label>
       <select id="status" name="status">
@@ -245,6 +265,34 @@
   document.getElementById('url').addEventListener('change', function() {
       document.getElementById('projectFields').style.display =
           this.value === 'sapo-imaginario.html' ? 'block' : 'none';
+  });
+
+  // Tipo de post: post normal / índice de história / capítulo
+  document.getElementById('postType').addEventListener('change', function() {
+      const isChapter = this.value === 'chapter';
+      document.getElementById('chapterFields').style.display = isChapter ? 'block' : 'none';
+      document.getElementById('urlFieldWrap').style.display = isChapter ? 'none' : 'block';
+  });
+
+  let knownStories = [];
+
+  function loadStoriesForChapterSelect(selectedStoryId) {
+      fetch(`${API_BASE}/user-stories`, { credentials: 'include' })
+          .then(r => r.ok ? r.json() : [])
+          .then(stories => {
+              knownStories = Array.isArray(stories) ? stories : [];
+              const select = document.getElementById('storySelect');
+              select.innerHTML = knownStories.length
+                  ? knownStories.map(s => `<option value="${s._id}">${escapeHtml(s.title)}</option>`).join('')
+                  : '<option value="">Nenhuma história cadastrada ainda</option>';
+              if (selectedStoryId) select.value = selectedStoryId;
+          })
+          .catch(() => {});
+  }
+
+  document.getElementById('storySelect').addEventListener('change', function() {
+      const story = knownStories.find(s => s._id === this.value);
+      if (story) document.getElementById('url').value = story.url;
   });
 
   // Tech tag input
@@ -382,6 +430,17 @@
               const urlSelect = document.getElementById('url');
               if (data.url) urlSelect.value = data.url;
               document.getElementById('status').value = data.status || 'published';
+
+              const postType = data.postType || 'post';
+              document.getElementById('postType').value = postType;
+              if (postType === 'chapter') {
+                  document.getElementById('chapterFields').style.display = 'block';
+                  document.getElementById('urlFieldWrap').style.display = 'none';
+                  if (data.chapterNumber != null) document.getElementById('chapterNumber').value = data.chapterNumber;
+                  loadStoriesForChapterSelect(data.storyId);
+              } else {
+                  loadStoriesForChapterSelect();
+              }
 
               ClassicEditor
                   .create(document.querySelector('#editor'), {

@@ -161,6 +161,7 @@
       <div class="dashboard-actions">
         <button onclick="window.location.href='publicar.html'">Nova Postagem</button>
         <button onclick="window.location.href='managePosts.html'">Gerenciar Postagens</button>
+        <button onclick="window.location.href='gerenciarHistorias.html'">Gerenciar Histórias</button>
       </div>
 
       <div class="dashboard-stats" id="statsContainer">
@@ -311,6 +312,7 @@
           document.getElementById('statsContainer').innerHTML = `
               <h3>Suas Estatísticas:</h3>
               <p>Total de Postagens: ${data.totalPosts} (${data.publishedCount || 0} publicadas · ${data.draftCount || 0} rascunhos)</p>
+              <p>Histórias: ${data.totalStories || 0} · Capítulos: ${data.totalChapters || 0}</p>
               <p>Total de Visualizações: ${data.totalViews || 0}</p>
               <p>Post mais popular: "${escapeHtml(data.mostPopularPost)}"</p>
           `;

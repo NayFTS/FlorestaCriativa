@@ -142,7 +142,10 @@ const Post = mongoose.model('Post', new mongoose.Schema({
     external_link: { type: String, default: '' },
     preview_link: { type: String, default: '' },
     technologies: [String],
-    gallery: { type: [String], default: [] }
+    gallery: { type: [String], default: [] },
+    postType: { type: String, enum: ['post', 'story_index', 'chapter'], default: 'post' },
+    storyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: null },
+    chapterNumber: { type: Number, default: null }
 }));
 
 const Comment = mongoose.model('Comment', new mongoose.Schema({
@@ -365,15 +368,38 @@ const postValidators = [
     body('url').trim().notEmpty().withMessage('URL é obrigatória')
 ];
 
+const POST_TYPES = ['post', 'story_index', 'chapter'];
+
+// Para posts do tipo 'chapter', a seção (`url`) é sempre herdada do post-índice no servidor —
+// nunca confiamos no valor enviado pelo client, pra um capítulo não "vazar" pra uma seção
+// diferente da história (o form só preenche isso escondido por conveniência visual).
+async function resolvePostTypeFields(reqBody) {
+    const postType = POST_TYPES.includes(reqBody.postType) ? reqBody.postType : 'post';
+    if (postType !== 'chapter') {
+        return { postType, storyId: null, chapterNumber: null, url: reqBody.url };
+    }
+    const storyId = reqBody.storyId;
+    if (!storyId || !mongoose.Types.ObjectId.isValid(storyId)) {
+        throw new Error('Selecione a história a que este capítulo pertence.');
+    }
+    const story = await Post.findById(storyId);
+    if (!story || story.postType !== 'story_index') {
+        throw new Error('História não encontrada.');
+    }
+    const chapterNumber = reqBody.chapterNumber ? parseInt(reqBody.chapterNumber) : null;
+    return { postType, storyId, chapterNumber, url: story.url };
+}
+
 app.post('/addPost', requireAuth, galleryUpload, postValidators, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ success: false, message: errors.array()[0].msg, errors: errors.array() });
     }
     try {
-        const { title, content, url, status, external_link, preview_link } = req.body;
+        const { title, content, status, external_link, preview_link } = req.body;
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         let technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
+        const { postType, storyId, chapterNumber, url } = await resolvePostTypeFields(req.body);
         const imageFile = req.files?.['image']?.[0];
         const image_path = imageFile ? await uploadToCloudinary(imageFile.buffer) : null;
         const galleryFiles = req.files?.['gallery'] || [];
@@ -382,7 +408,7 @@ app.post('/addPost', requireAuth, galleryUpload, postValidators, async (req, res
 
         const newPost = new Post({
             title, content, url, image_path, categories, technologies, gallery,
-            slug,
+            slug, postType, storyId, chapterNumber,
             external_link: external_link || '',
             preview_link: preview_link || '',
             status: status === 'draft' ? 'draft' : 'published'
@@ -409,7 +435,7 @@ app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req
             return res.status(400).json({ success: false, message: 'ID de post inválido' });
         }
 
-        const { title, content, url, status, external_link, preview_link } = req.body;
+        const { title, content, status, external_link, preview_link } = req.body;
         const categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         const technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
         const post = await Post.findById(postId);
@@ -418,10 +444,16 @@ app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req
             return res.status(404).json({ success: false, message: 'Post não encontrado' });
         }
 
+        const { postType, storyId, chapterNumber, url } = await resolvePostTypeFields(req.body);
+        const previousUrl = post.url;
+
         // Atualiza os campos
         post.title = title;
         post.content = content;
         post.url = url;
+        post.postType = postType;
+        post.storyId = storyId;
+        post.chapterNumber = chapterNumber;
         post.categories = categories;
         post.technologies = technologies;
         post.external_link = external_link || '';
@@ -444,6 +476,12 @@ app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req
 
         await post.save();
 
+        // Editar o post-índice de uma história e mudar de seção cascateia o `url` pros
+        // capítulos filhos, senão eles ficam "presos" na seção antiga.
+        if (post.postType === 'story_index' && post.url !== previousUrl) {
+            await Post.updateMany({ storyId: post._id, postType: 'chapter' }, { url: post.url });
+        }
+
         const staleImages = oldImagePath ? [...removedGalleryUrls, oldImagePath] : removedGalleryUrls;
         await Promise.all(staleImages.map(deleteFromCloudinary));
 
@@ -464,12 +502,21 @@ const POST_SORT_OPTIONS = {
     views: { views: -1 },
 };
 
-// Rota para buscar posts
+// Rota para buscar posts. `url` (seção do site) e `storyId` (capítulos de uma história) são usos
+// distintos e não devem ser combinados no mesmo request: `url` exclui capítulos (só aparece o
+// post-índice nas páginas de seção), `storyId` busca justamente os capítulos daquela história.
 app.get('/posts', async (req, res) => {
-    const { url, page, limit, category, sort } = req.query;
+    const { url, page, limit, category, sort, storyId } = req.query;
     try {
         const query = { status: { $ne: 'draft' } };
-        if (url) query.url = url;
+        if (storyId) {
+            if (!mongoose.Types.ObjectId.isValid(storyId)) return res.status(400).json({ message: 'storyId inválido' });
+            query.storyId = storyId;
+            query.postType = 'chapter';
+        } else if (url) {
+            query.url = url;
+            query.postType = { $ne: 'chapter' };
+        }
         if (category) {
             const categories = category.split(',').map(c => c.trim()).filter(Boolean);
             if (categories.length) query.categories = { $in: categories };
@@ -498,11 +545,28 @@ app.get('/posts/categories', async (req, res) => {
     try {
         const { url } = req.query;
         const query = { status: { $ne: 'draft' } };
-        if (url) query.url = url;
+        if (url) {
+            query.url = url;
+            query.postType = { $ne: 'chapter' };
+        }
         const categories = await Post.distinct('categories', query);
         res.json(categories.filter(Boolean).sort((a, b) => a.localeCompare(b, 'pt-BR')));
     } catch (err) {
         console.error('Erro ao buscar categorias:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+// Versão leve de /post/:id para o link "voltar para a história" na página de capítulo —
+// não incrementa views (senão cada leitura de capítulo infla artificialmente as views do índice).
+app.get('/posts/:id/brief', async (req, res) => {
+    try {
+        const id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'ID inválido' });
+        const post = await Post.findById(id).select('_id title slug postType');
+        if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+        res.json(post);
+    } catch (err) {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 });
@@ -583,6 +647,14 @@ app.delete('/posts/:id', requireAuth, async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Post inválido' });
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+
+        if (post.postType === 'story_index') {
+            const hasChapters = await Post.exists({ storyId: post._id, postType: 'chapter' });
+            if (hasChapters) {
+                return res.status(409).json({ message: 'Exclua os capítulos antes de excluir a história.' });
+            }
+        }
+
         await Post.findByIdAndDelete(req.params.id);
 
         const staleImages = post.image_path ? [...post.gallery, post.image_path] : post.gallery;
@@ -648,12 +720,38 @@ app.get('/search', async (req, res) => {
     }
 });
 
+// Lista geral de gerenciação (managePosts.html): exclui capítulos por padrão, já que eles têm
+// tela própria (gerenciarCapitulos.html). Passar ?storyId=X inverte isso e lista só os
+// capítulos daquela história (incluindo rascunhos, pois é rota autenticada).
 app.get('/user-posts', requireAuth, async (req, res) => {
     try {
-        const posts = await Post.find({}, 'title status publish_date views').sort({ publish_date: -1 });
+        const { storyId } = req.query;
+        let filter = { postType: { $ne: 'chapter' } };
+        if (storyId) {
+            if (!mongoose.Types.ObjectId.isValid(storyId)) return res.status(400).json({ message: 'storyId inválido' });
+            filter = { storyId, postType: 'chapter' };
+        }
+        const posts = await Post.find(filter, 'title status publish_date views chapterNumber').sort({ publish_date: -1 });
         res.json(posts);
     } catch (err) {
         console.error('Erro ao buscar postagens do usuário:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+// Post-índices do dono, com a contagem de capítulos de cada um (usado por gerenciarHistorias.html)
+app.get('/user-stories', requireAuth, async (req, res) => {
+    try {
+        const stories = await Post.find({ postType: 'story_index' }).sort({ publish_date: -1 });
+        const counts = await Post.aggregate([
+            { $match: { postType: 'chapter', storyId: { $in: stories.map(s => s._id) } } },
+            { $group: { _id: '$storyId', total: { $sum: 1 } } }
+        ]);
+        const countByStory = new Map(counts.map(c => [String(c._id), c.total]));
+        const result = stories.map(s => ({ ...s.toObject(), chapterCount: countByStory.get(String(s._id)) || 0 }));
+        res.json(result);
+    } catch (err) {
+        console.error('Erro ao buscar histórias:', err);
         res.status(500).json({ message: 'Erro no servidor' });
     }
 });
@@ -665,8 +763,13 @@ app.get('/dashboard-stats', requireAuth, async (req, res) => {
                 {
                     $group: {
                         _id: null,
-                        totalPosts: { $sum: 1 },
-                        draftCount: { $sum: { $cond: [{ $eq: ['$status', 'draft'] }, 1, 0] } },
+                        // Capítulos ficam de fora de totalPosts/draftCount — uma história de 30
+                        // capítulos não deve inflar o "Total de Postagens" geral, eles têm
+                        // contadores próprios (totalStories/totalChapters) abaixo.
+                        totalPosts: { $sum: { $cond: [{ $ne: ['$postType', 'chapter'] }, 1, 0] } },
+                        draftCount: { $sum: { $cond: [{ $and: [{ $ne: ['$postType', 'chapter'] }, { $eq: ['$status', 'draft'] }] }, 1, 0] } },
+                        totalStories: { $sum: { $cond: [{ $eq: ['$postType', 'story_index'] }, 1, 0] } },
+                        totalChapters: { $sum: { $cond: [{ $eq: ['$postType', 'chapter'] }, 1, 0] } },
                         totalViews: { $sum: { $ifNull: ['$views', 0] } },
                     },
                 },
@@ -688,12 +791,14 @@ app.get('/dashboard-stats', requireAuth, async (req, res) => {
             ]),
             Post.find({}).sort({ publish_date: -1 }).limit(3),
         ]);
-        const { totalPosts = 0, draftCount = 0, totalViews = 0 } = counts[0] || {};
+        const { totalPosts = 0, draftCount = 0, totalStories = 0, totalChapters = 0, totalViews = 0 } = counts[0] || {};
 
         res.json({
             totalPosts,
             draftCount,
             publishedCount: totalPosts - draftCount,
+            totalStories,
+            totalChapters,
             totalViews,
             mostPopularPost: mostPopularPost ? mostPopularPost.title : 'Nenhuma postagem encontrada',
             recentPosts,

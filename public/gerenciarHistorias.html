@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Histórias - Floresta Criativa</title>
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="vendor/overlayscrollbars/overlayscrollbars.min.css">
+    <link rel="stylesheet" href="scrollbars.css">
+    <script defer src="vendor/overlayscrollbars/overlayscrollbars.min.js"></script>
+    <script defer src="scrollbars.js"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="imagens/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="imagens/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
+  </head>
+  <body>
+    <div class="site-shell">
+      <div class="topbar">
+        <nav class="topbar-nav" aria-label="Navegação principal">
+          <a href="index.html">Home</a>
+          <a href="verde-inspiracao.html">Verde Inspiração</a>
+          <a href="sapo-imaginario.html">Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
+          <a href="sobre-mim.html">Sobre Mim</a>
+        </nav>
+        <div class="topbar-actions theme-toggle-target">
+          <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" onclick="toggleSearch()">
+            <span class="search-bar-placeholder">Pesquisar...</span>
+            <img src="imagens/decor/icone-busca-lupa.png" alt="" class="search-bar-icon" loading="lazy">
+          </button>
+        </div>
+      </div>
+
+      <aside class="site-sidebar">
+        <a href="index.html" class="topbar-sign">
+          <img class="topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+        </a>
+        <div class="sidebar-widgets">
+          <div class="currently-widget">
+            <h4>🌱 Currently</h4>
+            <ul class="widget-list js-currently-list">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+          <section class="mood-widget mood-card">
+            <h3 data-i18n="mood.title">mood</h3>
+            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje parece:</p>
+            <img class="mood-image" src="" alt="">
+            <strong class="mood-value"></strong>
+            <span class="mood-weather"></span>
+            <p class="mood-text"></p>
+          </section>
+          <img src="imagens/decor/sapo-sentado.png" alt="" class="sidebar-sticker" aria-hidden="true" loading="lazy">
+        </div>
+        <div class="sidebar-footer">
+          <a href="login.html" id="loginButton" class="login-link">Login</a>
+          <a href="#" class="logout-link" title="Sair">🚪</a>
+        </div>
+      </aside>
+
+      <header class="mobile-topbar">
+        <div class="mobile-topbar-row">
+          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
+          <div class="mobile-topbar-controls">
+            <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir menu">&#9776;</button>
+            <a href="index.html" class="mobile-topbar-sign" aria-label="Floresta Criativa — início">
+              <img class="mobile-topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS" loading="lazy">
+              <img class="mobile-topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS" loading="lazy">
+            </a>
+            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+            <div class="mobile-topbar-actions theme-toggle-target"></div>
+          </div>
+          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
+        </div>
+      </header>
+      <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+      <div class="nav-drawer" id="navDrawer">
+        <a href="index.html" class="sidebar-logo">
+          <img class="sidebar-logo-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="sidebar-logo-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+        </a>
+        <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
+          <a href="dashboard.html">📊 Dashboard</a>
+          <a href="managePosts.html"><img src="imagens/decor/icone-portfolio-pasta.png" alt="" class="nav-icon">Gerenciar Posts</a>
+          <a href="gerenciarHistorias.html">📚 Gerenciar Histórias</a>
+          <a href="publicar.html">✍️ Publicar</a>
+          <a href="index.html"><img src="imagens/decor/icone-home.png" alt="" class="nav-icon">Home</a>
+          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon">Verde Inspiração</a>
+          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon">Sapo Imaginário</a>
+          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon">Rascunhos da Floresta</a>
+          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon">Sobre Mim</a>
+          <a href="index.html#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
+        </div>
+        <div class="sidebar-widgets drawer-widgets">
+          <div class="currently-widget">
+            <h4>🌱 Currently</h4>
+            <ul class="widget-list js-currently-list">
+              <li>Carregando...</li>
+            </ul>
+          </div>
+          <section class="mood-widget mood-card">
+            <h3 data-i18n="mood.title">mood</h3>
+            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje parece:</p>
+            <img class="mood-image" src="" alt="">
+            <strong class="mood-value"></strong>
+            <span class="mood-weather"></span>
+            <p class="mood-text"></p>
+          </section>
+        </div>
+        <div class="sidebar-footer theme-toggle-target">
+          <a href="login.html" class="login-link">Login</a>
+          <a href="#" class="logout-link" title="Sair">🚪</a>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+        </div>
+      </div>
+
+      <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
+        <a href="index.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-home.png" alt=""></span>Home</a>
+        <a href="dashboard.html"><span class="bottom-nav-icon">📊</span>Dashboard</a>
+        <a href="index.html" class="bottom-nav-center" aria-label="Ir para a Home"><img src="imagens/decor/bottom-button-navbar.png" alt="" class="bottom-nav-center-day"><img src="imagens/decor/bottom-button-navbar-noturno.png" alt="" class="bottom-nav-center-night"></a>
+        <a href="managePosts.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-portfolio-pasta.png" alt=""></span>Posts</a>
+        <a href="publicar.html"><span class="bottom-nav-icon">✍️</span>Publicar</a>
+      </div>
+
+      <main class="site-main">
+    <div class="home-header-box sticker-card">
+      <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+      <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+    </div>
+    <div class="page-banner-caption">
+      <h1>Floresta Criativa</h1>
+      <p>Gerencie suas histórias por capítulo aqui.</p>
+    </div>
+    <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
+      <div class="search-overlay-box">
+        <div class="search-overlay-box-header">
+          <span style="font-weight:600;font-size:1em;" data-i18n="search.title">Pesquisar</span>
+          <button class="icon-btn search-close-btn" onclick="toggleSearch()" aria-label="Fechar" data-i18n-aria-label="search.close">✕</button>
+        </div>
+        <form onsubmit="search(); return false;">
+          <input type="text" id="searchBar" name="searchBar" placeholder="Pesquise por termos..." data-i18n-placeholder="search.placeholder">
+          <button type="submit" data-i18n="search.submit">Pesquisar</button>
+          <button type="button" onclick="toggleFilters()" data-i18n="search.filters">Filtros</button>
+          <button type="button" onclick="clearSearch()" data-i18n="search.clear">Limpar</button>
+        </form>
+        <div id="advancedFilters" style="display:none;">
+          <p>Categorias:</p>
+          <div id="searchCategoryFilters" class="search-category-filters"></div>
+          <input type="date" id="startDate" name="startDate">
+          <input type="date" id="endDate" name="endDate">
+        </div>
+        <div id="searchResults"></div>
+      </div>
+    </div>
+    <!-- Modal de confirmação de exclusão -->
+    <div id="deleteModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <p>Tem certeza que deseja excluir esta história?</p>
+        <div class="modal-actions">
+          <button id="modalCancel" class="btn-secondary">Cancelar</button>
+          <button id="modalConfirm" class="btn-danger">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="manage-posts-container">
+      <h2>Suas Histórias</h2>
+      <div class="dashboard-actions">
+        <button onclick="window.location.href='publicar.html?postType=story_index'">+ Nova História</button>
+      </div>
+      <div id="paginationControls" class="pagination-controls"></div>
+      <div class="table-scroll-wrapper">
+      <table id="storiesTable">
+        <thead>
+          <tr>
+            <th>Capa</th>
+            <th>Título</th>
+            <th>Capítulos</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      </div>
+    </div>
+
+    <script>
+  var API_BASE = '/api';
+
+  let allStories = [];
+  let currentPage = 1;
+  const PAGE_SIZE = 10;
+
+  function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(String(str)));
+      return div.innerHTML;
+  }
+
+  function loadStories() {
+      fetch(`${API_BASE}/user-stories`)
+          .then(response => {
+              if (!response.ok) {
+                  window.location.href = 'login.html';
+                  throw new Error('Não autenticado');
+              }
+              return response.json();
+          })
+          .then(stories => {
+              allStories = stories;
+              renderPage(1);
+          })
+          .catch(error => console.error('Erro ao carregar histórias:', error));
+  }
+
+  function renderPage(page) {
+      currentPage = page;
+      const start = (page - 1) * PAGE_SIZE;
+      const pageStories = allStories.slice(start, start + PAGE_SIZE);
+      const totalPages = Math.ceil(allStories.length / PAGE_SIZE);
+      const tbody = document.querySelector('#storiesTable tbody');
+      tbody.innerHTML = '';
+
+      if (allStories.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5">Nenhuma história encontrada.</td></tr>';
+          updatePaginationUI(0, 0);
+          return;
+      }
+
+      pageStories.forEach(story => {
+          const isDraft = story.status === 'draft';
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td data-label="Capa">${story.image_path ? `<img src="${story.image_path}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:6px;">` : ''}</td>
+              <td data-label="Título">${escapeHtml(story.title)}</td>
+              <td data-label="Capítulos">${story.chapterCount || 0}</td>
+              <td data-label="Status"><span class="badge ${isDraft ? 'badge-draft' : 'badge-published'}">${isDraft ? 'Rascunho' : 'Publicado'}</span></td>
+              <td data-label="Ações"></td>
+          `;
+
+          const actionsCell = row.querySelector('td:last-child');
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Editar Índice';
+          editBtn.onclick = () => window.location.href = `editPost.html?id=${story._id}`;
+          actionsCell.appendChild(editBtn);
+
+          const chaptersBtn = document.createElement('button');
+          chaptersBtn.textContent = 'Ver Capítulos';
+          chaptersBtn.onclick = () => window.location.href = `gerenciarCapitulos.html?storyId=${story._id}`;
+          actionsCell.appendChild(chaptersBtn);
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Excluir';
+          deleteBtn.className = 'btn-delete-mini';
+          deleteBtn.setAttribute('data-id', story._id);
+          deleteBtn.onclick = () => deleteStory(story._id);
+          actionsCell.appendChild(deleteBtn);
+
+          tbody.appendChild(row);
+      });
+
+      updatePaginationUI(page, totalPages);
+  }
+
+  function updatePaginationUI(page, totalPages) {
+      const container = document.getElementById('paginationControls');
+      container.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '← Anterior';
+      prevBtn.disabled = page === 1;
+      prevBtn.onclick = () => renderPage(page - 1);
+      container.appendChild(prevBtn);
+
+      const info = document.createElement('span');
+      info.textContent = `Página ${page} de ${totalPages}`;
+      container.appendChild(info);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = 'Próxima →';
+      nextBtn.disabled = page === totalPages;
+      nextBtn.onclick = () => renderPage(page + 1);
+      container.appendChild(nextBtn);
+  }
+
+  function confirmDelete() {
+      return new Promise(resolve => {
+          const modal = document.getElementById('deleteModal');
+          modal.style.display = 'flex';
+          document.getElementById('modalConfirm').onclick = () => {
+              modal.style.display = 'none';
+              resolve(true);
+          };
+          document.getElementById('modalCancel').onclick = () => {
+              modal.style.display = 'none';
+              resolve(false);
+          };
+      });
+  }
+
+  async function deleteStory(storyId) {
+      const confirmed = await confirmDelete();
+      if (!confirmed) return;
+
+      const btn = document.querySelector(`button[data-id="${storyId}"]`);
+      if (btn) { btn.textContent = 'Excluindo...'; btn.disabled = true; }
+
+      fetch(`${API_BASE}/posts/${storyId}`, { method: 'DELETE', credentials: 'include' })
+          .then(response => response.json().then(data => ({ ok: response.ok, data })))
+          .then(({ ok, data }) => {
+              if (!ok) throw new Error(data.message || 'Erro ao excluir');
+              loadStories();
+          })
+          .catch(error => {
+              console.error('Erro ao excluir história:', error);
+              alert(error.message || 'Erro ao excluir história.');
+              if (btn) { btn.disabled = false; btn.textContent = 'Excluir'; }
+          });
+  }
+
+  document.querySelectorAll('.logout-link').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          fetch(`${API_BASE}/logout`).then(r => { if (r.ok) window.location.href = 'login.html'; });
+      });
+  });
+
+  window.onload = loadStories;
+    </script>
+
+    <script src="i18n.js"></script>
+    <script src="mood-weather.js"></script>
+    <script src="search.js"></script>
+      </main>
+    </div>
+  </body>
+</html>

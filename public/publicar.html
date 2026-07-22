@@ -176,13 +176,33 @@
       <div id="galleryPreview" class="gallery-preview-edit"></div>
       <br>
 
-      <label for="url">Página de destino:</label>
-      <select id="url" name="url" required>
-        <option value="">escolha uma das opções</option>
-        <option value="verde-inspiracao.html">Hobbies, animes, jogos e leituras</option>
-        <option value="sapo-imaginario.html">portfolio e projetos</option>
-        <option value="rascunhos-da-floresta.html">eu que escrevi</option>
+      <label for="postType">Tipo de post:</label>
+      <select id="postType" name="postType">
+        <option value="post">Post normal</option>
+        <option value="story_index">Índice de História</option>
+        <option value="chapter">Capítulo</option>
       </select>
+      <br><br>
+
+      <div id="chapterFields" style="display:none">
+        <label for="storySelect">História:</label>
+        <select id="storySelect" name="storyId">
+          <option value="">carregando histórias...</option>
+        </select>
+        <label for="chapterNumber" style="margin-top:12px">Número do capítulo:</label>
+        <input type="number" id="chapterNumber" name="chapterNumber" min="1">
+        <br><br>
+      </div>
+
+      <div id="urlFieldWrap">
+        <label for="url">Página de destino:</label>
+        <select id="url" name="url" required>
+          <option value="">escolha uma das opções</option>
+          <option value="verde-inspiracao.html">Hobbies, animes, jogos e leituras</option>
+          <option value="sapo-imaginario.html">portfolio e projetos</option>
+          <option value="rascunhos-da-floresta.html">eu que escrevi</option>
+        </select>
+      </div>
 
       <div id="projectFields" style="display:none">
         <label for="external_link">Link do Repositório <span style="font-weight:400;font-size:0.9em">(opcional — GitHub, etc.)</span></label>
@@ -386,6 +406,65 @@
           this.value === 'sapo-imaginario.html' ? 'block' : 'none';
   });
 
+  // Tipo de post: post normal / índice de história / capítulo
+  document.getElementById('postType').addEventListener('change', function() {
+      const isChapter = this.value === 'chapter';
+      document.getElementById('chapterFields').style.display = isChapter ? 'block' : 'none';
+      // Esconde (não desabilita) o campo de seção — um <select> disabled não é enviado no
+      // FormData e quebraria a validação de servidor. Pra capítulo, o `url` final vem sempre
+      // do post-índice escolhido, recalculado no backend por segurança.
+      document.getElementById('urlFieldWrap').style.display = isChapter ? 'none' : 'block';
+  });
+
+  let knownStories = [];
+
+  function loadStoriesForChapterSelect() {
+      fetch(`${API_BASE}/user-stories`, { credentials: 'include' })
+          .then(r => r.ok ? r.json() : [])
+          .then(stories => {
+              knownStories = Array.isArray(stories) ? stories : [];
+              const select = document.getElementById('storySelect');
+              select.innerHTML = knownStories.length
+                  ? knownStories.map(s => `<option value="${s._id}">${escapeHtml(s.title)}</option>`).join('')
+                  : '<option value="">Nenhuma história cadastrada ainda</option>';
+              applyPresetFromQueryString();
+          })
+          .catch(() => {});
+  }
+
+  function suggestNextChapterNumber(storyId) {
+      fetch(`${API_BASE}/posts?storyId=${storyId}`)
+          .then(r => r.ok ? r.json() : [])
+          .then(chapters => {
+              const list = Array.isArray(chapters) ? chapters : [];
+              const maxNum = list.reduce((max, c) => Math.max(max, c.chapterNumber || 0), 0);
+              document.getElementById('chapterNumber').value = maxNum + 1;
+          })
+          .catch(() => {});
+  }
+
+  document.getElementById('storySelect').addEventListener('change', function() {
+      const story = knownStories.find(s => s._id === this.value);
+      if (story) {
+          document.getElementById('url').value = story.url;
+          suggestNextChapterNumber(story._id);
+      }
+  });
+
+  function applyPresetFromQueryString() {
+      const params = new URLSearchParams(location.search);
+      const presetType = params.get('postType');
+      const presetStoryId = params.get('storyId');
+      if (presetType && ['post', 'story_index', 'chapter'].includes(presetType)) {
+          document.getElementById('postType').value = presetType;
+          document.getElementById('postType').dispatchEvent(new Event('change'));
+      }
+      if (presetType === 'chapter' && presetStoryId) {
+          document.getElementById('storySelect').value = presetStoryId;
+          document.getElementById('storySelect').dispatchEvent(new Event('change'));
+      }
+  }
+
   // Tech tag input
   let techList = [];
 
@@ -551,6 +630,7 @@
           })
           .catch(error => console.error('Erro ao verificar autenticação:', error));
       loadCategorySuggestions();
+      loadStoriesForChapterSelect();
   };
     </script>
 
