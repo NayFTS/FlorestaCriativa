@@ -3158,6 +3158,20 @@ section#rascunhos-da-floresta {
     font-size: 0.82em;
 }
 
+.section-icon-img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    vertical-align: -3px;
+}
+
+.quick-fact-icon-img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    display: block;
+}
+
 .about-section p {
     margin: 0 0 12px;
     line-height: 1.75;
