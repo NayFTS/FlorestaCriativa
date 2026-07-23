@@ -13,8 +13,8 @@
             'search.close': 'Fechar',
             'mood.title': 'mood',
             'mood.subtitle': 'hoje parece:',
-            'lang.toggleLabel': 'EN',
-            'lang.toggleAria': 'Mudar para inglês'
+            'lang.pt': 'Português',
+            'lang.en': 'English'
         },
         en: {
             'footer.login': 'Login',
@@ -26,8 +26,8 @@
             'search.close': 'Close',
             'mood.title': 'mood',
             'mood.subtitle': 'today feels like:',
-            'lang.toggleLabel': 'PT',
-            'lang.toggleAria': 'Switch to Portuguese'
+            'lang.pt': 'Português',
+            'lang.en': 'English'
         }
     };
 
@@ -60,8 +60,7 @@
         document.documentElement.setAttribute('lang', lang === 'en' ? 'en' : 'pt-BR');
 
         document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-            btn.textContent = t('lang.toggleLabel', lang);
-            btn.setAttribute('aria-label', t('lang.toggleAria', lang));
+            btn.classList.toggle('active', btn.dataset.lang === lang);
         });
     }
 
@@ -81,14 +80,23 @@
 
     function injectLangToggle() {
         document.querySelectorAll('.theme-toggle-target').forEach(target => {
-            if (target.querySelector('.lang-toggle-btn')) return;
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'lang-toggle-btn';
-            btn.onclick = toggleLang;
-            btn.textContent = t('lang.toggleLabel');
-            btn.setAttribute('aria-label', t('lang.toggleAria'));
-            target.appendChild(btn);
+            if (target.querySelector('.lang-toggle')) return;
+            const lang = getLang();
+            const wrap = document.createElement('div');
+            wrap.className = 'lang-toggle';
+            wrap.setAttribute('role', 'group');
+            wrap.setAttribute('aria-label', 'Idioma / Language');
+            ['pt', 'en'].forEach(code => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'lang-toggle-btn' + (code === lang ? ' active' : '');
+                btn.dataset.lang = code;
+                btn.textContent = code.toUpperCase();
+                btn.setAttribute('aria-label', t('lang.' + code));
+                btn.onclick = () => setLang(code);
+                wrap.appendChild(btn);
+            });
+            target.appendChild(wrap);
         });
     }
 
