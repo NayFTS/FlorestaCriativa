@@ -2736,8 +2736,11 @@ input.input-error, input.input-error:focus {
     color: var(--color-text-secondary);
 }
 
-/* Estilos dos botões de ação */
-#postsTable button {
+/* Estilos dos botões de ação — postsTable (posts), storiesTable (histórias) e
+   chaptersTable (capítulos) compartilham o mesmo padrão de tabela de gerenciamento. */
+#postsTable button,
+#storiesTable button,
+#chaptersTable button {
     background-color: var(--color-accent);
     color: white;
     border: none;
@@ -2751,19 +2754,31 @@ input.input-error, input.input-error:focus {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-#postsTable button:hover {
+#postsTable button:hover,
+#storiesTable button:hover,
+#chaptersTable button:hover {
     background-color: var(--color-accent-dark);
     transform: translateY(-2px);
 }
 
-#postsTable button:active {
+#postsTable button:active,
+#storiesTable button:active,
+#chaptersTable button:active {
     transform: translateY(0);
 }
 
-#postsTable button.btn-publish-mini { background-color: var(--color-gold); color: #3a2f10; }
-#postsTable button.btn-publish-mini:hover { background-color: #c7a24f; }
-#postsTable button.btn-delete-mini { background-color: var(--color-danger); }
-#postsTable button.btn-delete-mini:hover { background-color: #a4494a; }
+#postsTable button.btn-publish-mini,
+#storiesTable button.btn-publish-mini,
+#chaptersTable button.btn-publish-mini { background-color: var(--color-gold); color: #3a2f10; }
+#postsTable button.btn-publish-mini:hover,
+#storiesTable button.btn-publish-mini:hover,
+#chaptersTable button.btn-publish-mini:hover { background-color: #c7a24f; }
+#postsTable button.btn-delete-mini,
+#storiesTable button.btn-delete-mini,
+#chaptersTable button.btn-delete-mini { background-color: var(--color-danger); }
+#postsTable button.btn-delete-mini:hover,
+#storiesTable button.btn-delete-mini:hover,
+#chaptersTable button.btn-delete-mini:hover { background-color: #a4494a; }
 
 
 /* Estilos para o formulário de edição */

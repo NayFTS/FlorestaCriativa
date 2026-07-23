@@ -273,6 +273,7 @@
       if (totalPages <= 1) return;
 
       const prevBtn = document.createElement('button');
+      prevBtn.className = 'pagination-btn';
       prevBtn.textContent = '← Anterior';
       prevBtn.disabled = page === 1;
       prevBtn.onclick = () => renderPage(page - 1);
@@ -283,6 +284,7 @@
       container.appendChild(info);
 
       const nextBtn = document.createElement('button');
+      nextBtn.className = 'pagination-btn';
       nextBtn.textContent = 'Próxima →';
       nextBtn.disabled = page === totalPages;
       nextBtn.onclick = () => renderPage(page + 1);

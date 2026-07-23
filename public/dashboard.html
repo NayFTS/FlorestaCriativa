@@ -185,7 +185,7 @@
       <h3>Gerenciar Guestbook</h3>
       <p class="settings-hint">Mensagens já aprovadas do <a href="livro-de-visitas.html" target="_blank">livro de visitas</a>. Arquive pra tirar da exibição pública sem apagar, ou exclua de vez.</p>
       <div class="listing-controls">
-        <select id="guestbookAdminFilter">
+        <select id="guestbookAdminFilter" class="listing-sort">
           <option value="active">Ativas</option>
           <option value="archived">Arquivadas</option>
           <option value="all">Todas</option>
@@ -210,7 +210,7 @@
       <h3>Gerenciar Comentários</h3>
       <p class="settings-hint">Comentários já aprovados dos posts. Arquive pra tirar da exibição pública sem apagar, ou exclua de vez.</p>
       <div class="listing-controls">
-        <select id="commentsAdminFilter">
+        <select id="commentsAdminFilter" class="listing-sort">
           <option value="active">Ativos</option>
           <option value="archived">Arquivados</option>
           <option value="all">Todos</option>
@@ -471,6 +471,7 @@
       if (totalPages <= 1) return;
 
       const prevBtn = document.createElement('button');
+      prevBtn.className = 'pagination-btn';
       prevBtn.textContent = '← Anterior';
       prevBtn.disabled = page <= 1;
       prevBtn.onclick = () => loadGuestbookAdmin(page - 1);
@@ -481,6 +482,7 @@
       container.appendChild(info);
 
       const nextBtn = document.createElement('button');
+      nextBtn.className = 'pagination-btn';
       nextBtn.textContent = 'Próxima →';
       nextBtn.disabled = page >= totalPages;
       nextBtn.onclick = () => loadGuestbookAdmin(page + 1);
@@ -589,6 +591,7 @@
       if (totalPages <= 1) return;
 
       const prevBtn = document.createElement('button');
+      prevBtn.className = 'pagination-btn';
       prevBtn.textContent = '← Anterior';
       prevBtn.disabled = page <= 1;
       prevBtn.onclick = () => loadCommentsAdmin(page - 1);
@@ -599,6 +602,7 @@
       container.appendChild(info);
 
       const nextBtn = document.createElement('button');
+      nextBtn.className = 'pagination-btn';
       nextBtn.textContent = 'Próxima →';
       nextBtn.disabled = page >= totalPages;
       nextBtn.onclick = () => loadCommentsAdmin(page + 1);
