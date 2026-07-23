@@ -433,7 +433,7 @@
       const status = document.getElementById('guestbookAdminFilter').value;
       const list = document.getElementById('guestbookAdminList');
       list.innerHTML = '<p class="widget-hint">Carregando...</p>';
-      fetch(`${API_BASE}/admin/guestbook?status=${status}&page=${page}&limit=10`)
+      fetch(`${API_BASE}/admin/guestbook?status=${status}&page=${page}&limit=5`)
           .then(r => r.json())
           .then(({ entries, total, limit }) => {
               if (!entries.length) {
@@ -550,7 +550,7 @@
       const status = document.getElementById('commentsAdminFilter').value;
       const list = document.getElementById('commentsAdminList');
       list.innerHTML = '<p class="widget-hint">Carregando...</p>';
-      fetch(`${API_BASE}/admin/comments?status=${status}&page=${page}&limit=10`)
+      fetch(`${API_BASE}/admin/comments?status=${status}&page=${page}&limit=5`)
           .then(r => r.json())
           .then(({ comments, total, limit }) => {
               if (!comments.length) {
