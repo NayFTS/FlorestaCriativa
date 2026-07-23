@@ -163,6 +163,18 @@
       <textarea id="editor" aria-label="Editor de texto do post"></textarea>
       <textarea id="content" name="content" style="display:none;"></textarea><br><br>
 
+      <details style="margin: 4px 0 16px;" id="enDetails">
+        <summary>Versão em inglês <span style="font-weight:400;font-size:0.9em">(opcional)</span></summary>
+        <div style="margin-top:10px">
+          <label for="title_en">Title (EN):</label>
+          <input type="text" id="title_en" name="title_en"><br><br>
+
+          <label for="editor_en">Content (EN):</label>
+          <textarea id="editor_en" aria-label="English text editor"></textarea>
+          <textarea id="content_en" name="content_en" style="display:none;"></textarea>
+        </div>
+      </details>
+
       <label for="image">Imagem de Capa:</label>
       <input type="file" id="image" name="image" accept="image/*"><br>
       <div id="imagePreviewWrap" class="gallery-preview-item" style="display:none">
@@ -260,6 +272,7 @@
 
     <script>
   let editorInstance;
+  let editorEnInstance = { getData: () => document.getElementById('editor_en').value };
   const postId = (new URLSearchParams(window.location.search).get('id') || '').trim();
 
   // Project fields toggle
@@ -428,6 +441,7 @@
           })
           .then(data => {
               document.getElementById('title').value = data.title || '';
+              document.getElementById('title_en').value = data.title_en || '';
               const urlSelect = document.getElementById('url');
               if (data.url) urlSelect.value = data.url;
               document.getElementById('status').value = data.status || 'published';
@@ -465,6 +479,36 @@
                       document.getElementById('editor').value = data.content || '';
                       editorInstance = { getData: () => document.getElementById('editor').value };
                   });
+
+              // CKEditor não inicializa direito dentro de um container escondido (o <details>
+              // fechado aplica display:none nos filhos) — só cria o editor EN quando a seção
+              // for aberta pela primeira vez, usando o content_en já carregado.
+              document.getElementById('enDetails').addEventListener('toggle', function onEnToggle() {
+                  if (!this.open) return;
+                  this.removeEventListener('toggle', onEnToggle);
+                  ClassicEditor
+                      .create(document.querySelector('#editor_en'), {
+                          toolbar: {
+                              items: [
+                                  'heading', '|',
+                                  'bold', 'italic', '|',
+                                  'link', 'blockQuote', '|',
+                                  'bulletedList', 'numberedList', '|',
+                                  'undo', 'redo'
+                              ]
+                          }
+                      })
+                      .then(editor => {
+                          editorEnInstance = editor;
+                          editorEnInstance.setData(data.content_en || '');
+                      })
+                      .catch(error => {
+                          console.error('Erro ao inicializar o CKEditor (EN):', error);
+                          document.getElementById('editor_en').style.display = 'block';
+                          document.getElementById('editor_en').value = data.content_en || '';
+                          editorEnInstance = { getData: () => document.getElementById('editor_en').value };
+                      });
+              });
 
               if (data.image_path) {
                   originalImageSrc = data.image_path.startsWith('http') ? data.image_path : `/imagens/uploads/${data.image_path}`;
@@ -640,6 +684,7 @@
       }
 
       document.getElementById('content').value = editorInstance.getData();
+      document.getElementById('content_en').value = editorEnInstance.getData();
       const formData = new FormData(this);
       const selectedCategories = Array.from(document.querySelectorAll('#editPostForm input[name="category[]"]:checked'))
           .map(checkbox => checkbox.value)

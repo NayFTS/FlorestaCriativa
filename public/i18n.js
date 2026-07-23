@@ -67,9 +67,12 @@
 
     function setLang(lang) {
         if (lang !== 'pt' && lang !== 'en') return;
+        if (getLang() === lang) return;
         localStorage.setItem(STORAGE_KEY, lang);
-        applyTranslations();
-        document.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));
+        // Recarrega em vez de só reaplicar as traduções estáticas: posts/histórias são
+        // buscados via fetch com título/conteúdo em pt ou en (ver postText() em search.js),
+        // e não há um jeito barato de re-renderizar tudo isso sem refazer as chamadas.
+        location.reload();
     }
 
     function toggleLang() {

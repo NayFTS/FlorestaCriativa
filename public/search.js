@@ -130,6 +130,17 @@ function _escapeHtmlGlobal(str) {
     return div.innerHTML;
 }
 
+// Retorna post[field] traduzido pro idioma atual, com fallback pro português
+// quando o post ainda não tem uma versão em inglês escrita (campo "field_en" vazio).
+function postText(post, field) {
+    const lang = window.i18n ? window.i18n.getLang() : 'pt';
+    if (lang === 'en') {
+        const enValue = post[field + '_en'];
+        if (enValue) return enValue;
+    }
+    return post[field] || '';
+}
+
 // ── Curtidas (persistidas no navegador via localStorage, sem precisar de login) ──
 function _getLikedPostIds() {
     try {
@@ -221,9 +232,10 @@ function _loadListingSidebar(pageUrl, opts = {}) {
                 const imgSrc = post.image_path
                     ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
                     : null;
-                const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy">` : '';
+                const title = postText(post, 'title');
+                const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${_escapeHtmlGlobal(title)}" loading="lazy">` : '';
                 featuredEl.innerHTML = `${imgHtml}
-                    <p><strong>${_escapeHtmlGlobal(post.title)}</strong></p>
+                    <p><strong>${_escapeHtmlGlobal(title)}</strong></p>
                     <a href="${link}" class="leia-mais">${ctaLabel}</a>`;
             })
             .catch(() => { featuredEl.innerHTML = '<p>Não foi possível carregar.</p>'; });
@@ -240,7 +252,7 @@ function _loadListingSidebar(pageUrl, opts = {}) {
                 }
                 const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
                 updatesEl.innerHTML = posts.map(post =>
-                    `<li>📝 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(post.title)}</a>"</li>`
+                    `<li>📝 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(postText(post, 'title'))}</a>"</li>`
                 ).join('');
             })
             .catch(() => { updatesEl.innerHTML = '<li>Não foi possível carregar.</li>'; });
@@ -467,7 +479,7 @@ function search() {
                 const titleElement = document.createElement('h3');
                 const a = document.createElement('a');
                 a.href = link;
-                a.textContent = post.title;
+                a.textContent = postText(post, 'title');
                 titleElement.appendChild(a);
                 resultItem.appendChild(titleElement);
 
@@ -481,7 +493,7 @@ function search() {
                 }
 
                 const tmp = document.createElement('div');
-                tmp.innerHTML = post.content || '';
+                tmp.innerHTML = postText(post, 'content') || '';
                 const plain = (tmp.textContent || '').trim();
                 const excerptElement = document.createElement('p');
                 excerptElement.textContent = plain.length > 120 ? plain.substring(0, 120) + '...' : plain;
@@ -519,8 +531,9 @@ function updateLoginButton() {
 updateLoginButton();
 
 function _renderPostCard(post) {
+    const title = postText(post, 'title');
     const temp = document.createElement('div');
-    temp.innerHTML = post.content;
+    temp.innerHTML = postText(post, 'content');
     const text = (temp.textContent || temp.innerText || '').trim();
     const excerpt = text.length > 150 ? text.substring(0, 150) + '...' : text;
     const link = post.slug
@@ -537,10 +550,10 @@ function _renderPostCard(post) {
     postItem.className = 'post-container';
     postItem.innerHTML =
         (imgSrc
-            ? `<a href="${link}" class="post-img-link" tabindex="-1" aria-hidden="true"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy"></a>`
+            ? `<a href="${link}" class="post-img-link" tabindex="-1" aria-hidden="true"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(title)}" loading="lazy"></a>`
             : '<div class="post-img-placeholder"></div>') +
         `<div class="post-card-body">
-            <h3><a href="${link}">${_escapeHtmlGlobal(post.title)}</a></h3>
+            <h3><a href="${link}">${_escapeHtmlGlobal(title)}</a></h3>
             <p>${_escapeHtmlGlobal(excerpt)}</p>
             <div class="post-card-stats">
                 <button type="button" class="like-btn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>

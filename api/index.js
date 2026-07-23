@@ -130,6 +130,8 @@ app.use(session({
 const Post = mongoose.model('Post', new mongoose.Schema({
     title: String,
     content: String,
+    title_en: { type: String, default: '' },
+    content_en: { type: String, default: '' },
     url: String,
     image_path: String,
     publish_date: { type: Date, default: Date.now },
@@ -378,6 +380,7 @@ app.get('/logout', (req, res) => {
 const postValidators = [
     body('title').trim().notEmpty().withMessage('Título é obrigatório').isLength({ max: 200 }).withMessage('Título muito longo'),
     body('content').trim().notEmpty().withMessage('Conteúdo é obrigatório'),
+    body('title_en').optional({ checkFalsy: true }).trim().isLength({ max: 200 }).withMessage('Título em inglês muito longo'),
     body('url').trim().notEmpty().withMessage('URL é obrigatória')
 ];
 
@@ -410,6 +413,8 @@ app.post('/addPost', requireAuth, galleryUpload, postValidators, async (req, res
     }
     try {
         const { title, content, status, external_link, preview_link } = req.body;
+        const title_en = (req.body.title_en || '').trim();
+        const content_en = (req.body.content_en || '').trim();
         let categories = req.body.categories ? JSON.parse(req.body.categories) : [];
         let technologies = req.body.technologies ? JSON.parse(req.body.technologies) : [];
         const { postType, storyId, chapterNumber, url } = await resolvePostTypeFields(req.body);
@@ -420,7 +425,7 @@ app.post('/addPost', requireAuth, galleryUpload, postValidators, async (req, res
         const slug = await uniqueSlug(title);
 
         const newPost = new Post({
-            title, content, url, image_path, categories, technologies, gallery,
+            title, content, title_en, content_en, url, image_path, categories, technologies, gallery,
             slug, postType, storyId, chapterNumber,
             external_link: external_link || '',
             preview_link: preview_link || '',
@@ -463,6 +468,8 @@ app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req
         // Atualiza os campos
         post.title = title;
         post.content = content;
+        post.title_en = (req.body.title_en || '').trim();
+        post.content_en = (req.body.content_en || '').trim();
         post.url = url;
         post.postType = postType;
         post.storyId = storyId;
@@ -576,7 +583,7 @@ app.get('/posts/:id/brief', async (req, res) => {
     try {
         const id = req.params.id;
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'ID inválido' });
-        const post = await Post.findById(id).select('_id title slug postType');
+        const post = await Post.findById(id).select('_id title title_en slug postType');
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
         res.json(post);
     } catch (err) {

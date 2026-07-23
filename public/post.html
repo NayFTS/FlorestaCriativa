@@ -386,16 +386,17 @@ function loadRelatedPosts(pageUrl, currentId) {
                 const imgSrc = post.image_path
                     ? (post.image_path.startsWith('http') ? post.image_path : `/imagens/uploads/${post.image_path}`)
                     : null;
+                const postTitle = postText(post, 'title');
                 const tmp = document.createElement('div');
-                tmp.innerHTML = post.content || '';
+                tmp.innerHTML = postText(post, 'content') || '';
                 const excerpt = (tmp.textContent || '').trim();
                 const card = document.createElement('a');
                 card.className = 'related-card';
                 card.href = link;
                 const excerptText = excerpt.length > 90 ? excerpt.substring(0, 90) + '...' : excerpt;
                 card.innerHTML =
-                    (imgSrc ? `<img src="${imgSrc}" alt="${escapeHtml(post.title)}" loading="lazy">` : '<div class="related-card-img-placeholder"></div>') +
-                    `<div class="related-card-body"><h4>${escapeHtml(post.title)}</h4><p>${escapeHtml(excerptText)}</p></div>`;
+                    (imgSrc ? `<img src="${imgSrc}" alt="${escapeHtml(postTitle)}" loading="lazy">` : '<div class="related-card-img-placeholder"></div>') +
+                    `<div class="related-card-body"><h4>${escapeHtml(postTitle)}</h4><p>${escapeHtml(excerptText)}</p></div>`;
                 grid.appendChild(card);
             });
             section.style.display = 'block';
@@ -420,11 +421,13 @@ function fetchPost() {
         })
         .then(data => {
             _currentPostId = data._id;
+            const title = postText(data, 'title');
+            const content = postText(data, 'content');
 
-            document.title = `${data.title} — Floresta Criativa`;
-            const desc = (data.content || '').replace(/<[^>]+>/g, '').trim().substring(0, 160);
+            document.title = `${title} — Floresta Criativa`;
+            const desc = (content || '').replace(/<[^>]+>/g, '').trim().substring(0, 160);
             document.querySelector('meta[name="description"]').setAttribute('content', desc);
-            document.querySelector('meta[property="og:title"]').setAttribute('content', data.title);
+            document.querySelector('meta[property="og:title"]').setAttribute('content', title);
             document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
             if (data.image_path) {
                 const ogImg = data.image_path.startsWith('http') ? data.image_path : `${window.location.origin}/imagens/uploads/${data.image_path}`;
@@ -437,13 +440,13 @@ function fetchPost() {
             });
             const resolveImg = (p) => p.startsWith('http') ? p : `/imagens/uploads/${p}`;
             const imageHTML = data.image_path
-                ? `<img class="post-cover-img" src="${resolveImg(data.image_path)}" alt="${escapeHtml(data.title)}">`
+                ? `<img class="post-cover-img" src="${resolveImg(data.image_path)}" alt="${escapeHtml(title)}">`
                 : '';
             const categories = data.categories ? [...new Set(data.categories)] : [];
             const categoryChipsHtml = categories.length
                 ? `<div class="category-chip-list">${categories.map(c => `<span class="category-chip">${escapeHtml(c)}</span>`).join('')}</div>`
                 : '';
-            const mins = readingTime(data.content || '');
+            const mins = readingTime(content || '');
             const gallery = Array.isArray(data.gallery) ? data.gallery : [];
 
             const isSapo = data.url === 'sapo-imaginario.html';
@@ -461,7 +464,7 @@ function fetchPost() {
                 postContainer.innerHTML = `
                     <div class="sapo-post-header">
                         ${categoryChipsHtml}
-                        <h2>${escapeHtml(data.title)}</h2>
+                        <h2>${escapeHtml(title)}</h2>
                         ${techHtml}
                         <div class="project-card-actions">
                             <button id="previewBtn" class="btn-preview">◈ Preview</button>
@@ -469,7 +472,7 @@ function fetchPost() {
                         </div>
                     </div>
                     ${imageHTML}
-                    <div class="content-body">${data.content}</div>
+                    <div class="content-body">${content}</div>
                     <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                     <div class="post-header-stats">
                         <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${data.likes || 0}</span></button>
@@ -478,13 +481,13 @@ function fetchPost() {
                     <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
                 `;
                 document.getElementById('previewBtn').addEventListener('click', () => {
-                    openPreview(data._id, previewLink, data.title);
+                    openPreview(data._id, previewLink, title);
                 });
             } else {
                 postContainer.innerHTML = `
                     <div class="post-header-card">
                         ${categoryChipsHtml}
-                        <h2>${escapeHtml(data.title)}</h2>
+                        <h2>${escapeHtml(title)}</h2>
                         <p class="post-meta"><strong>Publicado em:</strong> ${publishDate} &nbsp;·&nbsp; <strong>Visualizações:</strong> ${data.views || 0} &nbsp;·&nbsp; ${mins} min de leitura</p>
                         <div class="post-header-stats">
                             <button type="button" class="like-btn" id="postLikeBtn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${data.likes || 0}</span></button>
@@ -492,7 +495,7 @@ function fetchPost() {
                         </div>
                     </div>
                     ${imageHTML}
-                    <div class="content-body">${data.content}</div>
+                    <div class="content-body">${content}</div>
                     <div class="post-actions"><button id="shareBtn" class="share-btn">↗ Compartilhar</button></div>
                 `;
             }
@@ -510,7 +513,8 @@ function fetchPost() {
                         chapterListEl.innerHTML = list.length
                             ? `<h3>Capítulos</h3><ol class="chapter-links">${list.map(c => {
                                   const link = c.slug ? `post.html?slug=${c.slug}` : `post.html?id=${c._id}`;
-                                  const label = c.chapterNumber != null ? `Capítulo ${c.chapterNumber} — ${escapeHtml(c.title)}` : escapeHtml(c.title);
+                                  const cTitle = postText(c, 'title');
+                                  const label = c.chapterNumber != null ? `Capítulo ${c.chapterNumber} — ${escapeHtml(cTitle)}` : escapeHtml(cTitle);
                                   return `<li><a href="${link}">${label}</a></li>`;
                               }).join('')}</ol>`
                             : '<p class="widget-hint">Nenhum capítulo publicado ainda.</p>';
@@ -540,7 +544,7 @@ function fetchPost() {
                     chapterNavEl.innerHTML = `
                         <div class="chapter-nav-row">
                             ${prev ? `<a class="chapter-nav-link chapter-nav-prev" href="${chapterLink(prev)}">← Capítulo Anterior</a>` : '<span></span>'}
-                            ${storyLink ? `<a class="chapter-nav-link chapter-nav-index" href="${storyLink}">Índice: ${escapeHtml(story.title)}</a>` : '<span></span>'}
+                            ${storyLink ? `<a class="chapter-nav-link chapter-nav-index" href="${storyLink}">Índice: ${escapeHtml(postText(story, 'title'))}</a>` : '<span></span>'}
                             ${next ? `<a class="chapter-nav-link chapter-nav-next" href="${chapterLink(next)}">Próximo Capítulo →</a>` : '<span></span>'}
                         </div>
                     `;
@@ -553,7 +557,7 @@ function fetchPost() {
                 postContainer.insertBefore(galleryEl, actions);
             }
 
-            document.getElementById('shareBtn').addEventListener('click', () => sharePost(data.title));
+            document.getElementById('shareBtn').addEventListener('click', () => sharePost(title));
             _wireLikeButton(document.getElementById('postLikeBtn'), data._id, data.likes);
             loadRelatedPosts(data.url, data._id);
             loadComments(data._id);
@@ -591,7 +595,7 @@ function openPreview(postId, externalLink, title) {
         newTabBtn.style.display = 'none';
         fetch(`${API_BASE}/post/${postId}`)
             .then(r => r.json())
-            .then(p => { content.innerHTML = `<div class="content-body">${p.content}</div>`; })
+            .then(p => { content.innerHTML = `<div class="content-body">${postText(p, 'content')}</div>`; })
             .catch(() => { content.innerHTML = '<p>Erro ao carregar conteúdo.</p>'; });
     }
 

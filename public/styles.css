@@ -3650,12 +3650,12 @@ select {
 
 .lang-toggle-btn {
     background: none;
-    border: 1.5px solid var(--color-border);
+    border: none;
     color: var(--color-text);
-    padding: 4px 8px;
+    padding: 6px 8px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.75em;
+    font-size: 0.8em;
     font-weight: 700;
     letter-spacing: 0.03em;
     margin-left: 4px;
