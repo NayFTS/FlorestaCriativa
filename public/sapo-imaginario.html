@@ -43,7 +43,7 @@
           <div class="currently-widget">
             <h4>🌱 Currently</h4>
             <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
           <section class="mood-widget mood-card">
@@ -94,7 +94,7 @@
           <div class="currently-widget">
             <h4>🌱 Currently</h4>
             <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
           <section class="mood-widget mood-card">
@@ -128,7 +128,7 @@
     </div>
     <div class="page-banner-caption">
       <h1><span data-i18n="nav.sapo">Sapo Imaginário</span></h1>
-      <p>Veja um pouco do meu portfólio e projetos que estou participando!</p>
+      <p data-i18n="sapo.subtitle">Veja um pouco do meu portfólio e projetos que estou participando!</p>
     </div>
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
       <div class="search-overlay-box">
@@ -143,7 +143,7 @@
           <button type="button" onclick="clearSearch()" data-i18n="search.clear">Limpar</button>
         </form>
         <div id="advancedFilters" style="display:none;">
-          <p>Categorias:</p>
+          <p data-i18n="search.categoriesFilterLabel">Categorias:</p>
           <div id="searchCategoryFilters" class="search-category-filters"></div>
           <input type="date" id="startDate" name="startDate">
           <input type="date" id="endDate" name="endDate">
@@ -157,19 +157,19 @@
       <div class="portfolio-layout">
         <div class="portfolio-main">
           <div class="listing-controls" id="project-grid-controls">
-            <div class="listing-pills" role="group" aria-label="Filtrar por categoria">
-              <button type="button" class="filter-pill active" data-category="">Todos</button>
+            <div class="listing-pills" role="group" data-i18n-aria-label="listing.filterAllAria" aria-label="Filtrar por categoria">
+              <button type="button" class="filter-pill active" data-category="" data-i18n="listing.filterAll">Todos</button>
             </div>
             <div class="portfolio-controls-right">
-              <select class="listing-sort" aria-label="Ordenar projetos">
-                <option value="latest">Mais recentes</option>
-                <option value="oldest">Mais antigos</option>
-                <option value="likes">Mais curtidos</option>
-                <option value="views">Mais vistos</option>
+              <select class="listing-sort" data-i18n-aria-label="sapo.sortAria" aria-label="Ordenar projetos">
+                <option value="latest" data-i18n="listing.sortLatest">Mais recentes</option>
+                <option value="oldest" data-i18n="listing.sortOldest">Mais antigos</option>
+                <option value="likes" data-i18n="listing.sortLikes">Mais curtidos</option>
+                <option value="views" data-i18n="listing.sortViews">Mais vistos</option>
               </select>
-              <div class="view-toggle" role="group" aria-label="Alternar visualização">
-                <button type="button" class="view-toggle-btn active" data-view="grid" aria-label="Ver em grade">▦</button>
-                <button type="button" class="view-toggle-btn" data-view="list" aria-label="Ver em lista">☰</button>
+              <div class="view-toggle" role="group" data-i18n-aria-label="sapo.viewToggleAria" aria-label="Alternar visualização">
+                <button type="button" class="view-toggle-btn active" data-view="grid" data-i18n-aria-label="sapo.viewGridAria" aria-label="Ver em grade">▦</button>
+                <button type="button" class="view-toggle-btn" data-view="list" data-i18n-aria-label="sapo.viewListAria" aria-label="Ver em lista">☰</button>
               </div>
             </div>
           </div>
@@ -183,7 +183,7 @@
               <h3>📌 Featured Project</h3>
               <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
             </div>
-            <div id="featuredProject">Carregando...</div>
+            <div id="featuredProject"><span data-i18n="listing.loading">Carregando...</span></div>
           </div>
 
           <div class="widget-card sticker-card sticker-card--sm">
@@ -192,7 +192,7 @@
               <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
             </div>
             <ul class="widget-list widget-tools-list" id="toolsList">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
 
@@ -202,17 +202,17 @@
               <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
             </div>
             <div class="category-chip-list" id="skillsList">
-              <span class="category-chip">Carregando...</span>
+              <span class="category-chip"><span data-i18n="listing.loading">Carregando...</span></span>
             </div>
           </div>
 
           <div class="widget-card sticker-card sticker-card--sm widget-gardenlog">
             <div class="widget-window-header">
-              <h3>🪵 Recent Updates</h3>
+              <h3>🪵 Garden Log</h3>
               <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
             </div>
             <ul class="widget-list" id="portfolioRecentUpdates">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
         </aside>
@@ -225,12 +225,12 @@
       <div class="preview-drawer-header">
         <span id="previewTitle" class="preview-drawer-title"></span>
         <div class="preview-drawer-controls">
-          <a id="previewNewTab" href="#" target="_blank" rel="noopener" class="btn-newtab" style="display:none">↗ Abrir em nova aba</a>
-          <button class="icon-btn" onclick="closePreview()" aria-label="Fechar preview">✕</button>
+          <a id="previewNewTab" href="#" target="_blank" rel="noopener" class="btn-newtab" style="display:none" data-i18n="sapo.previewNewTab">↗ Abrir em nova aba</a>
+          <button class="icon-btn" onclick="closePreview()" data-i18n-aria-label="sapo.previewCloseAria" aria-label="Fechar preview">✕</button>
         </div>
       </div>
       <div class="preview-drawer-body">
-        <iframe id="previewIframe" src="" title="Preview do projeto" style="display:none; width:100%; height:100%; border:none;"></iframe>
+        <iframe id="previewIframe" src="" data-i18n-title="sapo.previewIframeTitle" title="Preview do projeto" style="display:none; width:100%; height:100%; border:none;"></iframe>
         <div id="previewContent" class="preview-post-content" style="display:none"></div>
       </div>
     </div>
@@ -248,7 +248,7 @@
           const state = { page: 1, limit: 6, category: '', sort: 'latest', view: 'grid' };
 
           function render() {
-              grid.innerHTML = '<p class="post-loading" style="grid-column:1/-1">Carregando projetos...</p>';
+              grid.innerHTML = `<p class="post-loading" style="grid-column:1/-1">${window.i18n.t('sapo.loadingProjects')}</p>`;
               const params = new URLSearchParams({ url: PORTFOLIO_URL, page: state.page, limit: state.limit, sort: state.sort });
               if (state.category) params.set('category', state.category);
 
@@ -259,7 +259,7 @@
                       const total = data.total || 0;
                       grid.innerHTML = '';
                       if (!posts.length) {
-                          grid.innerHTML = _emptyStateHtml('imagens/decor/sapo-de-costas-manchas.png', 'Nenhum projeto ainda. Em breve!', 'grid-column:1/-1');
+                          grid.innerHTML = _emptyStateHtml('imagens/decor/sapo-de-costas-manchas.png', window.i18n.t('sapo.noProjectsYet'), 'grid-column:1/-1');
                       } else {
                           posts.forEach(post => grid.appendChild(buildCard(post)));
                       }
@@ -270,7 +270,7 @@
                       });
                   })
                   .catch(() => {
-                      grid.innerHTML = '<p class="post-error" style="grid-column:1/-1">Erro ao carregar projetos. Tente novamente.</p>';
+                      grid.innerHTML = `<p class="post-error" style="grid-column:1/-1">${window.i18n.t('sapo.loadProjectsError')}</p>`;
                   });
           }
 
@@ -289,7 +289,7 @@
                       const btn = document.createElement('button');
                       btn.type = 'button';
                       btn.className = 'filter-pill';
-                      btn.textContent = cat;
+                      btn.textContent = window.i18n.translateCategory(cat);
                       btn.dataset.category = cat;
                       pillsEl.appendChild(btn);
                   });
@@ -327,34 +327,37 @@
               .then(data => {
                   const post = (data.posts || [])[0];
                   if (!post) {
-                      featuredEl.innerHTML = '<p>Nenhum projeto ainda.</p>';
+                      featuredEl.innerHTML = `<p>${window.i18n.t('sapo.featuredEmpty')}</p>`;
                       return;
                   }
                   const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
                   const imgSrc = post.image_path
                       ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
                       : null;
-                  const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy">` : '';
+                  const title = postText(post, 'title');
+                  const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${_escapeHtmlGlobal(title)}" loading="lazy">` : '';
                   featuredEl.innerHTML = `${imgHtml}
-                      <p><strong>${_escapeHtmlGlobal(post.title)}</strong></p>
-                      <a href="${link}" class="leia-mais">Ver projeto →</a>`;
+                      <p><strong>${_escapeHtmlGlobal(title)}</strong></p>
+                      <a href="${link}" class="leia-mais">${window.i18n.t('sapo.viewProjectCta')}</a>`;
               })
-              .catch(() => { featuredEl.innerHTML = '<p>Não foi possível carregar.</p>'; });
+              .catch(() => { featuredEl.innerHTML = `<p>${window.i18n.t('home.featuredError')}</p>`; });
 
           fetch(`${API_BASE}/posts?url=${encodeURIComponent(PORTFOLIO_URL)}&page=1&limit=4&sort=latest`)
               .then(r => r.json())
               .then(data => {
                   const posts = data.posts || [];
                   if (!posts.length) {
-                      updatesEl.innerHTML = '<li>Nenhuma atualização ainda.</li>';
+                      updatesEl.innerHTML = `<li>${window.i18n.t('listing.updatesEmpty')}</li>`;
                       return;
                   }
-                  const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+                  const dateLocale = window.i18n.getLang() === 'en' ? 'en-US' : 'pt-br';
+                  const fmt = d => new Date(d).toLocaleDateString(dateLocale, { day: '2-digit', month: 'short' });
+                  const posted = window.i18n.t('home.gardenLogPosted');
                   updatesEl.innerHTML = posts.map(post =>
-                      `<li>📷 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(post.title)}</a>"</li>`
+                      `<li>📷 ${fmt(post.publish_date)} — ${posted} "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(postText(post, 'title'))}</a>"</li>`
                   ).join('');
               })
-              .catch(() => { updatesEl.innerHTML = '<li>Não foi possível carregar.</li>'; });
+              .catch(() => { updatesEl.innerHTML = `<li>${window.i18n.t('home.featuredError')}</li>`; });
       }
 
       function buildCard(post) {
@@ -362,8 +365,9 @@
           const imgSrc = post.image_path
               ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
               : null;
+          const title = postText(post, 'title');
           const tmp = document.createElement('div');
-          tmp.innerHTML = post.content || '';
+          tmp.innerHTML = postText(post, 'content') || '';
           const text = (tmp.textContent || '').trim();
           const excerpt = text.length > 115 ? text.substring(0, 115) + '...' : text;
           const techs = (post.technologies || []);
@@ -374,7 +378,7 @@
           card.className = 'project-card';
 
           const imgHtml = imgSrc
-              ? `<a href="${link}"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(post.title)}" loading="lazy"></a>`
+              ? `<a href="${link}"><img src="${imgSrc}" alt="${_escapeHtmlGlobal(title)}" loading="lazy"></a>`
               : '<div class="project-card-img-placeholder">🌿</div>';
 
           const techHtml = techs.length
@@ -382,13 +386,13 @@
               : '';
 
           const verHtml = extLink
-              ? `<a href="${extLink}" target="_blank" rel="noopener" class="btn-ver-projeto">Ver Projeto ↗</a>`
+              ? `<a href="${extLink}" target="_blank" rel="noopener" class="btn-ver-projeto">${window.i18n.t('sapo.viewProjectBtn')}</a>`
               : '';
 
           card.innerHTML = `
               <div class="project-card-img">${imgHtml}</div>
               <div class="project-card-body">
-                  <h3><a href="${link}">${_escapeHtmlGlobal(post.title)}</a></h3>
+                  <h3><a href="${link}">${_escapeHtmlGlobal(title)}</a></h3>
                   <p>${_escapeHtmlGlobal(excerpt)}</p>
                   ${techHtml}
                   <div class="project-card-actions">
@@ -398,7 +402,7 @@
               </div>`;
 
           card.querySelector('.btn-preview').addEventListener('click', () => {
-              openPreview(post._id, previewLink, post.title);
+              openPreview(post._id, previewLink, title);
           });
 
           return card;
@@ -425,12 +429,12 @@
               newTabBtn.style.display = 'inline-flex';
           } else {
               content.style.display = 'block';
-              content.innerHTML = '<p class="post-loading">Carregando...</p>';
+              content.innerHTML = `<p class="post-loading">${window.i18n.t('listing.loading')}</p>`;
               newTabBtn.style.display = 'none';
               fetch(`${API_BASE}/post/${postId}`)
                   .then(r => r.json())
-                  .then(p => { content.innerHTML = `<div class="content-body">${p.content}</div>`; })
-                  .catch(() => { content.innerHTML = '<p>Erro ao carregar conteúdo.</p>'; });
+                  .then(p => { content.innerHTML = `<div class="content-body">${postText(p, 'content')}</div>`; })
+                  .catch(() => { content.innerHTML = `<p>${window.i18n.t('sapo.previewLoadError')}</p>`; });
           }
 
           overlay.classList.add('open');

@@ -199,9 +199,10 @@ function _wireLikeButton(btn, postId, initialLikes) {
 
 function _renderToolsListInto(el, tools) {
     if (!el) return;
+    const t = window.i18n ? window.i18n.t : (k) => k;
     el.innerHTML = (tools && tools.length)
-        ? tools.map(t => `<li><strong>${_escapeHtmlGlobal(t.name)}</strong><span>${_escapeHtmlGlobal(t.desc || '')}</span></li>`).join('')
-        : '<li>Nada por aqui no momento.</li>';
+        ? tools.map(tool => `<li><strong>${_escapeHtmlGlobal(tool.name)}</strong><span>${_escapeHtmlGlobal(tool.desc || '')}</span></li>`).join('')
+        : `<li>${t('listing.emptyGeneric')}</li>`;
 }
 
 function _renderChipListInto(el, items) {
@@ -214,10 +215,11 @@ function _renderChipListInto(el, items) {
 // Popula os widgets "Featured" e "Recent Updates" da sidebar de listagem (mesmo padrão usado
 // inline em sapo-imaginario.html), reutilizável por qualquer página de listagem de posts.
 function _loadListingSidebar(pageUrl, opts = {}) {
+    const t = window.i18n ? window.i18n.t : (k) => k;
     const featuredEl = document.getElementById(opts.featuredElId || 'featuredProject');
     const updatesEl = document.getElementById(opts.updatesElId || 'portfolioRecentUpdates');
-    const emptyFeatured = opts.emptyFeatured || 'Nenhum post ainda.';
-    const ctaLabel = opts.ctaLabel || 'Ler mais →';
+    const emptyFeatured = opts.emptyFeatured || t('home.featuredEmpty');
+    const ctaLabel = opts.ctaLabel || t('home.readMore');
 
     if (featuredEl) {
         fetch(`${API_BASE}/posts?url=${encodeURIComponent(pageUrl)}&page=1&limit=1&sort=likes`)
@@ -238,7 +240,7 @@ function _loadListingSidebar(pageUrl, opts = {}) {
                     <p><strong>${_escapeHtmlGlobal(title)}</strong></p>
                     <a href="${link}" class="leia-mais">${ctaLabel}</a>`;
             })
-            .catch(() => { featuredEl.innerHTML = '<p>Não foi possível carregar.</p>'; });
+            .catch(() => { featuredEl.innerHTML = `<p>${t('home.featuredError')}</p>`; });
     }
 
     if (updatesEl) {
@@ -247,15 +249,17 @@ function _loadListingSidebar(pageUrl, opts = {}) {
             .then(data => {
                 const posts = data.posts || [];
                 if (!posts.length) {
-                    updatesEl.innerHTML = '<li>Nenhuma atualização ainda.</li>';
+                    updatesEl.innerHTML = `<li>${t('listing.updatesEmpty')}</li>`;
                     return;
                 }
-                const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+                const dateLocale = (window.i18n && window.i18n.getLang() === 'en') ? 'en-US' : 'pt-br';
+                const fmt = d => new Date(d).toLocaleDateString(dateLocale, { day: '2-digit', month: 'short' });
+                const posted = t('home.gardenLogPosted');
                 updatesEl.innerHTML = posts.map(post =>
-                    `<li>📝 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(postText(post, 'title'))}</a>"</li>`
+                    `<li>📝 ${fmt(post.publish_date)} — ${posted} "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(postText(post, 'title'))}</a>"</li>`
                 ).join('');
             })
-            .catch(() => { updatesEl.innerHTML = '<li>Não foi possível carregar.</li>'; });
+            .catch(() => { updatesEl.innerHTML = `<li>${t('home.featuredError')}</li>`; });
     }
 }
 
@@ -306,7 +310,8 @@ function loadSearchCategoryFilters() {
             container.innerHTML = (categories || []).map((cat, i) => {
                 const id = `searchCat${i}`;
                 const safeCat = _escapeHtmlGlobal(cat);
-                return `<label for="${id}"><input type="checkbox" class="category" value="${safeCat}" name="category[]" id="${id}"> ${safeCat}</label>`;
+                const label = _escapeHtmlGlobal(window.i18n ? window.i18n.translateCategory(cat) : cat);
+                return `<label for="${id}"><input type="checkbox" class="category" value="${safeCat}" name="category[]" id="${id}"> ${label}</label>`;
             }).join('');
         })
         .catch(() => {});
@@ -486,9 +491,10 @@ function search() {
                 if (post.categories && post.categories.length > 0) {
                     const categoryElement = document.createElement('p');
                     const strong = document.createElement('strong');
-                    strong.textContent = 'Categoria(s): ';
+                    strong.textContent = window.i18n ? window.i18n.t('search.categoriesLabel') : 'Categoria(s): ';
                     categoryElement.appendChild(strong);
-                    categoryElement.appendChild(document.createTextNode([...new Set(post.categories)].join(', ')));
+                    const catNames = [...new Set(post.categories)].map(c => window.i18n ? window.i18n.translateCategory(c) : c);
+                    categoryElement.appendChild(document.createTextNode(catNames.join(', ')));
                     resultItem.appendChild(categoryElement);
                 }
 
@@ -531,6 +537,7 @@ function updateLoginButton() {
 updateLoginButton();
 
 function _renderPostCard(post) {
+    const t = window.i18n ? window.i18n.t : (k) => k;
     const title = postText(post, 'title');
     const temp = document.createElement('div');
     temp.innerHTML = postText(post, 'content');
@@ -542,8 +549,9 @@ function _renderPostCard(post) {
     const imgSrc = post.image_path
         ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
         : null;
+    const dateLocale = (window.i18n && window.i18n.getLang() === 'en') ? 'en-US' : 'pt-BR';
     const dateStr = post.publish_date
-        ? new Date(post.publish_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+        ? new Date(post.publish_date).toLocaleDateString(dateLocale, { day: '2-digit', month: 'short', year: 'numeric' })
         : '';
 
     const postItem = document.createElement('div');
@@ -556,11 +564,11 @@ function _renderPostCard(post) {
             <h3><a href="${link}">${_escapeHtmlGlobal(title)}</a></h3>
             <p>${_escapeHtmlGlobal(excerpt)}</p>
             <div class="post-card-stats">
-                <button type="button" class="like-btn" aria-label="Curtir post"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
+                <button type="button" class="like-btn" aria-label="${t('listing.likeAria')}"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
                 <span class="comment-count"><img src="imagens/decor/icone-comentario-balao.png" alt="" class="comment-icon"> ${post.commentsCount || 0}</span>
             </div>
             <div class="post-card-footer">
-                <a href="${link}" class="leia-mais">Leia mais</a>
+                <a href="${link}" class="leia-mais">${t('listing.readMoreCard')}</a>
                 ${dateStr ? `<time class="post-date">${dateStr}</time>` : ''}
             </div>
         </div>`;
@@ -616,13 +624,14 @@ function _renderPagination(el, page, limit, total, onGoto) {
 }
 
 function initPostListing(pageUrl, containerId) {
+    const t = window.i18n ? window.i18n.t : (k) => k;
     const container = document.getElementById(containerId);
     const controls = document.getElementById(containerId + '-controls');
     const pagination = document.getElementById(containerId + '-pagination');
     const state = { page: 1, limit: 6, category: '', sort: 'latest' };
 
     function render() {
-        container.innerHTML = '<p class="post-loading">Carregando...</p>';
+        container.innerHTML = `<p class="post-loading">${t('listing.loading')}</p>`;
         const params = new URLSearchParams({ url: pageUrl, page: state.page, limit: state.limit, sort: state.sort });
         if (state.category) params.set('category', state.category);
 
@@ -634,7 +643,7 @@ function initPostListing(pageUrl, containerId) {
                 container.innerHTML = '';
 
                 if (posts.length === 0) {
-                    container.innerHTML = _emptyStateHtml('imagens/decor/sapo-lendo-livro.png', 'Nenhum post encontrado.');
+                    container.innerHTML = _emptyStateHtml('imagens/decor/sapo-lendo-livro.png', t('listing.noPostsFound'));
                 } else {
                     posts.forEach(post => container.appendChild(_renderPostCard(post)));
                 }
@@ -647,7 +656,7 @@ function initPostListing(pageUrl, containerId) {
             })
             .catch(error => {
                 console.error('Erro ao buscar posts:', error);
-                container.innerHTML = '<p class="post-error">Erro ao carregar os posts. Tente novamente mais tarde.</p>';
+                container.innerHTML = `<p class="post-error">${t('listing.loadError')}</p>`;
             });
     }
 
@@ -670,7 +679,7 @@ function initPostListing(pageUrl, containerId) {
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = 'filter-pill';
-                        btn.textContent = cat;
+                        btn.textContent = window.i18n ? window.i18n.translateCategory(cat) : cat;
                         btn.dataset.category = cat;
                         pillsEl.appendChild(btn);
                     });

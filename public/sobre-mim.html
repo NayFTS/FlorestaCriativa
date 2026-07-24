@@ -43,7 +43,7 @@
           <div class="currently-widget">
             <h4>🌱 Currently</h4>
             <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
           <section class="mood-widget mood-card">
@@ -94,7 +94,7 @@
           <div class="currently-widget">
             <h4>🌱 Currently</h4>
             <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
           <section class="mood-widget mood-card">
@@ -128,7 +128,7 @@
         </div>
         <div class="page-banner-caption">
           <h1><span data-i18n="nav.sobre">Sobre Mim</span></h1>
-          <p>A sapinha por trás da Floresta Criativa</p>
+          <p data-i18n="sobre.subtitle">A sapinha por trás da Floresta Criativa</p>
         </div>
         <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
           <div class="search-overlay-box">
@@ -143,7 +143,7 @@
               <button type="button" onclick="clearSearch()" data-i18n="search.clear">Limpar</button>
             </form>
             <div id="advancedFilters" style="display:none;">
-              <p>Categorias:</p>
+              <p data-i18n="search.categoriesFilterLabel">Categorias:</p>
               <div id="searchCategoryFilters" class="search-category-filters"></div>
               <input type="date" id="startDate" name="startDate">
               <input type="date" id="endDate" name="endDate">
@@ -164,29 +164,29 @@
                   <img src="imagens/decor/moldura-circular-fina-flor.png" alt="" class="about-avatar-wreath" aria-hidden="true">
                 </div>
                 <div class="about-intro">
-                  <h2>Olá, sou a Nay!</h2>
-                  <p class="about-tagline">Programadora nas horas vagas, escritora amadora e otaku em tempo integral</p>
+                  <h2 data-i18n="sobre.greeting">Olá, sou a Nay!</h2>
+                  <p class="about-tagline" data-i18n="sobre.tagline">Programadora nas horas vagas, escritora amadora e otaku em tempo integral</p>
                 </div>
               </div>
 
               <div class="about-section">
-                <h3>Sobre mim</h3>
-                <p>
+                <h3 data-i18n="sobre.aboutTitle">Sobre mim</h3>
+                <p data-i18n="sobre.aboutP1">
                   Bem-vinde à minha Floresta Criativa! Este é o meu espaço pessoal na internet;
                   um lugar onde junto tudo que me move: escrita, projetos, referências e
                   devaneios do dia a dia. Aqui não tem tema fixo, só meus pensamentos e o que eu quero conversar mas não tenho quem.
                 </p>
-                <p>
+                <p data-i18n="sobre.aboutP2">
                   Sou apaixonada por histórias em todas as formas: animes, jogos, livros,
                   séries... e principalmente as que são criadas com base em histórias que já existem, isso mesmo, estou falando de fanfics. A escrita é o meu jeito
-                  favorito de processar o mundo e de deixar um rastro de quem eu fui em cada fase da vida. 
+                  favorito de processar o mundo e de deixar um rastro de quem eu fui em cada fase da vida.
                 </p>
-                <p>
+                <p data-i18n="sobre.aboutP3">
                   É interessante como nós sendo seres humanos temos necessidade de dar significado a tudo que existe e eu não sou exceção, quero que minhas palavras alcancem os outros e tragam sorrisos,
                   quero que você fique pensativo enquanto lê algo e, acima disso tudo, quero que pense: onde que eu consigo melhorar isso? E se ela tivesse feito tal coisa diferente?
                   Somos naturalmente seres que buscam, estamos sempre querendo consumir e consumir e nunca estamos satisfeitos, a maneira que eu encontrei de 'saciar' essa vontade foi escrevendo e criando meu próprio mundinho.
                 </p>
-                <p>
+                <p data-i18n="sobre.aboutP4">
                   Também me aventuro pelo desenvolvimento web, onde código e criatividade
                   andam juntos. Construir esse site foi parte do processo: aprender fazendo,
                   errando e tentando de novo, do mesmo jeito que a escrita funciona.
@@ -198,23 +198,23 @@
                 <div class="quick-facts-list">
                   <div class="quick-fact-row">
                     <span class="quick-fact-icon">🥤</span>
-                    <span class="quick-fact-label">Bebida favorita</span>
-                    <span class="quick-fact-value">Água com gás e um limãozinho</span>
+                    <span class="quick-fact-label" data-i18n="sobre.factDrinkLabel">Bebida favorita</span>
+                    <span class="quick-fact-value" data-i18n="sobre.factDrinkValue">Água com gás e um limãozinho</span>
                   </div>
                   <div class="quick-fact-row">
                     <span class="quick-fact-icon"><img src="imagens/decor/icon-sol.png" alt="" class="quick-fact-icon-img"></span>
-                    <span class="quick-fact-label">Clima favorito</span>
-                    <span class="quick-fact-value">Dia ensolarado, céu azul e limpo, com um ventinho gelado no sol quente</span>
+                    <span class="quick-fact-label" data-i18n="sobre.factWeatherLabel">Clima favorito</span>
+                    <span class="quick-fact-value" data-i18n="sobre.factWeatherValue">Dia ensolarado, céu azul e limpo, com um ventinho gelado no sol quente</span>
                   </div>
                   <div class="quick-fact-row">
                     <span class="quick-fact-icon">📖</span>
-                    <span class="quick-fact-label">Hobby favorito</span>
-                    <span class="quick-fact-value">Ler muuuuuito (e escrever um pouco)</span>
+                    <span class="quick-fact-label" data-i18n="sobre.factHobbyLabel">Hobby favorito</span>
+                    <span class="quick-fact-value" data-i18n="sobre.factHobbyValue">Ler muuuuuito (e escrever um pouco)</span>
                   </div>
                   <div class="quick-fact-row">
                     <span class="quick-fact-icon">🤫</span>
-                    <span class="quick-fact-label">Personalidade</span>
-                    <span class="quick-fact-value">Pessoalmente me considero uma pessoa quieta, não sou muito de falar ou expressar minha opinião a menos que seja algo que eu me importe, mas sou boa para resolver conflitos e me chamaram de resolutiva esses dias, então tem isso!</span>
+                    <span class="quick-fact-label" data-i18n="sobre.factPersonalityLabel">Personalidade</span>
+                    <span class="quick-fact-value" data-i18n="sobre.factPersonalityValue">Pessoalmente me considero uma pessoa quieta, não sou muito de falar ou expressar minha opinião a menos que seja algo que eu me importe, mas sou boa para resolver conflitos e me chamaram de resolutiva esses dias, então tem isso!</span>
                   </div>
                 </div>
               </div>
@@ -222,58 +222,61 @@
               <div class="about-section">
                 <h3>💚 Things I Love</h3>
                 <div class="category-chip-list">
-                  <span class="category-chip">Musicais</span>
-                  <span class="category-chip">Animes</span>
-                  <span class="category-chip">Ler</span>
-                  <span class="category-chip">Ouvir música</span>
-                  <span class="category-chip">Balançar na rede</span>
-                  <span class="category-chip">Cochilo pós-almoço</span>
-                  <span class="category-chip">Praia de Sergipe</span>
+                  <span class="category-chip" data-i18n="sobre.chipMusicais">Musicais</span>
+                  <span class="category-chip" data-i18n="sobre.chipAnimes">Animes</span>
+                  <span class="category-chip" data-i18n="sobre.chipLer">Ler</span>
+                  <span class="category-chip" data-i18n="sobre.chipMusica">Ouvir música</span>
+                  <span class="category-chip" data-i18n="sobre.chipRede">Balançar na rede</span>
+                  <span class="category-chip" data-i18n="sobre.chipCochilo">Cochilo pós-almoço</span>
+                  <span class="category-chip" data-i18n="sobre.chipPraia">Praia de Sergipe</span>
                 </div>
               </div>
 
               <div class="about-section">
                 <h3>🐾 My Journey</h3>
                 <ul class="journey-timeline">
-                  <li><span class="journey-year">2020</span><strong>Colômbia</strong></li>
+                  <li><span class="journey-year">2020</span><strong data-i18n="sobre.journeyColombia">Colômbia</strong></li>
                   <li><span class="journey-year">2021</span><strong>Portugal</strong></li>
-                  <li><span class="journey-year">2024</span><strong>CASADAAAAAA 💍</strong></li>
-                  <li><span class="journey-year">2026</span><strong>Carregando...</strong></li>
+                  <li><span class="journey-year">2024</span><strong data-i18n="sobre.journeyCasada">CASADAAAAAA 💍</strong></li>
+                  <li><span class="journey-year">2026</span><strong data-i18n="listing.loading">Carregando...</strong></li>
                 </ul>
               </div>
 
               <div class="about-section">
-                <h3>O que tem por aqui</h3>
+                <h3 data-i18n="sobre.sitemapTitle">O que tem por aqui</h3>
                 <div class="about-sitemap">
                   <a href="verde-inspiracao.html" class="about-sitemap-item">
                     <span class="about-sitemap-icon"><img src="imagens/decor/icone-arte-paleta.png" alt=""></span>
                     <div>
                       <strong><span data-i18n="nav.verde">Verde Inspiração</span></strong>
-                      <p>Hobbies, animes, jogos e leituras do momento.</p>
+                      <p data-i18n="sobre.sitemapVerdeDesc">Hobbies, animes, jogos e leituras do momento.</p>
                     </div>
                   </a>
                   <a href="sapo-imaginario.html" class="about-sitemap-item">
                     <span class="about-sitemap-icon"><img src="imagens/decor/icone-projetos-codigo.png" alt=""></span>
                     <div>
                       <strong><span data-i18n="nav.sapo">Sapo Imaginário</span></strong>
-                      <p>Projetos e experimentos de programação.</p>
+                      <p data-i18n="sobre.sitemapSapoDesc">Projetos e experimentos de programação.</p>
                     </div>
                   </a>
                   <a href="rascunhos-da-floresta.html" class="about-sitemap-item">
                     <span class="about-sitemap-icon"><img src="imagens/decor/icone-blog-livro.png" alt=""></span>
                     <div>
                       <strong><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></strong>
-                      <p>Textos, fanfics e tudo que escrevo.</p>
+                      <p data-i18n="sobre.sitemapRascunhosDesc">Textos, fanfics e tudo que escrevo.</p>
                     </div>
                   </a>
                 </div>
               </div>
 
               <div class="about-section">
-                <h3>Encontre-me por aí</h3>
+                <h3 data-i18n="sobre.findMeTitle">Encontre-me por aí</h3>
                 <div class="about-links">
                   <a href="https://github.com/nayfts" target="_blank" rel="noopener" class="about-link-btn">
                     GitHub
+                  </a>
+                  <a href="https://www.instagram.com/nathy_freitass/" target="_blank" rel="noopener" class="about-link-btn">
+                    Instagram
                   </a>
                 </div>
               </div>
@@ -286,7 +289,7 @@
                   <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
                 </div>
                 <img src="imagens/uploads/familia.jpg" alt="" loading="lazy">
-                <p>Um dos meus momentos favoritos ♥</p>
+                <p data-i18n="sobre.featuredMemoryCaption">Um dos meus momentos favoritos ♥</p>
               </div>
 
               <div class="widget-card sticker-card sticker-card--sm">
@@ -295,7 +298,7 @@
                   <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
                 </div>
                 <ul class="widget-list widget-tools-list" id="aboutToolsList">
-                  <li>Carregando...</li>
+                  <li><span data-i18n="listing.loading">Carregando...</span></li>
                 </ul>
               </div>
 
@@ -305,7 +308,7 @@
                   <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
                 </div>
                 <div class="category-chip-list" id="aboutValuesList">
-                  <span class="category-chip">Carregando...</span>
+                  <span class="category-chip"><span data-i18n="listing.loading">Carregando...</span></span>
                 </div>
               </div>
             </aside>

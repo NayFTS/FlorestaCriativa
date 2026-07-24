@@ -2326,6 +2326,16 @@ input.input-error, input.input-error:focus {
 .ck.ck-toolbar { flex-wrap: wrap !important; }
 .ck.ck-toolbar__items { flex-wrap: wrap !important; }
 
+/* CKEditor: altura inicial (vazia) maior que o padrão, pra não parecer um campo pequeno */
+.ck.ck-editor__editable_inline {
+    min-height: 400px;
+}
+
+/* Fallback (textarea simples, se o CKEditor não carregar) com a mesma altura */
+#editor, #editor_en {
+    min-height: 400px;
+}
+
 /* CKEditor: acompanha o modo noturno (por padrão vem com fundo branco fixo) */
 [data-theme="dark"] .ck.ck-editor__editable_inline,
 [data-theme="dark"] .ck.ck-content {

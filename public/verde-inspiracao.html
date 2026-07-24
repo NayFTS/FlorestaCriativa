@@ -43,7 +43,7 @@
           <div class="currently-widget">
             <h4>🌱 Currently</h4>
             <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
           <section class="mood-widget mood-card">
@@ -94,7 +94,7 @@
           <div class="currently-widget">
             <h4>🌱 Currently</h4>
             <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
           <section class="mood-widget mood-card">
@@ -128,7 +128,7 @@
     </div>
     <div class="page-banner-caption">
       <h1><span data-i18n="nav.verde">Verde Inspiração</span></h1>
-      <p>Meus hobbies, leituras, animes e jogos.</p>
+      <p data-i18n="verde.subtitle">Meus hobbies, leituras, animes e jogos.</p>
     </div>
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">
       <div class="search-overlay-box">
@@ -143,7 +143,7 @@
           <button type="button" onclick="clearSearch()" data-i18n="search.clear">Limpar</button>
         </form>
         <div id="advancedFilters" style="display:none;">
-          <p>Categorias:</p>
+          <p data-i18n="search.categoriesFilterLabel">Categorias:</p>
           <div id="searchCategoryFilters" class="search-category-filters"></div>
           <input type="date" id="startDate" name="startDate">
           <input type="date" id="endDate" name="endDate">
@@ -156,14 +156,14 @@
       <div class="portfolio-layout">
         <div class="portfolio-main">
           <div class="listing-controls" id="post-list-controls">
-            <div class="listing-pills" role="group" aria-label="Filtrar por categoria">
-              <button type="button" class="filter-pill active" data-category="">Todos</button>
+            <div class="listing-pills" role="group" data-i18n-aria-label="listing.filterAllAria" aria-label="Filtrar por categoria">
+              <button type="button" class="filter-pill active" data-category="" data-i18n="listing.filterAll">Todos</button>
             </div>
-            <select class="listing-sort" aria-label="Ordenar posts">
-              <option value="latest">Mais recentes</option>
-              <option value="oldest">Mais antigos</option>
-              <option value="likes">Mais curtidos</option>
-              <option value="views">Mais vistos</option>
+            <select class="listing-sort" data-i18n-aria-label="listing.sortAria" aria-label="Ordenar posts">
+              <option value="latest" data-i18n="listing.sortLatest">Mais recentes</option>
+              <option value="oldest" data-i18n="listing.sortOldest">Mais antigos</option>
+              <option value="likes" data-i18n="listing.sortLikes">Mais curtidos</option>
+              <option value="views" data-i18n="listing.sortViews">Mais vistos</option>
             </select>
           </div>
           <div id="post-list"></div>
@@ -176,36 +176,24 @@
               <h3>📌 Featured Post</h3>
               <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
             </div>
-            <div id="featuredProject">Carregando...</div>
+            <div id="featuredProject"><span data-i18n="listing.loading">Carregando...</span></div>
           </div>
 
           <div class="widget-card sticker-card sticker-card--sm">
             <div class="widget-window-header">
-              <h3>🛠️ Tools I Use</h3>
+              <h3>✨ Coming Soon</h3>
               <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
             </div>
-            <ul class="widget-list widget-tools-list" id="toolsList">
-              <li>Carregando...</li>
-            </ul>
-          </div>
-
-          <div class="widget-card sticker-card sticker-card--sm">
-            <div class="widget-window-header">
-              <h3>✨ Skills &amp; Services</h3>
-              <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
-            </div>
-            <div class="category-chip-list" id="skillsList">
-              <span class="category-chip">Carregando...</span>
-            </div>
+            <div id="verdeComingSoon"><span data-i18n="listing.loading">Carregando...</span></div>
           </div>
 
           <div class="widget-card sticker-card sticker-card--sm widget-gardenlog">
             <div class="widget-window-header">
-              <h3>🪵 Recent Updates</h3>
+              <h3>🪵 Garden Log</h3>
               <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
             </div>
             <ul class="widget-list" id="portfolioRecentUpdates">
-              <li>Carregando...</li>
+              <li><span data-i18n="listing.loading">Carregando...</span></li>
             </ul>
           </div>
         </aside>
@@ -217,7 +205,7 @@
     <script>
       window.onload = () => {
           initPostListing('verde-inspiracao.html', 'post-list');
-          _loadListingSidebar('verde-inspiracao.html', { emptyFeatured: 'Nenhum post ainda.', ctaLabel: 'Ler post →' });
+          _loadListingSidebar('verde-inspiracao.html');
       };
     </script>
       </main>
