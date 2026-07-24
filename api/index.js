@@ -533,11 +533,11 @@ app.get('/posts', async (req, res) => {
             if (!mongoose.Types.ObjectId.isValid(storyId)) return res.status(400).json({ message: 'storyId inválido' });
             query.storyId = storyId;
             query.postType = 'chapter';
-        } else if (url) {
+        } else if (url && typeof url === 'string') {
             query.url = url;
             query.postType = { $ne: 'chapter' };
         }
-        if (category) {
+        if (category && typeof category === 'string') {
             const categories = category.split(',').map(c => c.trim()).filter(Boolean);
             if (categories.length) query.categories = { $in: categories };
         }
@@ -565,7 +565,7 @@ app.get('/posts/categories', async (req, res) => {
     try {
         const { url } = req.query;
         const query = { status: { $ne: 'draft' } };
-        if (url) {
+        if (url && typeof url === 'string') {
             query.url = url;
             query.postType = { $ne: 'chapter' };
         }
@@ -702,14 +702,14 @@ app.get('/search', async (req, res) => {
 
         // Cria o filtro de busca
         const filter = {};
-        if (q) {
+        if (q && typeof q === 'string') {
             const safeQ = escapeRegex(q);
             filter.$or = [
                 { title: { $regex: safeQ, $options: 'i' } }, // Busca por título
                 { content: { $regex: safeQ, $options: 'i' } } // Busca por conteúdo
             ];
         }
-        if (category) {
+        if (category && typeof category === 'string') {
             const categories = category.split(',').map(c => c.trim()).filter(Boolean); // Converte para array
             if (categories.length) filter.categories = { $in: categories }; // Filtra pelas categorias
         }
