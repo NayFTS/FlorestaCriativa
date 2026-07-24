@@ -884,19 +884,29 @@ ${items}
 });
 
 // Inscrição por e-mail
+const SUBSCRIBE_MESSAGES = {
+    pt: { email: 'E-mail inválido', already: 'Você já está inscrito(a)!', confirmed: 'Inscrição confirmada! Obrigado por acompanhar 🐸', saveError: 'Erro ao salvar inscrição' },
+    en: { email: 'Invalid email', already: "You're already subscribed!", confirmed: 'Subscription confirmed! Thanks for following 🐸', saveError: 'Error saving subscription' }
+};
+
 app.post('/subscribe', subscribeLimiter, [
-    body('email').trim().isEmail().withMessage('E-mail inválido')
+    body('email').trim().isEmail().withMessage('email')
 ], async (req, res) => {
+    const lang = req.body.lang === 'en' ? 'en' : 'pt';
+    const msgs = SUBSCRIBE_MESSAGES[lang];
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const mapped = errors.array().map(e => ({ ...e, msg: msgs[e.msg] || e.msg }));
+        return res.status(400).json({ errors: mapped });
+    }
     try {
         const email = req.body.email.trim().toLowerCase();
         const exists = await Subscriber.exists({ email });
-        if (exists) return res.json({ success: true, message: 'Você já está inscrito(a)!' });
+        if (exists) return res.json({ success: true, message: msgs.already });
         await Subscriber.create({ email });
-        res.json({ success: true, message: 'Inscrição confirmada! Obrigado por acompanhar 🐸' });
+        res.json({ success: true, message: msgs.confirmed });
     } catch (err) {
-        res.status(500).json({ message: 'Erro ao salvar inscrição' });
+        res.status(500).json({ message: msgs.saveError });
     }
 });
 
@@ -1049,19 +1059,29 @@ app.delete('/admin/comments/:id', requireAuth, async (req, res) => {
 
 // ── Guestbook ────────────────────────────────────────────
 
+const GUESTBOOK_MESSAGES = {
+    pt: { name: 'Nome inválido', message: 'Mensagem inválida', sent: 'Mensagem enviada para moderação!', saveError: 'Erro ao salvar mensagem' },
+    en: { name: 'Invalid name', message: 'Invalid message', sent: 'Message sent for moderation!', saveError: 'Error saving message' }
+};
+
 app.post('/guestbook', guestbookLimiter, [
-    body('author').trim().notEmpty().isLength({ max: 60 }).withMessage('Nome inválido'),
-    body('message').trim().notEmpty().isLength({ max: 500 }).withMessage('Mensagem inválida')
+    body('author').trim().notEmpty().isLength({ max: 60 }).withMessage('name'),
+    body('message').trim().notEmpty().isLength({ max: 500 }).withMessage('message')
 ], async (req, res) => {
+    const lang = req.body.lang === 'en' ? 'en' : 'pt';
+    const msgs = GUESTBOOK_MESSAGES[lang];
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const mapped = errors.array().map(e => ({ ...e, msg: msgs[e.msg] || e.msg }));
+        return res.status(400).json({ errors: mapped });
+    }
     const { author, message } = req.body;
     try {
         const entry = new GuestbookEntry({ author: author.trim(), message: message.trim() });
         await entry.save();
-        res.json({ success: true, message: 'Mensagem enviada para moderação!' });
+        res.json({ success: true, message: msgs.sent });
     } catch (err) {
-        res.status(500).json({ message: 'Erro ao salvar mensagem' });
+        res.status(500).json({ message: msgs.saveError });
     }
 });
 

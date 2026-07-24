@@ -11,17 +11,17 @@
             icon: 'cloud-frog.png'
         },
         cloudy: {
-            pt: { weather: 'Nublado', mood: 'Aconchegada', text: 'cinza cozy' },
-            en: { weather: 'Cloudy', mood: 'Cozy', text: 'cozy grey' },
+            pt: { weather: 'Nublado', mood: 'Aconchegada', text: 'Dia lento' },
+            en: { weather: 'Cloudy', mood: 'Cozy', text: 'Slow Day' },
             icon: 'cozy-frog.png'
         },
         overcast: {
             pt: { weather: 'Muito nublado', mood: 'Preguiçosa', text: 'dia de ficar quietinha' },
-            en: { weather: 'Overcast', mood: 'Sleepy', text: 'quiet grey' },
+            en: { weather: 'Overcast', mood: 'Sleepy', text: 'quiet day' },
             icon: 'sleepy-cloud-frog.png'
         },
         fog: {
-            pt: { weather: 'Neblina', mood: 'Misteriosa', text: 'sonhos com névoa' },
+            pt: { weather: 'Neblina', mood: 'Misteriosa', text: 'sonhos enevoados' },
             en: { weather: 'Foggy', mood: 'Mysterious', text: 'foggy dreams' },
             icon: 'fog-frog.png'
         },
@@ -31,8 +31,8 @@
             icon: 'drizzle-frog.png'
         },
         lightRain: {
-            pt: { weather: 'Chuva leve', mood: 'Chuvinha calma', text: 'chuva macia' },
-            en: { weather: 'Light rain', mood: 'Soft rain', text: 'soft rain' },
+            pt: { weather: 'Chuva leve', mood: 'Agitada', text: 'chuva miúda para lavar a alma' },
+            en: { weather: 'Light rain', mood: 'Restless', text: 'fine rain to wash the soul' },
             icon: 'rain-frog.png'
         },
         moderateRain: {
@@ -41,18 +41,18 @@
             icon: 'tea-rain-frog.png'
         },
         heavyRain: {
-            pt: { weather: 'Chuva forte', mood: 'Dramática', text: 'chá de tempestade' },
-            en: { weather: 'Heavy rain', mood: 'Dramatic', text: 'stormy tea' },
+            pt: { weather: 'Chuva forte', mood: 'Dramática', text: 'dançar na chuva ou chorar copiosamente' },
+            en: { weather: 'Heavy rain', mood: 'Dramatic', text: 'dance in the rain or cry it out' },
             icon: 'storm-tea-frog.png'
         },
         thunderstorm: {
-            pt: { weather: 'Trovoada', mood: 'Intensa', text: 'trovões no brejo' },
-            en: { weather: 'Thunderstorm', mood: 'Intense', text: 'thunder pond' },
+            pt: { weather: 'Trovoada', mood: 'Intensa', text: 'ver um filme embaixo dos lençóis' },
+            en: { weather: 'Thunderstorm', mood: 'Intense', text: 'watching a movie under the covers' },
             icon: 'thunder-frog.png'
         },
         storm: {
-            pt: { weather: 'Tempestade', mood: 'Caótica cozy', text: 'caos com cobertor' },
-            en: { weather: 'Storm', mood: 'Cozy chaos', text: 'blanket chaos' },
+            pt: { weather: 'Tempestade', mood: 'Caótica', text: 'Hora de jogar The Sims' },
+            en: { weather: 'Storm', mood: 'Chaotic', text: 'Time to play The Sims' },
             icon: 'storm-frog.png'
         },
         windy: {
@@ -66,8 +66,8 @@
             icon: 'breeze-frog.png'
         },
         cold: {
-            pt: { weather: 'Frio', mood: 'Modo mantinha', text: 'sapinho enrolado' },
-            en: { weather: 'Cold', mood: 'Blanket mode', text: 'blanket time' },
+            pt: { weather: 'Frio', mood: 'Lenta', text: 'modo mantinha' },
+            en: { weather: 'Cold', mood: 'Slow', text: 'blanket mode' },
             icon: 'blanket-frog.png'
         },
         veryCold: {
@@ -81,13 +81,13 @@
             icon: 'hot-frog.png'
         },
         veryHot: {
-            pt: { weather: 'Muito calor', mood: 'Sapinho assado', text: 'sombra urgente' },
-            en: { weather: 'Very hot', mood: 'Roasted frog', text: 'urgent shade' },
+            pt: { weather: 'Muito calor', mood: 'Cabeça quente', text: 'alguém traz um ventilador' },
+            en: { weather: 'Very hot', mood: 'Hot-headed', text: 'someone bring a fan' },
             icon: 'shade-frog.png'
         },
         snow: {
-            pt: { weather: 'Neve', mood: 'Encantada', text: 'feitiço de neve' },
-            en: { weather: 'Snow', mood: 'Enchanted', text: 'snow spell' },
+            pt: { weather: 'Neve', mood: 'Encantada', text: 'christmas time!' },
+            en: { weather: 'Snow', mood: 'Enchanted', text: 'christmas time!' },
             icon: 'snow-frog.png'
         },
         hail: {
@@ -111,8 +111,8 @@
             icon: 'moon-frog.png'
         },
         nightRain: {
-            pt: { weather: 'Noite chuvosa', mood: 'Melancólica cozy', text: 'janela molhada e chá' },
-            en: { weather: 'Rainy night', mood: 'Cozy melancholy', text: 'rainy window tea' },
+            pt: { weather: 'Noite chuvosa', mood: 'Melancólica', text: 'Músicas e chá junto com um bom livro' },
+            en: { weather: 'Rainy night', mood: 'Melancholic', text: 'Music and tea with a good book' },
             icon: 'night-rain-frog.png'
         },
         unknown: {

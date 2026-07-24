@@ -20,15 +20,15 @@
       <div class="topbar">
         <nav class="topbar-nav" aria-label="Navegação principal">
           <a href="index.html">Home</a>
-          <a href="verde-inspiracao.html">Verde Inspiração</a>
-          <a href="sapo-imaginario.html">Sapo Imaginário</a>
-          <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
-          <a href="sobre-mim.html">Sobre Mim</a>
+          <a href="verde-inspiracao.html"><span data-i18n="nav.verde">Verde Inspiração</span></a>
+          <a href="sapo-imaginario.html"><span data-i18n="nav.sapo">Sapo Imaginário</span></a>
+          <a href="rascunhos-da-floresta.html"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></a>
+          <a href="sobre-mim.html"><span data-i18n="nav.sobre">Sobre Mim</span></a>
           <a href="login.html" class="login-link">Login</a>
         </nav>
         <div class="topbar-actions theme-toggle-target">
-          <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" onclick="toggleSearch()">
-            <span class="search-bar-placeholder">Pesquisar...</span>
+          <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()">
+            <span class="search-bar-placeholder" data-i18n="search.triggerPlaceholder">Pesquisar...</span>
             <img src="imagens/decor/icone-busca-lupa.png" alt="" class="search-bar-icon" loading="lazy">
           </button>
         </div>
@@ -47,8 +47,8 @@
             </ul>
           </div>
           <section class="mood-widget mood-card">
-            <h3 data-i18n="mood.title">mood</h3>
-            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje parece:</p>
+            <h3 data-i18n="mood.title">humor</h3>
+            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje me sinto</p>
             <img class="mood-image" src="" alt="">
             <strong class="mood-value"></strong>
             <span class="mood-weather"></span>
@@ -57,7 +57,7 @@
           <img src="imagens/decor/sapo-sentado.png" alt="" class="sidebar-sticker" aria-hidden="true" loading="lazy">
         </div>
         <div class="sidebar-footer">
-          <div class="sidebar-social"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.png" alt="" class="icon-github"></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="subscribe-btn-icon"></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" aria-label="E-mail" required><button type="submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
+          <div class="sidebar-social"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.png" alt="" class="icon-github"></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" data-i18n-aria-label="subscribe.btnAriaLabel" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="subscribe-btn-icon"></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title" data-i18n="subscribe.title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" data-i18n-placeholder="subscribe.emailPlaceholder" aria-label="E-mail" data-i18n-aria-label="subscribe.emailAriaLabel" required><button type="submit" data-i18n="subscribe.submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
         </div>
       </aside>
 
@@ -70,7 +70,7 @@
               <img class="mobile-topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS" loading="lazy">
               <img class="mobile-topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS" loading="lazy">
             </a>
-            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
             <div class="mobile-topbar-actions theme-toggle-target"></div>
           </div>
           <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
@@ -84,10 +84,10 @@
         </a>
         <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
           <a href="index.html"><img src="imagens/decor/icone-home.png" alt="" class="nav-icon">Home</a>
-          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon">Verde Inspiração</a>
-          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon">Sapo Imaginário</a>
-          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon">Rascunhos da Floresta</a>
-          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon">Sobre Mim</a>
+          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon"><span data-i18n="nav.verde">Verde Inspiração</span></a>
+          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon"><span data-i18n="nav.sapo">Sapo Imaginário</span></a>
+          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></a>
+          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon"><span data-i18n="nav.sobre">Sobre Mim</span></a>
           <a href="#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
         </div>
         <div class="sidebar-widgets drawer-widgets">
@@ -98,8 +98,8 @@
             </ul>
           </div>
           <section class="mood-widget mood-card">
-            <h3 data-i18n="mood.title">mood</h3>
-            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje parece:</p>
+            <h3 data-i18n="mood.title">humor</h3>
+            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje me sinto</p>
             <img class="mood-image" src="" alt="">
             <strong class="mood-value"></strong>
             <span class="mood-weather"></span>
@@ -108,17 +108,17 @@
         </div>
         <div class="sidebar-footer theme-toggle-target">
           <a href="login.html" class="login-link">Login</a>
-          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
         </div>
-        <div class="sidebar-social sidebar-social-drawer"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.png" alt="" class="icon-github"></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="subscribe-btn-icon"></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" aria-label="E-mail" required><button type="submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
+        <div class="sidebar-social sidebar-social-drawer"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.png" alt="" class="icon-github"></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" data-i18n-aria-label="subscribe.btnAriaLabel" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="subscribe-btn-icon"></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title" data-i18n="subscribe.title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" data-i18n-placeholder="subscribe.emailPlaceholder" aria-label="E-mail" data-i18n-aria-label="subscribe.emailAriaLabel" required><button type="submit" data-i18n="subscribe.submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
       </div>
 
       <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
         <a href="index.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-home.png" alt=""></span>Home</a>
-        <a href="verde-inspiracao.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-arte-paleta.png" alt=""></span>Blog</a>
+        <a href="verde-inspiracao.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-arte-paleta.png" alt=""></span><span data-i18n="nav.bottomBlog">Blog</span></a>
         <a href="jogo-sapinho/index.html" target="_blank" rel="noopener" class="bottom-nav-center" aria-label="Jogar: Sapo e a Mosca" onclick="toggleGamePopup(event)"><img src="imagens/decor/bottom-button-navbar.png" alt="" class="bottom-nav-center-day"><img src="imagens/decor/bottom-button-navbar-noturno.png" alt="" class="bottom-nav-center-night"></a>
-        <a href="sapo-imaginario.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-projetos-codigo.png" alt=""></span>Projetos</a>
-        <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-blog-livro.png" alt=""></span>Escrita</a>
+        <a href="sapo-imaginario.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-projetos-codigo.png" alt=""></span><span data-i18n="nav.bottomProjetos">Projetos</span></a>
+        <a href="rascunhos-da-floresta.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-blog-livro.png" alt=""></span><span data-i18n="nav.bottomEscrita">Escrita</span></a>
       </div>
 
       <main class="site-main">
@@ -152,12 +152,14 @@
       function _buildGardenLog(data) {
           const log = document.getElementById('gardenLog');
           if (!data.length) {
-              log.innerHTML = '<li>Nenhuma postagem ainda.</li>';
+              log.innerHTML = `<li>${window.i18n.t('home.gardenLogEmpty')}</li>`;
               return;
           }
-          const fmt = d => new Date(d).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+          const lang = window.i18n.getLang();
+          const fmt = d => new Date(d).toLocaleDateString(lang === 'en' ? 'en-us' : 'pt-br', { day: '2-digit', month: 'short' });
+          const posted = window.i18n.t('home.gardenLogPosted');
           log.innerHTML = data.slice(0, 4).map(post =>
-              `<li>🌱 ${fmt(post.publish_date)} — publicou "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(post.title)}</a>"</li>`
+              `<li>🌱 ${fmt(post.publish_date)} — ${posted} "<a href="post.html?${post.slug ? 'slug=' + post.slug : 'id=' + post._id}">${_escapeHtmlGlobal(post.title)}</a>"</li>`
           ).join('');
       }
 
@@ -191,7 +193,7 @@
               card.innerHTML = `<a href="${link}" class="carousel-card-body">
                   <h3>${_escapeHtmlGlobal(post.title)}</h3>
                   <p>${_escapeHtmlGlobal(excerpt)}</p>
-                  <span class="leia-mais">Leia mais →</span>
+                  <span class="leia-mais">${window.i18n.t('home.readMore')}</span>
               </a>`;
               info.appendChild(card);
 
@@ -241,7 +243,7 @@
               .then(_build)
               .catch(() => {
                   document.getElementById('carouselInfo').innerHTML =
-                      '<p style="padding:16px;text-align:center;color:var(--color-text-secondary)">Não foi possível carregar os posts.</p>';
+                      `<p style="padding:16px;text-align:center;color:var(--color-text-secondary)">${window.i18n.t('home.postsLoadError')}</p>`;
               });
           loadGuestbook();
           initGuestbookForm();
@@ -255,17 +257,18 @@
               .then(data => {
                   const post = (data.posts || [])[0];
                   if (!post) {
-                      featuredEl.innerHTML = '<p>Nenhum post ainda.</p>';
+                      featuredEl.innerHTML = `<p>${window.i18n.t('home.featuredEmpty')}</p>`;
                       return;
                   }
                   const link = post.slug ? `post.html?slug=${post.slug}` : `post.html?id=${post._id}`;
                   const imgSrc = post.image_path
                       ? (post.image_path.startsWith('http') ? post.image_path : '/imagens/uploads/' + post.image_path)
                       : 'imagens/decor/sapo-guarda-chuva.png';
+                  const likesText = window.i18n.t('home.featuredLikes').replace('{n}', post.likes || 0);
                   featuredEl.innerHTML = `<a href="${link}"><img src="${imgSrc}" alt="${escapeHtml(post.title)}" loading="lazy"></a>
-                      <p><a href="${link}">${escapeHtml(post.title)}</a> — ${post.likes || 0} curtidas</p>`;
+                      <p><a href="${link}">${escapeHtml(post.title)}</a> ${likesText}</p>`;
               })
-              .catch(() => { featuredEl.innerHTML = '<p>Não foi possível carregar.</p>'; });
+              .catch(() => { featuredEl.innerHTML = `<p>${window.i18n.t('home.featuredError')}</p>`; });
       }
 
       function escapeHtml(str) {
@@ -283,7 +286,7 @@
                   const wrap = document.getElementById('guestbookEntries');
                   const moreBtn = document.getElementById('guestbookMoreBtn');
                   if (!entries.length) {
-                      wrap.innerHTML = _emptyStateHtml('imagens/decor/sapo-dormindo-lago.png', 'Nenhuma mensagem ainda — seja a primeira!', null, 'empty-state--sm');
+                      wrap.innerHTML = _emptyStateHtml('imagens/decor/sapo-dormindo-lago.png', window.i18n.t('home.guestbookEmpty'), null, 'empty-state--sm');
                       moreBtn.style.display = 'none';
                       return;
                   }
@@ -299,7 +302,7 @@
               })
               .catch(() => {
                   document.getElementById('guestbookEntries').innerHTML =
-                      '<p class="widget-hint">Não foi possível carregar as mensagens.</p>';
+                      `<p class="widget-hint">${window.i18n.t('home.guestbookLoadError')}</p>`;
               });
       }
 
@@ -316,7 +319,7 @@
               fetch(`${API_BASE}/guestbook`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ author, message })
+                  body: JSON.stringify({ author, message, lang: window.i18n.getLang() })
               })
               .then(r => r.json().then(data => ({ ok: r.ok, data })))
               .then(({ ok, data }) => {
@@ -326,12 +329,12 @@
                       this.reset();
                       loadGuestbook();
                   } else {
-                      feedback.textContent = data.errors?.[0]?.msg || data.message || 'Erro ao enviar mensagem.';
+                      feedback.textContent = data.errors?.[0]?.msg || data.message || window.i18n.t('home.guestbookSendError');
                   }
               })
               .catch(() => {
                   btn.disabled = false;
-                  feedback.textContent = 'Erro ao enviar mensagem.';
+                  feedback.textContent = window.i18n.t('home.guestbookSendError');
               });
           });
       }
@@ -339,12 +342,12 @@
 
     <div class="container home-grid" id="content">
       <div class="home-header-box sticker-card">
-        <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
-        <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+        <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="eager">
+        <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="eager">
       </div>
 
       <section id="posts-recentes">
-        <h2>🌿 Posts Recentes</h2>
+        <h2 data-i18n="home.recentPosts">🌿 Posts Recentes</h2>
         <div class="carousel-outer">
           <div class="carousel-clip" id="carouselWrap">
             <div class="carousel-track" id="carouselTrack"></div>
@@ -367,23 +370,23 @@
           <div class="quicklink-panel">
             <a href="verde-inspiracao.html" class="quicklink-row">
               <img src="imagens/decor/icone-arte-paleta.png" alt="" class="quicklink-icon" loading="lazy">
-              <span class="quicklink-text"><strong>Verde Inspiração</strong><span>arte e criatividade</span></span>
+              <span class="quicklink-text"><strong><span data-i18n="nav.verde">Verde Inspiração</span></strong><span data-i18n="home.qlVerde">Hobbies e gostos</span></span>
             </a>
             <a href="sapo-imaginario.html" class="quicklink-row">
               <img src="imagens/decor/icone-projetos-codigo.png" alt="" class="quicklink-icon" loading="lazy">
-              <span class="quicklink-text"><strong>Sapo Imaginário</strong><span>códigos e experimentos</span></span>
+              <span class="quicklink-text"><strong><span data-i18n="nav.sapo">Sapo Imaginário</span></strong><span data-i18n="home.qlSapo">códigos e projetos</span></span>
             </a>
             <a href="rascunhos-da-floresta.html" class="quicklink-row">
               <img src="imagens/decor/icone-blog-livro.png" alt="" class="quicklink-icon" loading="lazy">
-              <span class="quicklink-text"><strong>Rascunhos da Floresta</strong><span>textos e ideias soltas</span></span>
+              <span class="quicklink-text"><strong><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></strong><span data-i18n="home.qlRascunhos">textos e ideias soltas</span></span>
             </a>
             <a href="sobre-mim.html" class="quicklink-row">
               <img src="imagens/decor/icone-perfil-usuario.png" alt="" class="quicklink-icon" loading="lazy">
-              <span class="quicklink-text"><strong>Sobre Mim</strong><span>quem é a sapinha por trás</span></span>
+              <span class="quicklink-text"><strong><span data-i18n="nav.sobre">Sobre Mim</span></strong><span data-i18n="home.qlSobre">quem sou eu?</span></span>
             </a>
             <a href="livro-de-visitas.html" class="quicklink-row">
               <img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="quicklink-icon" loading="lazy">
-              <span class="quicklink-text"><strong>Guestbook</strong><span>veja as mensagens</span></span>
+              <span class="quicklink-text"><strong data-i18n="home.qlGuestbookTitle">Livro de Visitas</strong><span data-i18n="home.qlGuestbookDesc">veja as mensagens</span></span>
             </a>
           </div>
         </div>
@@ -400,7 +403,7 @@
 
         <div class="widget-card sticker-card sticker-card--sm widget-nowplaying-card">
           <div class="widget-window-header">
-            <h3>🎵 Now Playing</h3>
+            <h3 data-i18n="home.nowPlaying">🎵 Now Playing</h3>
             <span class="window-dots" aria-hidden="true"><span>−</span><span>□</span><span>✕</span></span>
           </div>
           <div class="widget-nowplaying">
@@ -418,7 +421,7 @@
               <span id="nowPlayingDuration" class="widget-nowplaying-time" hidden>0:00</span>
             </div>
 
-            <a id="nowPlayingLink" class="widget-nowplaying-link" href="#" target="_blank" rel="noopener" hidden>Ouvir no Spotify ↗</a>
+            <a id="nowPlayingLink" class="widget-nowplaying-link" href="#" target="_blank" rel="noopener" hidden data-i18n="home.spotifyLink">Ouvir no Spotify ↗</a>
           </div>
         </div>
 
@@ -435,22 +438,22 @@
 
       <section id="guestbook" class="container">
         <div class="guestbook-card sticker-card">
-          <h2>📝 Guestbook</h2>
-          <p class="guestbook-subtitle">Deixe uma mensagem pra sapinha ♡</p>
+          <h2 data-i18n="home.guestbookTitle">📝 Livro de Visitas</h2>
+          <p class="guestbook-subtitle" data-i18n="home.guestbookSubtitle">Deixe uma mensagem para mim ♡</p>
           <div class="guestbook-layout">
             <form id="guestbookForm" class="guestbook-form">
-              <label for="guestbookAuthor">Seu nome:</label>
+              <label for="guestbookAuthor" data-i18n="home.guestbookName">Seu nome:</label>
               <input type="text" id="guestbookAuthor" name="author" maxlength="60" required>
-              <label for="guestbookMessage">Mensagem:</label>
+              <label for="guestbookMessage" data-i18n="home.guestbookMessage">Mensagem:</label>
               <textarea id="guestbookMessage" name="message" maxlength="500" rows="3" required></textarea>
-              <button type="submit">Enviar</button>
+              <button type="submit" data-i18n="home.guestbookSend">Enviar</button>
               <p id="guestbookFeedback"></p>
             </form>
             <div class="guestbook-entries-col">
               <div class="guestbook-entries" id="guestbookEntries">
                 <p class="widget-hint">Carregando mensagens...</p>
               </div>
-              <a href="livro-de-visitas.html" class="leia-mais guestbook-more-btn" id="guestbookMoreBtn" style="display:none">Ver mais mensagens</a>
+              <a href="livro-de-visitas.html" class="leia-mais guestbook-more-btn" id="guestbookMoreBtn" style="display:none" data-i18n="home.guestbookMore">Ver mais mensagens</a>
             </div>
           </div>
         </div>

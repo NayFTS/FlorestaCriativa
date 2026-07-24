@@ -20,14 +20,14 @@
       <div class="topbar">
         <nav class="topbar-nav" aria-label="Navegação principal">
           <a href="index.html">Home</a>
-          <a href="verde-inspiracao.html">Verde Inspiração</a>
-          <a href="sapo-imaginario.html">Sapo Imaginário</a>
-          <a href="rascunhos-da-floresta.html">Rascunhos da Floresta</a>
-          <a href="sobre-mim.html">Sobre Mim</a>
+          <a href="verde-inspiracao.html"><span data-i18n="nav.verde">Verde Inspiração</span></a>
+          <a href="sapo-imaginario.html"><span data-i18n="nav.sapo">Sapo Imaginário</span></a>
+          <a href="rascunhos-da-floresta.html"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></a>
+          <a href="sobre-mim.html"><span data-i18n="nav.sobre">Sobre Mim</span></a>
         </nav>
         <div class="topbar-actions theme-toggle-target">
-          <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" onclick="toggleSearch()">
-            <span class="search-bar-placeholder">Pesquisar...</span>
+          <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()">
+            <span class="search-bar-placeholder" data-i18n="search.triggerPlaceholder">Pesquisar...</span>
             <img src="imagens/decor/icone-busca-lupa.png" alt="" class="search-bar-icon" loading="lazy">
           </button>
         </div>
@@ -46,8 +46,8 @@
             </ul>
           </div>
           <section class="mood-widget mood-card">
-            <h3 data-i18n="mood.title">mood</h3>
-            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje parece:</p>
+            <h3 data-i18n="mood.title">humor</h3>
+            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje me sinto</p>
             <img class="mood-image" src="" alt="">
             <strong class="mood-value"></strong>
             <span class="mood-weather"></span>
@@ -70,7 +70,7 @@
               <img class="mobile-topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS" loading="lazy">
               <img class="mobile-topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS" loading="lazy">
             </a>
-            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
             <div class="mobile-topbar-actions theme-toggle-target"></div>
           </div>
           <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
@@ -87,10 +87,10 @@
           <a href="managePosts.html"><img src="imagens/decor/icone-portfolio-pasta.png" alt="" class="nav-icon">Gerenciar Posts</a>
           <a href="publicar.html">✍️ Publicar</a>
           <a href="index.html"><img src="imagens/decor/icone-home.png" alt="" class="nav-icon">Home</a>
-          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon">Verde Inspiração</a>
-          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon">Sapo Imaginário</a>
-          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon">Rascunhos da Floresta</a>
-          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon">Sobre Mim</a>
+          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon"><span data-i18n="nav.verde">Verde Inspiração</span></a>
+          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon"><span data-i18n="nav.sapo">Sapo Imaginário</span></a>
+          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></a>
+          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon"><span data-i18n="nav.sobre">Sobre Mim</span></a>
           <a href="index.html#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
         </div>
         <div class="sidebar-widgets drawer-widgets">
@@ -101,8 +101,8 @@
             </ul>
           </div>
           <section class="mood-widget mood-card">
-            <h3 data-i18n="mood.title">mood</h3>
-            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje parece:</p>
+            <h3 data-i18n="mood.title">humor</h3>
+            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje me sinto</p>
             <img class="mood-image" src="" alt="">
             <strong class="mood-value"></strong>
             <span class="mood-weather"></span>
@@ -112,9 +112,9 @@
         <div class="sidebar-footer theme-toggle-target">
           <a href="login.html" class="login-link">Login</a>
           <a href="#" class="logout-link" title="Sair">🚪</a>
-          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
         </div>
-        <div class="sidebar-social sidebar-social-drawer"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.png" alt="" class="icon-github"></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="subscribe-btn-icon"></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" aria-label="E-mail" required><button type="submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
+        <div class="sidebar-social sidebar-social-drawer"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.png" alt="" class="icon-github"></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" data-i18n-aria-label="subscribe.btnAriaLabel" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="subscribe-btn-icon"></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title" data-i18n="subscribe.title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" data-i18n-placeholder="subscribe.emailPlaceholder" aria-label="E-mail" data-i18n-aria-label="subscribe.emailAriaLabel" required><button type="submit" data-i18n="subscribe.submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
       </div>
 
       <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
@@ -127,8 +127,8 @@
 
       <main class="site-main">
     <div class="home-header-box sticker-card">
-      <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
-      <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" alt="Bem-vinda ao meu cantinho — onde as ideias pulam, crescem e florescem" loading="eager">
+      <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="eager">
+      <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="eager">
     </div>
     <div class="page-banner-caption">
       <h1>Floresta Criativa</h1>

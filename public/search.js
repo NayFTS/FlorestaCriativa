@@ -734,7 +734,7 @@ function submitSubscribeForm(event, form) {
     fetch(`${API_BASE}/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, lang: window.i18n.getLang() })
     })
         .then(r => r.json().then(data => ({ ok: r.ok, data })))
         .then(({ ok, data }) => {
@@ -743,12 +743,12 @@ function submitSubscribeForm(event, form) {
                 feedback.textContent = data.message;
                 form.reset();
             } else {
-                feedback.textContent = data.errors?.[0]?.msg || data.message || 'Erro ao se inscrever.';
+                feedback.textContent = data.errors?.[0]?.msg || data.message || window.i18n.t('subscribe.error');
             }
         })
         .catch(() => {
             btn.disabled = false;
-            feedback.textContent = 'Erro ao se inscrever.';
+            feedback.textContent = window.i18n.t('subscribe.error');
         });
 
     return false;
