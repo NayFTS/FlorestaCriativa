@@ -4603,6 +4603,99 @@ body.game-popup-active .mobile-topbar {
 
 .share-btn:hover { background: var(--color-border); }
 
+/* Índice de capítulos (post do tipo "story_index") */
+.story-chapter-list {
+    max-width: 68ch;
+    margin: 32px auto 0;
+}
+
+.story-chapter-list h3 {
+    margin-bottom: 0.6em;
+}
+
+.chapter-links {
+    list-style: decimal;
+    padding-left: 1.4em;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chapter-links a {
+    color: var(--color-text);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+}
+
+.chapter-links a:hover {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+}
+
+/* Navegação entre capítulos (post do tipo "chapter") */
+.chapter-nav {
+    max-width: 68ch;
+    margin: 28px auto 0;
+}
+
+.chapter-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+.chapter-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    font-size: 0.88em;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.chapter-nav-link:hover {
+    background: var(--color-border);
+}
+
+.chapter-nav-index {
+    order: 2;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-accent);
+    background: none;
+    border-color: transparent;
+}
+
+.chapter-nav-index:hover {
+    background: var(--color-surface-alt);
+    border-color: var(--color-border);
+}
+
+.chapter-nav-prev { order: 1; }
+.chapter-nav-next { order: 3; margin-left: auto; }
+
+@media (max-width: 480px) {
+    .chapter-nav-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .chapter-nav-link {
+        justify-content: center;
+        order: initial !important;
+        margin-left: 0 !important;
+    }
+}
+
 /* Posts relacionados */
 #related-posts {
     max-width: 800px;
