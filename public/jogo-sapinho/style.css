@@ -23,6 +23,29 @@
     }
 }
 
+/* Escolha manual do botão de dia/noite (script.js) — o seletor de atributo tem mais
+   especificidade que o :root de dentro do @media acima, então sempre vence, não
+   importa a preferência do sistema. */
+:root[data-theme="day"] {
+    --color-sky-top: #cdeffd;
+    --color-sky-bottom: #eafff0;
+    --color-hud-bg: rgba(255, 255, 255, 0.85);
+    --color-text: #2c3e2d;
+    --bg-scene: url('assets/fundo-dia.png');
+    --start-banner: url('assets/game-start-dia.png');
+    --gameover-banner: url('assets/game-over-dia.png');
+}
+
+:root[data-theme="night"] {
+    --color-sky-top: #16212b;
+    --color-sky-bottom: #17261c;
+    --color-hud-bg: rgba(20, 24, 20, 0.75);
+    --color-text: #eaf5ea;
+    --bg-scene: url('assets/fundo-noite.png');
+    --start-banner: url('assets/game-start-noite.png');
+    --gameover-banner: url('assets/game-over-noite.png');
+}
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -83,6 +106,16 @@ body {
     font-weight: 600;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
+
+.theme-toggle-btn {
+    border: none;
+    font-size: 1.05rem;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.theme-toggle-btn:active { transform: scale(0.92); }
 
 .hud-fly-icon {
     display: block;

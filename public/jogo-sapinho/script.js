@@ -11,15 +11,30 @@
     const finalScoreEl = document.getElementById('finalScore');
     const startBtn = document.getElementById('startBtn');
     const restartBtn = document.getElementById('restartBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
 
     const MAX_FLIES = 4;
     const SPAWN_MARGIN = 30;
-    const GAME_DURATION = 60;
+    const GAME_DURATION = 30;
     const FROG_AVOID_PADDING = 16; // margem extra ao redor do sapo onde mosca não pode nascer
     const SPAWN_MAX_ATTEMPTS = 20;
     const FROG_IDLE_SRC = 'assets/sapo-idle.png';
     const FROG_OPEN_SRC = 'assets/sapo-boca-aberta.png';
     const MOUTH_TOP_RATIO = 0.36; // posição da boca na arte (mesmo valor do "top" da .tongue no style.css)
+
+    // Intervalo entre moscas e tempo de vida delas no ar: começam no valor "START" e
+    // encolhem até o valor "END" conforme o tempo do round passa (ver getDifficultyProgress).
+    const SPAWN_INTERVAL_MIN_START = 900;
+    const SPAWN_INTERVAL_MAX_START = 1600;
+    const SPAWN_INTERVAL_MIN_END = 350;
+    const SPAWN_INTERVAL_MAX_END = 700;
+
+    const FLY_LIFETIME_MIN_START = 3500;
+    const FLY_LIFETIME_MAX_START = 5500;
+    const FLY_LIFETIME_MIN_END = 1200;
+    const FLY_LIFETIME_MAX_END = 2200;
+
+    const THEME_STORAGE_KEY = 'sapinho-theme';
 
     let score = 0;
     let timeLeft = GAME_DURATION;
@@ -31,6 +46,16 @@
 
     function randRange(min, max) {
         return min + Math.random() * (max - min);
+    }
+
+    function lerp(a, b, t) {
+        return a + (b - a) * t;
+    }
+
+    // 0 no início do round, 1 quando o tempo acaba — usado pra ir apertando o jogo aos poucos.
+    function getDifficultyProgress() {
+        const progress = 1 - timeLeft / GAME_DURATION;
+        return Math.min(1, Math.max(0, progress));
     }
 
     // Troca o <img> por um <span> com o emoji equivalente se o arquivo de sprite
@@ -92,7 +117,10 @@
         attachSpriteFallback(flySprite, '🪰');
         fly.appendChild(flySprite);
 
-        const timeoutId = setTimeout(() => removeFly(fly), randRange(3500, 5500));
+        const progress = getDifficultyProgress();
+        const lifetimeMin = lerp(FLY_LIFETIME_MIN_START, FLY_LIFETIME_MIN_END, progress);
+        const lifetimeMax = lerp(FLY_LIFETIME_MAX_START, FLY_LIFETIME_MAX_END, progress);
+        const timeoutId = setTimeout(() => removeFly(fly), randRange(lifetimeMin, lifetimeMax));
         fly.addEventListener('click', () => catchFly(fly, timeoutId));
 
         sky.appendChild(fly);
@@ -164,7 +192,10 @@
     function spawnLoop() {
         if (!isPlaying) return;
         if (flies.size < MAX_FLIES) spawnFly();
-        spawnTimeoutId = setTimeout(spawnLoop, randRange(900, 1600));
+        const progress = getDifficultyProgress();
+        const intervalMin = lerp(SPAWN_INTERVAL_MIN_START, SPAWN_INTERVAL_MIN_END, progress);
+        const intervalMax = lerp(SPAWN_INTERVAL_MAX_START, SPAWN_INTERVAL_MAX_END, progress);
+        spawnTimeoutId = setTimeout(spawnLoop, randRange(intervalMin, intervalMax));
     }
 
     function tickTimer() {
@@ -199,6 +230,32 @@
         finalScoreEl.textContent = score;
         gameOverOverlay.hidden = false;
     }
+
+    // Modo dia/noite: por padrão segue a preferência do sistema (prefers-color-scheme,
+    // ver style.css), mas o botão permite forçar um dos dois e guarda a escolha.
+    function getSystemTheme() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'night'
+            : 'day';
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        themeToggleBtn.textContent = theme === 'night' ? '☀️' : '🌙';
+        themeToggleBtn.setAttribute(
+            'aria-label',
+            theme === 'night' ? 'Mudar para modo diurno' : 'Mudar para modo noturno'
+        );
+    }
+
+    let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || getSystemTheme();
+    applyTheme(currentTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+        currentTheme = currentTheme === 'night' ? 'day' : 'night';
+        localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
+        applyTheme(currentTheme);
+    });
 
     startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', startGame);
