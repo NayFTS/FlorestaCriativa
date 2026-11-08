@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500&display=swap">
     <title>Gerenciar Capítulos - Floresta Criativa</title>
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
     <link rel="stylesheet" href="styles.css">
@@ -15,45 +18,61 @@
     <link rel="icon" type="image/png" sizes="16x16" href="imagens/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="imagens/favicon_io/site.webmanifest">
   </head>
-  <body>
+  <body class="page-admin">
     <div class="site-shell">
       <div class="topbar">
         <nav class="topbar-nav" aria-label="Navegação principal">
           <a href="index.html">Home</a>
-          <a href="verde-inspiracao.html"><span data-i18n="nav.verde">Verde Inspiração</span></a>
-          <a href="sapo-imaginario.html"><span data-i18n="nav.sapo">Sapo Imaginário</span></a>
-          <a href="rascunhos-da-floresta.html"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></a>
+          <a href="rascunhos-da-floresta.html" title="Escrita: crônicas, trechos e ideias soltas"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></a>
+          <a href="sapo-imaginario.html" title="Projetos e portfólio"><span data-i18n="nav.sapo">Sapo Imaginário</span></a>
+          <a href="verde-inspiracao.html" title="Hobbies: animes, jogos e leituras"><span data-i18n="nav.verde">Verde Inspiração</span></a>
           <a href="sobre-mim.html"><span data-i18n="nav.sobre">Sobre Mim</span></a>
         </nav>
         <div class="topbar-actions theme-toggle-target">
           <button id="searchToggle" class="search-bar-trigger" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()">
             <span class="search-bar-placeholder" data-i18n="search.triggerPlaceholder">Pesquisar...</span>
-            <img src="imagens/decor/icone-busca-lupa.png" alt="" class="search-bar-icon" loading="lazy">
+            <img src="imagens/decor/icone-busca-lupa.webp" alt="" class="search-bar-icon" loading="lazy">
           </button>
         </div>
       </div>
 
       <aside class="site-sidebar">
         <a href="index.html" class="topbar-sign">
-          <img class="topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
-          <img class="topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="topbar-sign-day" src="imagens/decor/placa-nayfts.webp" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.webp" alt="NAYFTS — write, art, code, life" loading="lazy">
         </a>
         <div class="sidebar-widgets">
-          <div class="currently-widget">
-            <h4>🌱 Currently</h4>
-            <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
-            </ul>
-          </div>
-          <section class="mood-widget mood-card">
-            <h3 data-i18n="mood.title">humor</h3>
-            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje me sinto</p>
-            <img class="mood-image" src="" alt="">
-            <strong class="mood-value"></strong>
-            <span class="mood-weather"></span>
+          <section class="diario-card mood-card">
+            <img src="imagens/decor/sapo-sentado.webp" alt="" class="diario-sapo" aria-hidden="true" loading="lazy">
+            <img src="imagens/decor/planta-galho-vertical-folhas.webp" alt="" class="diario-galho" aria-hidden="true" loading="lazy">
+            <img src="imagens/decor/flor-rosa-pequena.webp" alt="" class="diario-flor" aria-hidden="true" loading="lazy">
+            <p class="diario-label"><span data-i18n="mood.title">humor</span> · <span data-i18n="mood.subtitle">hoje me sinto</span></p>
+            <div class="diario-humor">
+              <img class="mood-image" src="" alt="">
+              <div class="diario-humor-info"><strong class="mood-value"></strong><span class="mood-weather"></span></div>
+            </div>
             <p class="mood-text"></p>
+            <div class="diario-currently">
+              <p class="diario-label">🌱 Currently</p>
+              <ul class="widget-list js-currently-list">
+                <li>Carregando...</li>
+              </ul>
+            </div>
           </section>
-          <img src="imagens/decor/sapo-sentado.png" alt="" class="sidebar-sticker" aria-hidden="true" loading="lazy">
+          <section class="mini-guestbook" aria-label="Recadinhos do livro de visitas">
+            <p class="mini-guestbook-title">📮 Recadinhos</p>
+            <div class="mini-guestbook-list js-mini-guestbook"></div>
+            <div class="mini-guestbook-actions">
+              <button type="button" class="mini-guestbook-cta" aria-expanded="false" onclick="toggleRecadoForm(this)">deixar um recado</button>
+              <a href="livro-de-visitas.html" class="mini-guestbook-all">ler todos →</a>
+            </div>
+            <form class="mini-guestbook-form" hidden onsubmit="return submitRecado(event, this)">
+              <input type="text" name="author" maxlength="60" placeholder="seu nome" aria-label="Seu nome" autocomplete="name" required>
+              <textarea name="message" maxlength="500" rows="3" placeholder="escreva seu recadinho ♡" aria-label="Mensagem" required></textarea>
+              <button type="submit">enviar ✉</button>
+              <p class="mini-guestbook-feedback" aria-live="polite"></p>
+            </form>
+          </section>
         </div>
         <div class="sidebar-footer">
           <a href="login.html" id="loginButton" class="login-link">Login</a>
@@ -63,76 +82,94 @@
 
       <header class="mobile-topbar">
         <div class="mobile-topbar-row">
-          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
+          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.webp" alt="" aria-hidden="true">
           <div class="mobile-topbar-controls">
             <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir menu">&#9776;</button>
             <a href="index.html" class="mobile-topbar-sign" aria-label="Floresta Criativa — início">
-              <img class="mobile-topbar-sign-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS" loading="lazy">
-              <img class="mobile-topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS" loading="lazy">
+              <img class="mobile-topbar-sign-day" src="imagens/decor/placa-nayfts.webp" alt="NAYFTS" loading="lazy">
+              <img class="mobile-topbar-sign-night" src="imagens/decor/placa-nayfts-noturno.webp" alt="NAYFTS" loading="lazy">
             </a>
-            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+            <button type="button" class="mobile-topbar-search" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.webp" alt=""></button>
             <div class="mobile-topbar-actions theme-toggle-target"></div>
           </div>
-          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.png" alt="" aria-hidden="true">
+          <img class="mobile-topbar-vine" src="imagens/decor/divisor-vinha-horizontal.webp" alt="" aria-hidden="true">
         </div>
       </header>
       <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
       <div class="nav-drawer" id="navDrawer">
         <a href="index.html" class="sidebar-logo">
-          <img class="sidebar-logo-day" src="imagens/decor/placa-nayfts.png" alt="NAYFTS — write, art, code, life" loading="lazy">
-          <img class="sidebar-logo-night" src="imagens/decor/placa-nayfts-noturno.png" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="sidebar-logo-day" src="imagens/decor/placa-nayfts.webp" alt="NAYFTS — write, art, code, life" loading="lazy">
+          <img class="sidebar-logo-night" src="imagens/decor/placa-nayfts-noturno.webp" alt="NAYFTS — write, art, code, life" loading="lazy">
         </a>
         <div class="sidebar-nav" role="navigation" aria-label="Navegação (menu)">
           <a href="dashboard.html">📊 Dashboard</a>
-          <a href="managePosts.html"><img src="imagens/decor/icone-portfolio-pasta.png" alt="" class="nav-icon">Gerenciar Posts</a>
+          <a href="managePosts.html"><img src="imagens/decor/icone-portfolio-pasta.webp" alt="" class="nav-icon">Gerenciar Posts</a>
           <a href="gerenciarHistorias.html">📚 Gerenciar Histórias</a>
+          <a href="gerenciarAnimes.html">📺 Gerenciar Animes</a>
           <a href="publicar.html">✍️ Publicar</a>
-          <a href="index.html"><img src="imagens/decor/icone-home.png" alt="" class="nav-icon">Home</a>
-          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.png" alt="" class="nav-icon"><span data-i18n="nav.verde">Verde Inspiração</span></a>
-          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.png" alt="" class="nav-icon"><span data-i18n="nav.sapo">Sapo Imaginário</span></a>
-          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.png" alt="" class="nav-icon"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span></a>
-          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.png" alt="" class="nav-icon"><span data-i18n="nav.sobre">Sobre Mim</span></a>
-          <a href="index.html#guestbook"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="nav-icon">Guestbook</a>
+          <a href="index.html"><img src="imagens/decor/icone-home.webp" alt="" class="nav-icon">Home</a>
+          <a href="rascunhos-da-floresta.html"><img src="imagens/decor/icone-blog-livro.webp" alt="" class="nav-icon"><span class="nav-text"><span data-i18n="nav.rascunhos">Rascunhos da Floresta</span><small class="nav-caption">escrita e crônicas</small></span></a>
+          <a href="sapo-imaginario.html"><img src="imagens/decor/icone-projetos-codigo.webp" alt="" class="nav-icon"><span class="nav-text"><span data-i18n="nav.sapo">Sapo Imaginário</span><small class="nav-caption">projetos e portfólio</small></span></a>
+          <a href="verde-inspiracao.html"><img src="imagens/decor/icone-arte-paleta.webp" alt="" class="nav-icon"><span class="nav-text"><span data-i18n="nav.verde">Verde Inspiração</span><small class="nav-caption">hobbies, animes e jogos</small></span></a>
+          <a href="sobre-mim.html"><img src="imagens/decor/icone-perfil-usuario.webp" alt="" class="nav-icon"><span data-i18n="nav.sobre">Sobre Mim</span></a>
+          <a href="livro-de-visitas.html"><img src="imagens/decor/icone-mensagem-envelope.webp" alt="" class="nav-icon"><span data-i18n="nav.livro">Livro de Visitas</span></a>
         </div>
         <div class="sidebar-widgets drawer-widgets">
-          <div class="currently-widget">
-            <h4>🌱 Currently</h4>
-            <ul class="widget-list js-currently-list">
-              <li>Carregando...</li>
-            </ul>
-          </div>
-          <section class="mood-widget mood-card">
-            <h3 data-i18n="mood.title">humor</h3>
-            <p class="mood-subtitle" data-i18n="mood.subtitle">hoje me sinto</p>
-            <img class="mood-image" src="" alt="">
-            <strong class="mood-value"></strong>
-            <span class="mood-weather"></span>
+          <section class="diario-card mood-card">
+            <img src="imagens/decor/sapo-sentado.webp" alt="" class="diario-sapo" aria-hidden="true" loading="lazy">
+            <img src="imagens/decor/planta-galho-vertical-folhas.webp" alt="" class="diario-galho" aria-hidden="true" loading="lazy">
+            <img src="imagens/decor/flor-rosa-pequena.webp" alt="" class="diario-flor" aria-hidden="true" loading="lazy">
+            <p class="diario-label"><span data-i18n="mood.title">humor</span> · <span data-i18n="mood.subtitle">hoje me sinto</span></p>
+            <div class="diario-humor">
+              <img class="mood-image" src="" alt="">
+              <div class="diario-humor-info"><strong class="mood-value"></strong><span class="mood-weather"></span></div>
+            </div>
             <p class="mood-text"></p>
+            <div class="diario-currently">
+              <p class="diario-label">🌱 Currently</p>
+              <ul class="widget-list js-currently-list">
+                <li>Carregando...</li>
+              </ul>
+            </div>
+          </section>
+          <section class="mini-guestbook" aria-label="Recadinhos do livro de visitas">
+            <p class="mini-guestbook-title">📮 Recadinhos</p>
+            <div class="mini-guestbook-list js-mini-guestbook"></div>
+            <div class="mini-guestbook-actions">
+              <button type="button" class="mini-guestbook-cta" aria-expanded="false" onclick="toggleRecadoForm(this)">deixar um recado</button>
+              <a href="livro-de-visitas.html" class="mini-guestbook-all">ler todos →</a>
+            </div>
+            <form class="mini-guestbook-form" hidden onsubmit="return submitRecado(event, this)">
+              <input type="text" name="author" maxlength="60" placeholder="seu nome" aria-label="Seu nome" autocomplete="name" required>
+              <textarea name="message" maxlength="500" rows="3" placeholder="escreva seu recadinho ♡" aria-label="Mensagem" required></textarea>
+              <button type="submit">enviar ✉</button>
+              <p class="mini-guestbook-feedback" aria-live="polite"></p>
+            </form>
           </section>
         </div>
         <div class="sidebar-footer theme-toggle-target">
           <a href="login.html" class="login-link">Login</a>
           <a href="#" class="logout-link" title="Sair">🚪</a>
-          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.png" alt=""></button>
+          <button id="searchToggleDrawer" class="icon-btn" aria-label="Abrir busca" data-i18n-aria-label="search.openAria" onclick="toggleSearch()"><img src="imagens/decor/icone-busca-lupa.webp" alt=""></button>
         </div>
-        <div class="sidebar-social sidebar-social-drawer"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.png" alt="" class="icon-github"></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" data-i18n-aria-label="subscribe.btnAriaLabel" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.png" alt="" class="subscribe-btn-icon"></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title" data-i18n="subscribe.title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" data-i18n-placeholder="subscribe.emailPlaceholder" aria-label="E-mail" data-i18n-aria-label="subscribe.emailAriaLabel" required><button type="submit" data-i18n="subscribe.submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
+        <div class="sidebar-social sidebar-social-drawer"><a href="https://github.com/nayfts" target="_blank" rel="noopener" aria-label="GitHub"><img src="imagens/decor/icon-github.webp" alt="" class="icon-github"><span class="social-label">github</span></a><button type="button" class="subscribe-btn" aria-label="Inscreva-se por e-mail" data-i18n-aria-label="subscribe.btnAriaLabel" aria-expanded="false" onclick="toggleSubscribeForm(this)"><img src="imagens/decor/icone-mensagem-envelope.webp" alt="" class="subscribe-btn-icon"><span class="social-label">se inscreva</span></button><form class="subscribe-popover" onsubmit="return submitSubscribeForm(event, this)"><p class="subscribe-popover-title" data-i18n="subscribe.title">Receba novidades por e-mail</p><input type="email" name="email" placeholder="seu@email.com" data-i18n-placeholder="subscribe.emailPlaceholder" aria-label="E-mail" data-i18n-aria-label="subscribe.emailAriaLabel" required><button type="submit" data-i18n="subscribe.submit">Inscrever-se</button><p class="subscribe-feedback" aria-live="polite"></p></form></div>
       </div>
 
       <div class="bottom-nav" role="navigation" aria-label="Navegação mobile">
-        <a href="index.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-home.png" alt=""></span>Home</a>
+        <a href="index.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-home.webp" alt=""></span>Home</a>
         <a href="dashboard.html"><span class="bottom-nav-icon">📊</span>Dashboard</a>
-        <a href="index.html" class="bottom-nav-center" aria-label="Ir para a Home"><img src="imagens/decor/bottom-button-navbar.png" alt="" class="bottom-nav-center-day"><img src="imagens/decor/bottom-button-navbar-noturno.png" alt="" class="bottom-nav-center-night"></a>
-        <a href="managePosts.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-portfolio-pasta.png" alt=""></span>Posts</a>
+        <a href="index.html" class="bottom-nav-center" aria-label="Ir para a Home"><img src="imagens/decor/bottom-button-navbar.webp" alt="" class="bottom-nav-center-day" loading="lazy"><img src="imagens/decor/bottom-button-navbar-noturno.webp" alt="" class="bottom-nav-center-night" loading="lazy"></a>
+        <a href="managePosts.html"><span class="bottom-nav-icon"><img src="imagens/decor/icone-portfolio-pasta.webp" alt=""></span>Posts</a>
         <a href="publicar.html"><span class="bottom-nav-icon">✍️</span>Publicar</a>
       </div>
 
       <main class="site-main">
     <div class="home-header-box sticker-card">
-      <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.png" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="eager">
-      <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.png" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="eager">
+      <img class="hero-banner-img hero-banner-day" src="imagens/decor/banner-header-dia.webp" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="lazy" fetchpriority="high">
+      <img class="hero-banner-img hero-banner-night" src="imagens/decor/banner-header-noite.webp" data-i18n-alt="banner.alt" alt="Bem-vinde ao meu cantinho! Onde as ideias pulam soltas, crescem desenfreadas e florescem lindamente" loading="lazy" fetchpriority="high">
     </div>
     <div class="page-banner-caption">
-      <h1>Floresta Criativa</h1>
+      <h1>Gerenciar capítulos</h1>
       <p id="storyTitleCaption">Gerencie os capítulos desta história.</p>
     </div>
     <div id="searchOverlay" class="search-overlay" onclick="closeSearchOverlay(event)" style="display:none;">

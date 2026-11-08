@@ -10,7 +10,6 @@
     var SELECTORS = [
         '.site-sidebar',
         '.nav-drawer',
-        '.currently-widget .widget-list',
         '.guestbook-entries',
         '.search-overlay-box #searchResults',
         '.preview-post-content'

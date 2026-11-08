@@ -5,8 +5,8 @@
     function setButtonState(btn) {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         btn.innerHTML = isDark
-            ? '<img src="imagens/decor/icon-sol.png" alt="" class="theme-toggle-icon">'
-            : '<img src="imagens/decor/icon-lua.png" alt="" class="theme-toggle-icon">';
+            ? '<img src="imagens/decor/icon-sol.webp" alt="" class="theme-toggle-icon">'
+            : '<img src="imagens/decor/icon-lua.webp" alt="" class="theme-toggle-icon">';
         btn.setAttribute('aria-label', isDark ? 'Ativar modo claro' : 'Ativar modo escuro');
     }
 
@@ -61,10 +61,10 @@
         if (!document.body.classList.contains('page-public')) return;
         if (document.querySelector('.corner-vine')) return;
         const corners = [
-            ['corner-vine-tr', 'imagens/decor/planta-pendente-folhas-2.png'],
-            ['corner-vine-bl', 'imagens/decor/planta-galho-vertical-folhas.png'],
-            ['corner-vine-br', 'imagens/decor/planta-galho-vertical-folhas-2.png'],
-            ['corner-signpost-br', 'imagens/decor/placa-madeira-seta-direcao.png'],
+            ['corner-vine-tr', 'imagens/decor/planta-pendente-folhas-2.webp'],
+            ['corner-vine-bl', 'imagens/decor/planta-galho-vertical-folhas.webp'],
+            ['corner-vine-br', 'imagens/decor/planta-galho-vertical-folhas-2.webp'],
+            ['corner-signpost-br', 'imagens/decor/placa-madeira-seta-direcao.webp'],
         ];
         corners.forEach(([cls, src]) => {
             const img = document.createElement('img');
@@ -160,8 +160,8 @@ function _setPostLiked(id, liked) {
     localStorage.setItem('likedPosts', JSON.stringify(next));
 }
 
-const LIKE_ICON_SAD = 'imagens/decor/icon-sapo-triste.png';
-const LIKE_ICON_HEART = 'imagens/decor/icon-sapo-heart.png';
+const LIKE_ICON_SAD = 'imagens/decor/icon-sapo-triste.webp';
+const LIKE_ICON_HEART = 'imagens/decor/icon-sapo-heart.webp';
 
 function _setLikeIcon(btn, liked) {
     const iconEl = btn.querySelector('.like-icon');
@@ -197,19 +197,28 @@ function _wireLikeButton(btn, postId, initialLikes) {
     });
 }
 
+// Esconde o card inteiro quando a lista dele veio vazia
+function _toggleEmptyWidget(el, isEmpty) {
+    const card = el.closest('.widget-card');
+    if (card) card.classList.toggle('is-empty', isEmpty);
+}
+
 function _renderToolsListInto(el, tools) {
     if (!el) return;
-    const t = window.i18n ? window.i18n.t : (k) => k;
-    el.innerHTML = (tools && tools.length)
+    const hasItems = !!(tools && tools.length);
+    el.innerHTML = hasItems
         ? tools.map(tool => `<li><strong>${_escapeHtmlGlobal(tool.name)}</strong><span>${_escapeHtmlGlobal(tool.desc || '')}</span></li>`).join('')
-        : `<li>${t('listing.emptyGeneric')}</li>`;
+        : '';
+    _toggleEmptyWidget(el, !hasItems);
 }
 
 function _renderChipListInto(el, items) {
     if (!el) return;
-    el.innerHTML = (items && items.length)
+    const hasItems = !!(items && items.length);
+    el.innerHTML = hasItems
         ? items.map(i => `<span class="category-chip">${_escapeHtmlGlobal(i)}</span>`).join('')
         : '';
+    _toggleEmptyWidget(el, !hasItems);
 }
 
 // Popula os widgets "Featured" e "Recent Updates" da sidebar de listagem (mesmo padrão usado
@@ -276,12 +285,21 @@ function loadSiteSettings() {
     fetch(`${API_BASE}/settings`)
         .then(r => r.json())
         .then(s => {
+            const hasCurrently = !!(s.currently && s.currently.length);
             currentlyLists.forEach(list => {
-                list.innerHTML = (s.currently && s.currently.length)
+                list.innerHTML = hasCurrently
                     ? s.currently.map(c => `<li>${_escapeHtmlGlobal(c)}</li>`).join('')
-                    : '<li>Nada por aqui no momento.</li>';
+                    : '';
+                // Sem nada no "Currently": esconde o widget em vez de mostrar uma caixa vazia
+                const widget = list.closest('.diario-currently');
+                if (widget) widget.classList.toggle('is-empty', !hasCurrently);
             });
-            if (nowPlayingTrack) nowPlayingTrack.textContent = s.nowPlayingTrack || '';
+            if (nowPlayingTrack) {
+                nowPlayingTrack.textContent = s.nowPlayingTrack || '';
+                // Sem música cadastrada (e o Spotify ainda não respondeu): esconde o "Ouvindo agora"
+                const card = nowPlayingTrack.closest('.widget-nowplaying-card');
+                if (card && !s.nowPlayingTrack && !nowPlayingTrack.dataset.live) card.classList.add('is-empty');
+            }
             if (nowPlayingArtist) nowPlayingArtist.textContent = s.nowPlayingArtist || '';
             _renderToolsListInto(toolsList, s.tools);
             _renderChipListInto(skillsList, s.skills);
@@ -291,9 +309,23 @@ function loadSiteSettings() {
         .catch(() => {});
 }
 
+// Troca os textos "Carregando..." fixos no HTML por linhas de esqueleto animadas
+// (o conteúdo de verdade substitui tudo quando os dados chegam)
+function _applyLoadingSkeletons() {
+    const skeleton = '<span class="skeleton" aria-hidden="true"><span class="skeleton-line"></span><span class="skeleton-line skeleton-line--short"></span></span><span class="sr-only">Carregando...</span>';
+    document.querySelectorAll('.site-sidebar li, .nav-drawer li, .site-main li, .site-main div, .site-main strong, .site-main span, .site-main p').forEach(el => {
+        if (el.children.length || !/^Carregando.*\.\.\.$/.test(el.textContent.trim())) return;
+        if (el.closest('.search-overlay')) return;
+        if (el.matches('[data-i18n]')) el.outerHTML = skeleton; // o i18n não reescreve o texto depois
+        else el.innerHTML = skeleton;
+    });
+}
+
 if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _applyLoadingSkeletons);
     document.addEventListener('DOMContentLoaded', loadSiteSettings);
 } else {
+    _applyLoadingSkeletons();
     loadSiteSettings();
 }
 
@@ -384,6 +416,9 @@ function loadSpotifyNowPlaying() {
             }
 
             trackEl.textContent = data.track;
+            trackEl.dataset.live = '1';
+            const npCard = trackEl.closest('.widget-nowplaying-card');
+            if (npCard) npCard.classList.remove('is-empty');
             if (artistEl) artistEl.textContent = data.artist;
 
             const cover = document.getElementById('nowPlayingCover');
@@ -472,7 +507,7 @@ function search() {
             resultContainer.style.display = 'block';
 
             if (!data.length) {
-                resultContainer.innerHTML = _emptyStateHtml('imagens/decor/sapo-espiando-agua-1.png', 'Nenhum resultado encontrado.', null, 'empty-state--lg');
+                resultContainer.innerHTML = _emptyStateHtml('imagens/decor/sapo-espiando-agua-1.webp', 'Nenhum resultado encontrado.', null, 'empty-state--lg');
                 return;
             }
 
@@ -526,7 +561,10 @@ function updateLoginButton() {
         .then(data => {
             if (data && data.username) {
                 loginBtns.forEach(btn => {
-                    btn.textContent = `Bem-vindo, ${data.username}`;
+                    // Na barra do topo o espaço é curto: mostra só "Painel"
+                    btn.textContent = btn.closest('.topbar-nav') ? 'Painel' : `Bem-vindo, ${data.username}`;
+                    btn.title = `Bem-vindo, ${data.username}`;
+                    btn.classList.add('is-logged-in');
                     btn.href = 'dashboard.html';
                 });
             }
@@ -564,8 +602,8 @@ function _renderPostCard(post) {
             <h3><a href="${link}">${_escapeHtmlGlobal(title)}</a></h3>
             <p>${_escapeHtmlGlobal(excerpt)}</p>
             <div class="post-card-stats">
-                <button type="button" class="like-btn" aria-label="${t('listing.likeAria')}"><img class="like-icon" src="imagens/decor/icon-sapo-triste.png" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
-                <span class="comment-count"><img src="imagens/decor/icone-comentario-balao.png" alt="" class="comment-icon"> ${post.commentsCount || 0}</span>
+                <button type="button" class="like-btn" aria-label="${t('listing.likeAria')}"><img class="like-icon" src="imagens/decor/icon-sapo-triste.webp" alt="" loading="lazy"> <span class="like-count">${post.likes || 0}</span></button>
+                <span class="comment-count"><img src="imagens/decor/icone-comentario-balao.webp" alt="" class="comment-icon"> ${post.commentsCount || 0}</span>
             </div>
             <div class="post-card-footer">
                 <a href="${link}" class="leia-mais">${t('listing.readMoreCard')}</a>
@@ -643,7 +681,7 @@ function initPostListing(pageUrl, containerId) {
                 container.innerHTML = '';
 
                 if (posts.length === 0) {
-                    container.innerHTML = _emptyStateHtml('imagens/decor/sapo-lendo-livro.png', t('listing.noPostsFound'));
+                    container.innerHTML = _emptyStateHtml('imagens/decor/sapo-lendo-livro.webp', t('listing.noPostsFound'));
                 } else {
                     posts.forEach(post => container.appendChild(_renderPostCard(post)));
                 }
@@ -785,4 +823,132 @@ function toggleGamePopup(e) {
         overlay.classList.add('open');
         document.body.classList.add('game-popup-active');
     }
+}
+
+
+// Mini livro de visitas na barra lateral: busca até 10 recados e mostra
+// quantos couberem na altura da tela (no menu do celular, até 3)
+const MINI_GUESTBOOK_MAX = 10;
+const MINI_GUESTBOOK_DRAWER_MAX = 3;
+
+function _fitSidebarGuestbook() {
+    const sidebar = document.querySelector('.site-sidebar');
+    const list = sidebar && sidebar.querySelector('.js-mini-guestbook');
+    const footer = sidebar && sidebar.querySelector('.sidebar-footer');
+    if (!list || !footer || !sidebar.offsetParent) return;
+    const letters = [...list.querySelectorAll('.mini-letter')];
+    if (!letters.length) return;
+    letters.forEach(l => { l.hidden = false; });
+    const limit = () => sidebar.getBoundingClientRect().bottom - 20; // 20px = padding da barra
+    // Tira recados do fim até o rodapé (github / se inscreva) voltar a caber, deixando pelo menos 1
+    for (let i = letters.length - 1; i > 0 && footer.getBoundingClientRect().bottom > limit(); i--) {
+        letters[i].hidden = true;
+    }
+}
+
+function loadSidebarGuestbook() {
+    const lists = document.querySelectorAll('.js-mini-guestbook');
+    if (!lists.length) return;
+    fetch(`${API_BASE}/guestbook?limit=${MINI_GUESTBOOK_MAX}`)
+        .then(r => r.json())
+        .then(({ entries }) => {
+            const tilts = ['mini-tilt-a', 'mini-tilt-b'];
+            lists.forEach(list => {
+                const box = list.closest('.mini-guestbook');
+                if (!entries || !entries.length) {
+                    list.innerHTML = '<p class="mini-guestbook-empty">Ainda sem recados. Que tal ser a primeira pessoa?</p>';
+                    return;
+                }
+                const inDrawer = !!list.closest('.nav-drawer');
+                const shown = inDrawer ? entries.slice(0, MINI_GUESTBOOK_DRAWER_MAX) : entries;
+                list.innerHTML = shown.map((e, i) => {
+                    const date = new Date(e.createdAt).toLocaleDateString('pt-br', { day: '2-digit', month: 'short' });
+                    return `<a class="mini-letter ${tilts[i % 2]}" href="livro-de-visitas.html">
+                        <img class="mini-letter-stamp" src="imagens/decor/flor-rosa-pequena.webp" alt="" aria-hidden="true" loading="lazy">
+                        <span class="mini-letter-msg">${_escapeHtmlGlobal(e.message)}</span>
+                        <span class="mini-letter-sig">— ${_escapeHtmlGlobal(e.author)} · ${date}</span>
+                    </a>`;
+                }).join('');
+                if (box) box.classList.remove('is-empty');
+            });
+            _fitSidebarGuestbook();
+            // As fontes e a imagem do humor podem mudar a altura depois de carregar
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(_fitSidebarGuestbook);
+            window.addEventListener('load', _fitSidebarGuestbook);
+        })
+        .catch(() => {
+            lists.forEach(list => { const box = list.closest('.mini-guestbook'); if (box) box.classList.add('is-empty'); });
+        });
+}
+
+let _miniGuestbookResizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(_miniGuestbookResizeTimer);
+    _miniGuestbookResizeTimer = setTimeout(_fitSidebarGuestbook, 150);
+});
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadSidebarGuestbook);
+} else {
+    loadSidebarGuestbook();
+}
+
+// Formulário de recado dentro do "Recadinhos" (barra lateral e menu do celular)
+function toggleRecadoForm(btn, forceOpen) {
+    const box = btn.closest('.mini-guestbook');
+    const form = box && box.querySelector('.mini-guestbook-form');
+    if (!form) return;
+    const opening = forceOpen || form.hidden;
+    form.hidden = !opening;
+    btn.setAttribute('aria-expanded', String(opening));
+    btn.textContent = opening ? 'fechar' : 'deixar um recado';
+    if (opening) {
+        form.querySelector('input[name="author"]').focus({ preventScroll: true });
+        form.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+}
+
+// Abre o formulário a partir de outro lugar (ex.: "deixar a sua" no Livro de Visitas)
+function openRecadoForm() {
+    const mobile = window.matchMedia('(max-width: 768px)').matches;
+    const scope = mobile ? document.getElementById('navDrawer') : document.querySelector('.site-sidebar');
+    const btn = scope && scope.querySelector('.mini-guestbook-cta');
+    if (!btn) return false;
+    if (mobile && !scope.classList.contains('open')) toggleDrawer();
+    setTimeout(() => toggleRecadoForm(btn, true), mobile ? 320 : 0);
+    return false;
+}
+
+function submitRecado(event, form) {
+    event.preventDefault();
+    const author = form.author.value.trim();
+    const message = form.message.value.trim();
+    const feedback = form.querySelector('.mini-guestbook-feedback');
+    const btn = form.querySelector('button[type="submit"]');
+    const lang = window.i18n ? window.i18n.getLang() : 'pt';
+    btn.disabled = true;
+    feedback.textContent = '';
+    feedback.classList.remove('is-error');
+    fetch(`${API_BASE}/guestbook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ author, message, lang })
+    })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+            btn.disabled = false;
+            if (ok) {
+                form.reset();
+                feedback.textContent = 'Recadinho enviado! Ele aparece aqui assim que eu aprovar ♡';
+            } else {
+                feedback.classList.add('is-error');
+                feedback.textContent = (data.errors && data.errors[0] && data.errors[0].msg) || data.message || 'Não deu para enviar. Tenta de novo?';
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            feedback.classList.add('is-error');
+            feedback.textContent = 'Não deu para enviar. Tenta de novo?';
+        });
+    return false;
 }

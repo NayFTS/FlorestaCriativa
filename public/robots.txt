@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /login.html
+Disallow: /dashboard.html
+Disallow: /publicar.html
+Disallow: /managePosts.html
+Disallow: /editPost.html
+Disallow: /gerenciarAnimes.html
+Disallow: /gerenciarCapitulos.html
+Disallow: /gerenciarHistorias.html
+
+Sitemap: https://nayfts.dev/sitemap.xml

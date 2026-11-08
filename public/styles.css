@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ===================== */
 /* CSS VARIABLES — Design System NAYFTS (ver DESIGN_SYSTEM.md) */
@@ -224,18 +223,22 @@ a:hover {
 
 .corner-vine-tr { top: -10px; right: 10px; transform: scaleX(-1); }
 .corner-vine-bl { bottom: -10px; left: -25px; }
-.corner-vine-br { bottom: -10px; right: 10px; transform: scaleX(-1); }
+/* Placa + galhinho "em pé" no chão do card principal, no canto de baixo,
+   sem encostar na barra de rolagem nem sair da tela */
+.corner-vine-br { width: 72px; bottom: 18px; right: 34px; opacity: 1; transform: scaleX(-1); }
 
 .corner-signpost-br {
-    width: 90px;
-    bottom: 0;
-    right: 85px;
+    width: 78px;
+    bottom: 18px;
+    right: 80px;
+    opacity: 1;
     transform: scaleX(-1);
 }
 
 @media (max-width: 900px) {
     .corner-vine { width: 70px; opacity: 0.75; }
-    .corner-signpost-br { width: 60px; right: 55px; }
+    .corner-vine-br { width: 56px; right: 30px; }
+    .corner-signpost-br { width: 52px; right: 78px; }
 }
 
 @media (max-width: 520px) {
@@ -500,7 +503,7 @@ body.page-public .site-main {
     transform: translateX(-50%);
     width: 88%;
     height: 20px;
-    background-image: url('imagens/decor/divisor-coracao-setas-folha.png');
+    background-image: url('imagens/decor/divisor-coracao-setas-folha.webp');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -518,120 +521,114 @@ body.page-public .site-main {
     color: var(--color-text-muted);
 }
 
-/* Moldura ilustrada do sapo, com o conteúdo do "Currently" dentro dela */
-.currently-widget {
-    background-image: url('imagens/decor/moldura-retangular-sapo-cantos-folhas.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    aspect-ratio: 577 / 700;
-    margin: 0 -24px;
-    padding: 70px 20px 87px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-height: 0;
+/* Card "diário do dia": humor + currently num card só (nov/2026).
+   Borda fina como os outros cards, sapo sentado em cima, galho e flor nos cantos. */
+.diario-card {
+    position: relative;
+    margin: 66px 0 14px;
+    padding: 22px 16px 18px;
+    background: var(--color-surface);
+    border: var(--border-card-width) solid var(--color-border);
+    border-radius: var(--radius-card);
+    text-align: left;
 }
 
-[data-theme="dark"] .currently-widget {
-    background-image: url('imagens/decor/moldura-retangular-sapo-cantos-folhas-noturno.png');
+[data-theme="dark"] .diario-card { background: var(--color-bg-secondary); }
+
+.diario-sapo,
+.diario-galho,
+.diario-flor {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
 }
 
-.currently-widget h4 {
-    color: var(--color-accent-dark);
-    flex-shrink: 0;
-}
+.diario-sapo { width: 82px; top: -62px; right: 10px; }
+.diario-galho { width: 52px; top: -30px; left: -24px; transform: rotate(-40deg); }
+.diario-flor { width: 34px; bottom: -15px; left: -10px; }
 
-[data-theme="dark"] .currently-widget h4 {
-    color: #E8F5E0;
-}
-
-/* A moldura muda entre dia (clara) e noite (escura), então o texto usa cor
-   fixa por tema em vez das variáveis de tema — senão fica ilegível. */
-.currently-widget .widget-list {
-    align-items: center;
-    font-family: var(--font-handwritten);
-    font-size: 0.8rem;
-    gap: 4px;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    min-height: 0;
-    color: #4A5A3F;
-}
-
-[data-theme="dark"] .currently-widget .widget-list {
-    color: #E8F5E0;
-}
-
-/* Moldura de cantos com folhas, envolvendo o widget de Mood */
-.mood-widget {
-    background-image: url('imagens/decor/moldura-cantos-folhas-vertical.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    aspect-ratio: 433 / 577;
-    margin: 0 -24px;
-    padding: 34px 26px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 8px;
-    min-height: 0;
-}
-
-[data-theme="dark"] .mood-widget {
-    background-image: url('imagens/decor/moldura-cantos-folhas-vertical-noturno.png');
-}
-
-.mood-widget h3 {
-    margin: 0;
-    font-size: 0.78rem;
+.diario-card .diario-label {
+    margin: 0 0 8px;
+    font-size: 0.7rem;
     font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
     color: var(--color-accent-dark);
 }
 
-[data-theme="dark"] .mood-widget h3 { color: #E8F5E0; }
+[data-theme="dark"] .diario-card .diario-label { color: var(--color-accent); }
 
-.mood-subtitle {
-    margin: 0;
-    font-size: 0.72rem;
-    color: #4A5A3F;
+.diario-humor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-[data-theme="dark"] .mood-subtitle { color: #E8F5E0; }
-
-.mood-image {
-    width: 64px;
-    height: 64px;
+.diario-humor .mood-image {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
     object-fit: contain;
-    display: block;
-    margin: 2px 0;
+    border-radius: 50%;
+    background: var(--color-bg-secondary);
+    padding: 3px;
 }
 
-.mood-value {
-    font-size: 0.95rem;
-    color: #4A5A3F;
-    font-weight: 700;
+[data-theme="dark"] .diario-humor .mood-image { background: var(--color-surface-hover); }
+
+/* Imagem ainda sem src (antes do clima responder): não mostra ícone quebrado */
+.diario-humor .mood-image:not([src]),
+.diario-humor .mood-image[src=""] { visibility: hidden; }
+
+.diario-humor-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
 }
 
-[data-theme="dark"] .mood-value { color: #E8F5E0; }
+.diario-card .mood-value {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.1;
+    color: var(--color-text);
+}
 
-.mood-weather {
-    font-size: 0.75rem;
+.diario-card .mood-weather {
+    font-size: 0.72rem;
     color: var(--color-text-muted);
 }
 
-.mood-text {
-    margin: 0;
-    font-size: 0.78rem;
-    font-style: italic;
-    color: #4A5A3F;
+.diario-card .mood-text {
+    margin: 8px 0 0;
+    font-family: var(--font-handwritten);
+    font-size: 0.98rem;
+    text-align: center;
+    color: var(--color-text-soft);
 }
 
-[data-theme="dark"] .mood-text { color: #E8F5E0; }
+.diario-card .mood-text:not(:empty)::before { content: '\201C'; }
+.diario-card .mood-text:not(:empty)::after { content: '\201D'; }
+
+.diario-currently {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px dashed var(--color-border);
+}
+
+.diario-currently .widget-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font-family: var(--font-handwritten);
+    font-size: 1rem;
+    line-height: 1.25;
+    color: var(--color-text-soft);
+}
+
+.diario-currently .skeleton { align-items: flex-start; }
 
 .sidebar-footer {
     margin-top: auto;
@@ -717,7 +714,7 @@ body.page-public .site-main {
     flex-direction: column;
     gap: 6px;
     position: absolute;
-    top: calc(100% + 10px);
+    bottom: calc(100% + 10px);
     left: 0;
     width: 210px;
     max-width: calc(100vw - 40px);
@@ -934,11 +931,8 @@ body.page-public .site-main {
 
     .nav-drawer.open { transform: translateX(0); }
 
-    /* Currently/Mood também aparecem no drawer mobile (no desktop ficam só na .site-sidebar) */
-    .nav-drawer .drawer-widgets .currently-widget,
-    .nav-drawer .drawer-widgets .mood-widget {
-        margin: 0 -20px;
-    }
+    /* O card "diário do dia" também aparece no drawer mobile (no desktop fica só na .site-sidebar) */
+    .nav-drawer .drawer-widgets .diario-card { margin-top: 70px; }
 
     .nav-drawer .sidebar-footer {
         gap: 10px;
@@ -1168,13 +1162,15 @@ body.page-public .site-main {
     margin: 20px 0 28px;
 }
 
-.page-banner-caption h1 {
+.page-banner-caption h1,
+.page-banner-caption .page-banner-title {
     font-family: var(--font-heading);
     color: var(--color-accent-dark);
     margin: 0 0 6px;
 }
 
-[data-theme="dark"] .page-banner-caption h1 {
+[data-theme="dark"] .page-banner-caption h1,
+[data-theme="dark"] .page-banner-caption .page-banner-title {
     color: var(--color-accent-light);
 }
 
@@ -1442,8 +1438,10 @@ input.input-error, input.input-error:focus {
     grid-template-columns: 280px 1fr 260px 260px;
     grid-template-areas:
         "header    header    header     widgets"
-        "posts     posts     quicklinks widgets"
-        "guestbook guestbook guestbook  widgets";
+        "posts     posts     quicklinks widgets";
+    /* a coluna da direita ocupa as 2 linhas; a sobra de altura dela vai pra
+       linha de baixo (1fr), sem abrir espaço embaixo do banner */
+    grid-template-rows: auto 1fr;
     align-items: start;
     gap: 24px;
 }
@@ -1671,106 +1669,11 @@ input.input-error, input.input-error:focus {
     transition: width 1s linear;
 }
 
-/* Home no desktop: encaixa na tela sem rolar a página — colunas/seções rolam internamente */
+/* Home no desktop: rola como as outras páginas (.site-main rola internamente,
+   ver regra abaixo). O carrossel mantém a proporção 16:9 da imagem em vez de
+   esticar/encolher conforme a altura da janela — antes, numa tela de 900px de
+   altura a foto ficava numa faixa de ~60px. */
 @media (min-width: 1101px) {
-    body.page-home,
-    body.page-home .site-shell {
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    body.page-home .site-main {
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    body.page-home #content.home-grid {
-        flex: 1 1 auto;
-        min-height: 0;
-        overflow: hidden;
-        grid-template-rows: auto minmax(0, 1fr) minmax(0, auto);
-        align-items: stretch;
-    }
-
-    body.page-home .home-quicklinks-col,
-    body.page-home .home-widgets,
-    body.page-home #guestbook {
-        min-height: 0;
-        overflow-y: auto;
-    }
-
-    /* Posts Recentes: mesma altura do Quick Links — a imagem cresce pra
-       preencher o espaço, título/resumo/dots ficam com altura fixa. */
-    body.page-home #posts-recentes {
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-    }
-
-    body.page-home .carousel-outer {
-        flex: 1 1 auto;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-    }
-
-    body.page-home .carousel-clip {
-        flex: 1 1 auto;
-        min-height: 60px;
-        max-height: none;
-    }
-
-    body.page-home .carousel-track {
-        height: 100%;
-    }
-
-    body.page-home .carousel-slide img {
-        height: 100%;
-        aspect-ratio: auto;
-    }
-
-    body.page-home #posts-recentes > h2 {
-        flex-shrink: 0;
-        padding: 10px 16px 6px;
-        font-size: 1.1em;
-    }
-
-    body.page-home .carousel-info {
-        flex-shrink: 0;
-        padding: 8px 18px 4px;
-    }
-
-    body.page-home .carousel-card-body h3 {
-        font-size: 1em;
-        margin-bottom: 2px;
-    }
-
-    body.page-home .carousel-card-body p {
-        margin-bottom: 2px;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    body.page-home .carousel-dots {
-        flex-shrink: 0;
-        padding: 4px 0 8px;
-    }
-
-    body.page-home #guestbook .guestbook-card {
-        max-height: 100%;
-    }
-
-    /* Home no desktop não rola a página inteira — a lista de recados
-       precisa do próprio scroll interno pra não estourar a altura fixa. */
-    body.page-home .guestbook-entries-col {
-        max-height: 260px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding-right: 4px;
-    }
-
     /* Banner com altura fixa acima de posts + quick links */
     body.page-home .home-header-box {
         height: 220px;
@@ -1783,26 +1686,29 @@ input.input-error, input.input-error:focus {
         object-fit: cover;
     }
 
-    body.page-home footer {
-        flex-shrink: 0;
+    body.page-home .carousel-card-body p {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 }
 
-/* Todas as outras páginas no desktop: mesmo princípio da home — a janela não
+/* Todas as páginas no desktop (inclusive a home): a janela não
    rola, só o conteúdo principal (.site-main) rola internamente. A sidebar já
    tem seu próprio scroll interno via position:sticky + overflow-y. */
 @media (min-width: 1101px) {
-    body:not(.page-home) {
+    body {
         height: 100vh;
         overflow: hidden;
     }
 
-    body:not(.page-home) .site-shell {
+    body .site-shell {
         height: 100vh;
         overflow: hidden;
     }
 
-    body:not(.page-home) .site-main {
+    body .site-main {
         min-height: 0;
         overflow-y: auto;
     }
@@ -1814,8 +1720,7 @@ input.input-error, input.input-error:focus {
         grid-template-areas:
             "header    header"
             "posts     quicklinks"
-            "widgets   widgets"
-            "guestbook guestbook";
+            "widgets   widgets";
     }
 }
 
@@ -3428,10 +3333,12 @@ section#rascunhos-da-floresta {
     margin: 0 auto;
 }
 
+/* Corpo dos posts em fonte de leitura (Quicksand); a letra manuscrita
+   (Patrick Hand) fica para as citações, legendas e detalhes. */
 .content-body {
-    font-family: var(--font-handwritten);
-    font-size: 1.2rem;
-    line-height: 1.85;
+    font-family: var(--font-body);
+    font-size: 1.08rem;
+    line-height: 1.8;
     max-width: 68ch;
     margin-left: auto;
     margin-right: auto;
@@ -3477,10 +3384,9 @@ section#rascunhos-da-floresta {
     padding: 14px 22px;
     background: var(--color-surface-alt);
     border-radius: 0 8px 8px 0;
-    font-style: italic;
-    font-family: var(--font-heading);
+    font-family: var(--font-handwritten);
     color: var(--color-text-secondary);
-    font-size: 1.05em;
+    font-size: 1.2em;
 }
 
 .content-body img {
@@ -3798,6 +3704,7 @@ select {
     box-shadow: var(--shadow-card);
 }
 
+.post-header-card h1,
 .post-header-card h2 {
     margin: 0 0 10px;
     font-size: 1.9em;
@@ -3853,6 +3760,7 @@ select {
     margin-bottom: 28px;
 }
 
+.sapo-post-header h1,
 .sapo-post-header h2 {
     margin: 0 0 16px;
     font-size: 1.9em;
@@ -3886,12 +3794,14 @@ select {
     .post-header-card {
         padding: 20px 18px 18px;
     }
+    .post-header-card h1,
     .post-header-card h2 {
         font-size: 1.5em;
     }
     .sapo-post-header {
         padding: 20px 18px 18px;
     }
+    .sapo-post-header h1,
     .sapo-post-header h2 {
         font-size: 1.5em;
     }
@@ -5208,3 +5118,481 @@ body.game-popup-active .mobile-topbar {
 }
 
 .gallery-remove-btn:hover { background: #a93226; }
+
+/* Login fora da navegação pública: o link só aparece (como "Bem-vindo, …",
+   levando ao dashboard) quando a sessão de admin está ativa. Para entrar,
+   acesse /login.html direto. */
+.login-link:not(.is-logged-in) { display: none !important; }
+
+/* Telas desktop mais estreitas: compacta a navbar pra caber numa linha só */
+@media (min-width: 1101px) and (max-width: 1460px) {
+    .topbar-nav { gap: 2px; }
+    .topbar-nav a { padding: 8px 8px; }
+}
+
+/* Abaixo de 1300px a busca vira só a lupa, liberando espaço pros links */
+@media (min-width: 1101px) and (max-width: 1300px) {
+    .topbar-nav a { padding: 8px 6px; font-size: 0.78rem; }
+    .search-bar-trigger { width: auto; padding: 8px; }
+    .search-bar-placeholder { display: none; }
+}
+
+/* Título da página de post: o h1 agora é o título do post; a faixa
+   "Floresta Criativa" acima mantém o mesmo visual de antes */
+.page-banner-caption .page-banner-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+}
+
+/* Texto só para leitores de tela e buscadores */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Menu lateral: legenda curta embaixo dos nomes das seções */
+.sidebar-nav .nav-text { display: flex; flex-direction: column; line-height: 1.2; }
+.sidebar-nav .nav-caption {
+    font-size: 0.72em;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+.sidebar-nav a.active .nav-caption { color: inherit; opacity: 0.8; }
+
+/* Botões, campos e selects usam a fonte do site em vez da fonte padrão do navegador */
+button, input, select, textarea { font-family: inherit; }
+
+/* ===================== */
+/* AJUSTES DE ESPAÇAMENTO (revisão nov/2026) */
+/* ===================== */
+
+/* Botões "− □ ✕" das janelinhas: são só enfeite, então ficam menores e
+   em tom suave, sem competir com o título do card */
+.window-dots span {
+    width: 14px;
+    height: 14px;
+    font-size: 9px;
+    border-radius: 4px;
+    background: var(--color-border);
+    color: var(--color-text-muted);
+    cursor: default;
+}
+[data-theme="dark"] .window-dots span {
+    background: var(--color-surface-hover);
+    color: var(--color-text-muted);
+}
+.window-dots span:hover { filter: none; }
+
+/* Livro de visitas na home: recados lado a lado ocupando a largura toda */
+/* (seletor mais específico porque o OverlayScrollbars força display:flex em linha nesse elemento) */
+.guestbook-card .guestbook-entries {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+
+/* Páginas internas no desktop: banner mais baixo, o conteúdo aparece sem rolar */
+@media (min-width: 1101px) {
+    body:not(.page-home) .home-header-box .hero-banner-img {
+        height: 230px;
+        object-fit: cover;
+        object-position: center 62%;
+    }
+    body:not(.page-home) .page-banner-caption { margin: 14px 0 20px; }
+}
+
+
+/* ============================================================
+   CELULAR (revisão nov/2026)
+   - topbar mais limpa: só menu, logo e busca (tema fica no menu lateral)
+   - PT/EN escondido enquanto a tradução não está completa
+   - Quick Links escondido (a barra de baixo e o menu já fazem esse papel)
+   - link "Voltar" no topo do post
+   ============================================================ */
+.post-back-link { display: none; }
+
+@media (max-width: 768px) {
+    .mobile-topbar-actions { display: none; }
+    .mobile-topbar-controls { gap: 10px; }
+    .mobile-topbar-sign { height: 46px; }
+    .mobile-topbar-row { padding: 6px 0; }
+
+    .lang-toggle { display: none !important; }
+
+    /* no celular o Quick Links some (a barra de baixo faz esse papel), mas o Ouvindo agora fica */
+    .home-quicklinks-col > .widget-card:not(.widget-nowplaying-card) { display: none; }
+
+    .post-back-link {
+        display: inline-flex;
+        align-self: flex-start;
+        width: fit-content;
+        align-items: center;
+        gap: 4px;
+        margin: 4px 16px 10px;
+        padding: 6px 14px;
+        border-radius: var(--radius-pill);
+        background: var(--color-surface);
+        border: var(--border-card-width) solid var(--color-border);
+        color: var(--color-text);
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+}
+
+
+/* ============================================================
+   CARREGAMENTO E WIDGETS VAZIOS (revisão nov/2026)
+   ============================================================ */
+.skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    min-width: 120px;
+    padding: 4px 0;
+}
+.skeleton-line {
+    display: block;
+    height: 12px;
+    width: 90%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--color-surface-alt) 25%, var(--color-border) 50%, var(--color-surface-alt) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+    opacity: 0.7;
+}
+.skeleton-line--short { width: 60%; }
+@keyframes skeleton-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-line { animation: none; }
+}
+
+/* Widgets sem conteúdo somem em vez de mostrar "Nada por aqui" */
+.diario-currently.is-empty,
+.widget-nowplaying-card.is-empty { display: none !important; }
+.widget-card.is-empty { display: none !important; }
+/* "Coming Soon" das listagens ainda não tem nada que preencha o conteúdo: fica escondido
+   até ganhar texto (é só tirar esta regra) */
+.widget-card:has(> #verdeComingSoon),
+.widget-card:has(> #rascunhosComingSoon) { display: none; }
+
+/* ============================================================
+   TELAS DE ADMIN (revisão nov/2026): sem banner nem widgets
+   decorativos, para o formulário começar no topo
+   ============================================================ */
+body.page-admin .home-header-box,
+body.page-admin .sidebar-widgets { display: none !important; }
+body.page-admin .page-banner-caption { margin: 8px 0 18px; }
+/* Todos os cards do painel com a mesma largura (o de Postagens Recentes encolhia no celular) */
+.dashboard-recent-posts { width: 100%; box-sizing: border-box; }
+
+/* ============================================================
+   MINI LIVRO DE VISITAS NA BARRA LATERAL (nov/2026)
+   ============================================================ */
+.mini-guestbook {
+    margin: 4px 0 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.mini-guestbook.is-empty { display: none; }
+.mini-guestbook-title {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-accent-dark);
+}
+[data-theme="dark"] .mini-guestbook-title { color: var(--color-accent); }
+.mini-guestbook-list { display: flex; flex-direction: column; gap: 10px; }
+.mini-letter {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 30px 9px 12px;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: 6px;
+    box-shadow: 2px 3px 0 rgba(71, 137, 68, 0.12);
+    text-decoration: none;
+    color: inherit;
+    transition: transform .2s ease;
+}
+[data-theme="dark"] .mini-letter { background: var(--color-bg-secondary); box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.3); }
+.mini-tilt-a { transform: rotate(-1.4deg); }
+.mini-tilt-b { transform: rotate(1.1deg); }
+.mini-letter:hover, .mini-letter:focus-visible { transform: rotate(0) translateY(-2px); }
+.mini-letter-stamp { position: absolute; top: 6px; right: 6px; width: 20px; opacity: .9; }
+.mini-letter-msg {
+    font-family: var(--font-handwritten);
+    font-size: 0.95rem;
+    line-height: 1.25;
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.mini-letter-sig { font-size: 0.7rem; color: var(--color-text-muted); }
+.mini-guestbook-empty {
+    margin: 0;
+    font-family: var(--font-handwritten);
+    font-size: 0.95rem;
+    color: var(--color-text-soft);
+}
+.mini-guestbook-actions { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.mini-guestbook-cta {
+    padding: 5px 11px;
+    white-space: nowrap;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent-dark);
+    color: #FFFDF6;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+[data-theme="dark"] .mini-guestbook-cta { background: var(--color-accent); color: #10190F; }
+.mini-guestbook-cta:hover { filter: brightness(1.08); }
+.mini-guestbook-all { white-space: nowrap; font-size: 0.78rem; font-weight: 600; color: var(--color-link); text-decoration: none; }
+.mini-guestbook-all:hover { text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .mini-letter { transition: none; } }
+.mini-letter[hidden] { display: none; }
+
+/* Formulário de recado (o guestbook principal agora fica aqui, não mais na home) */
+button.mini-guestbook-cta { border: 0; cursor: pointer; font-family: inherit; }
+.mini-guestbook-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    background: var(--color-surface);
+    border: 1.5px dashed var(--color-border);
+    border-radius: 10px;
+}
+.mini-guestbook-form[hidden] { display: none; }
+[data-theme="dark"] .mini-guestbook-form { background: var(--color-bg-secondary); }
+.mini-guestbook-form input,
+.mini-guestbook-form textarea {
+    width: 100%;
+    padding: 6px 9px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-handwritten);
+    font-size: 0.95rem;
+    resize: vertical;
+}
+.mini-guestbook-form input:focus,
+.mini-guestbook-form textarea:focus { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.mini-guestbook-form button[type="submit"] {
+    align-self: flex-end;
+    padding: 5px 14px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent-dark);
+    color: #FFFDF6;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+[data-theme="dark"] .mini-guestbook-form button[type="submit"] { background: var(--color-accent); color: #10190F; }
+.mini-guestbook-form button[type="submit"]:disabled { opacity: .6; cursor: wait; }
+.mini-guestbook-feedback { margin: 0; font-size: 0.75rem; color: var(--color-accent-dark); }
+.mini-guestbook-feedback:empty { display: none; }
+.mini-guestbook-feedback.is-error { color: var(--color-danger); }
+[data-theme="dark"] .mini-guestbook-feedback:not(.is-error) { color: var(--color-accent); }
+
+/* Área principal: rola normalmente, mas sem a barra de rolagem aparecendo
+   (ela cobria os cantos arredondados do card) */
+.site-main {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    border-radius: var(--radius-card);
+}
+.site-main::-webkit-scrollbar { display: none; }
+/* No desktop o card principal já ocupa a altura da tela; o min-height do
+   .container (100vh - 100px) passava uns 20px da altura do card e criava
+   rolagem mesmo sem conteúdo embaixo */
+@media (min-width: 1101px) {
+    .site-main > .container { min-height: 0; }
+}
+
+/* Menu de cima maior (nov/2026): sem o "Livro de Visitas" (ele agora vive no
+   Recadinhos da barra lateral), sobra espaço para links maiores */
+:root { --topbar-height: 100px; }
+@media (min-width: 1101px) {
+    .topbar-nav { gap: 8px; }
+    .topbar-nav a { padding: 10px 16px; border-radius: 14px; }
+    .search-bar-trigger { padding-top: 10px; padding-bottom: 10px; }
+}
+@media (min-width: 1101px) and (max-width: 1460px) {
+    .topbar-nav { gap: 4px; }
+    .topbar-nav a { padding: 10px 11px; }
+}
+@media (min-width: 1101px) and (max-width: 1300px) {
+    .topbar-nav { gap: 2px; flex-wrap: nowrap; }
+    .topbar-nav a { padding: 8px 7px; }
+}
+
+/* Rodapé da barra lateral: ícones com nome ao lado (nov/2026) */
+.sidebar-social { gap: 6px; flex-wrap: wrap; }
+.sidebar-social > a,
+.sidebar-social > .subscribe-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px 3px 3px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    color: var(--color-text-soft);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    transition: transform 0.2s, background-color 0.2s;
+}
+[data-theme="dark"] .sidebar-social > a,
+[data-theme="dark"] .sidebar-social > .subscribe-btn { background: var(--color-bg-secondary); }
+.sidebar-social > a:hover,
+.sidebar-social > .subscribe-btn:hover { transform: translateY(-1px); background: var(--color-surface-hover); color: var(--color-text); }
+.sidebar-social .icon-github,
+.sidebar-social .subscribe-btn-icon { width: 26px; height: 26px; }
+.social-label { white-space: nowrap; }
+
+.corner-vine-bl { width: 88px; left: -30px; }
+
+/* ============================================================
+   HOME ESTÁTICA (nov/2026): em telas de computador com altura
+   suficiente, tudo da home cabe na tela, sem rolagem. O carrossel
+   de posts estica/encolhe para ocupar a altura que sobra.
+   Em telas mais baixas a home continua rolando como antes.
+   ============================================================ */
+@media (min-width: 1600px) and (min-height: 860px) {
+    body.page-home .site-main { overflow: hidden; }
+    body.page-home .site-main > .home-grid {
+        height: 100%;
+        box-sizing: border-box;
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+    body.page-home #posts-recentes {
+        align-self: stretch;
+        min-height: 0;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    body.page-home .carousel-outer {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    body.page-home .carousel-clip {
+        flex: 1;
+        min-height: 120px;
+        max-height: none;
+    }
+    body.page-home .carousel-track,
+    body.page-home .carousel-slide,
+    body.page-home .carousel-slide a { height: 100%; }
+    body.page-home .carousel-slide img { height: 100%; aspect-ratio: auto; }
+    /* Coluna da direita: se não couber, rola só ela (sem barra aparecendo) */
+    body.page-home .home-widgets {
+        align-self: stretch;
+        min-height: 0;
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+    /* Na home estática os cards ocupam até o fim da tela; a placa e o
+       galhinho do canto ficariam por cima do Garden Log */
+    body.page-home .corner-signpost-br,
+    body.page-home .corner-vine-br { display: none; }
+    body.page-home .home-widgets::-webkit-scrollbar { display: none; }
+}
+
+/* Tablet / notebook pequeno (769–1100px): menu de cima numa linha só,
+   busca vira só a lupa */
+@media (min-width: 769px) and (max-width: 1100px) {
+    /* a coluna do conteúdo não pode ficar mais larga que a tela */
+    .site-shell { grid-template-columns: var(--sidebar-width) minmax(0, 1fr); grid-template-rows: auto 1fr; }
+    .topbar { gap: 10px; padding: 10px 16px; min-height: 64px; }
+    .topbar-nav { gap: 2px; min-width: 0; }
+    .topbar-nav a { padding: 7px 7px; font-size: 0.8rem; }
+    .search-bar-trigger { width: auto; padding: 8px; }
+    .search-bar-placeholder { display: none; }
+    .lang-toggle { display: none !important; } /* igual ao celular: tradução ainda incompleta */
+    /* Featured ocupa a largura toda aqui; sem limite a imagem ficava gigante */
+    #featuredPost img { max-height: 320px; width: 100%; object-fit: cover; }
+}
+
+
+/* Fora do celular o menu lateral (drawer) nunca aparece. O OverlayScrollbars
+   injeta display:flex no elemento e ele caía numa terceira linha da página,
+   embaixo do conteúdo (aparecia em telas de 769–1100px) */
+@media (min-width: 769px) {
+    .nav-drawer, .drawer-overlay, .mobile-topbar, .bottom-nav { display: none !important; }
+}
+
+/* "Ouvindo agora" mora embaixo do Quick Links (nov/2026) */
+@media (min-width: 769px) and (max-width: 1100px) {
+    .home-quicklinks-col .widget-card.widget-nowplaying-card { height: auto; flex: 0 0 auto; }
+    .home-quicklinks-col > .widget-card:first-child { height: auto; flex: 1; }
+}
+
+/* Carrossel na home estática: a arte aparece inteira (sem cortar), com um
+   fundo desfocado da própria imagem preenchendo as laterais */
+@media (min-width: 1600px) and (min-height: 860px) {
+    body.page-home .carousel-slide { position: relative; overflow: hidden; }
+    body.page-home .carousel-slide::before {
+        content: '';
+        position: absolute;
+        inset: -30px;
+        background: var(--slide-bg, none) center / cover no-repeat;
+        filter: blur(24px) saturate(1.1);
+        opacity: 0.85;
+    }
+    body.page-home .carousel-slide a { position: relative; }
+    body.page-home .carousel-slide img { object-fit: contain; }
+    body.page-home .carousel-slide a:hover img { transform: none; }
+}
+
+
+/* Celular (nov/2026) */
+@media (max-width: 768px) {
+    /* O menu lateral abre por cima do topo (o topo fica escondido embaixo
+       dele e do fundo escurecido; tocar fora fecha o menu) */
+    .nav-drawer { z-index: 230 !important; padding-top: 24px !important; }
+    .drawer-overlay { z-index: 225 !important; }
+    /* Topo com os cantos de baixo arredondados, igual ao card do conteúdo,
+       e um respiro entre os dois */
+    .mobile-topbar {
+        border-radius: 0 0 var(--radius-card) var(--radius-card);
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px rgba(36, 52, 31, 0.08);
+    }
+    /* sem barra de rolagem desenhada na lateral (no celular ela não é necessária) */
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    /* barras desenhadas pelo OverlayScrollbars também somem no celular (rolagem por toque) */
+    .os-scrollbar { display: none !important; }
+}

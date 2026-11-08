@@ -17,6 +17,7 @@ const cloudinary = require('cloudinary').v2;
 const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
+const { Resend } = require('resend');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -24,8 +25,23 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+
 function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function stripHtml(s) {
+    return (s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function buildSiteUrl(req) {
+    return process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+}
+
+function buildPostLink(post, siteUrl) {
+    return post.slug ? `${siteUrl}/post.html?slug=${post.slug}` : `${siteUrl}/post.html?id=${post._id}`;
 }
 
 function uploadToCloudinary(buffer) {
@@ -169,6 +185,8 @@ const GuestbookEntry = mongoose.model('GuestbookEntry', new mongoose.Schema({
 
 const Subscriber = mongoose.model('Subscriber', new mongoose.Schema({
     email: { type: String, required: true, unique: true, maxlength: 200 },
+    lang: { type: String, enum: ['pt', 'en'], default: 'pt' },
+    unsubscribeToken: { type: String, default: () => crypto.randomBytes(20).toString('hex') },
     createdAt: { type: Date, default: Date.now }
 }));
 
@@ -434,6 +452,10 @@ app.post('/addPost', requireAuth, galleryUpload, postValidators, async (req, res
 
         await newPost.save();
         res.json({ success: true, message: 'Post publicado com sucesso!', slug: newPost.slug });
+
+        if (newPost.status === 'published') {
+            notifySubscribersOfNewPost(newPost, req).catch(err => console.error('Erro ao notificar inscritos:', err));
+        }
     } catch (err) {
         console.error('Erro ao salvar o post:', err);
         res.status(400).json({ success: false, message: err.message || 'Erro ao salvar o post' });
@@ -464,6 +486,7 @@ app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req
 
         const { postType, storyId, chapterNumber, url } = await resolvePostTypeFields(req.body);
         const previousUrl = post.url;
+        const wasPublished = post.status === 'published';
 
         // Atualiza os campos
         post.title = title;
@@ -506,6 +529,10 @@ app.post('/editPost/:id', requireAuth, galleryUpload, postValidators, async (req
         await Promise.all(staleImages.map(deleteFromCloudinary));
 
         res.json({ success: true, message: 'Post atualizado com sucesso!' });
+
+        if (!wasPublished && post.status === 'published') {
+            notifySubscribersOfNewPost(post, req).catch(err => console.error('Erro ao notificar inscritos:', err));
+        }
     } catch (err) {
         console.error('Erro ao atualizar post:', err);
         res.status(400).json({ success: false, message: err.message || 'Erro ao atualizar post' });
@@ -837,9 +864,14 @@ app.patch('/posts/:id/publish', requireAuth, async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Post inválido' });
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+        const wasPublished = post.status === 'published';
         post.status = 'published';
         await post.save();
         res.json({ success: true });
+
+        if (!wasPublished) {
+            notifySubscribersOfNewPost(post, req).catch(err => console.error('Erro ao notificar inscritos:', err));
+        }
     } catch (err) {
         res.status(500).json({ message: 'Erro no servidor' });
     }
@@ -849,12 +881,11 @@ app.patch('/posts/:id/publish', requireAuth, async (req, res) => {
 app.get('/feed.xml', async (req, res) => {
     try {
         const posts = await Post.find({ status: { $ne: 'draft' } }).sort({ publish_date: -1 }).limit(20);
-        const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
-        const stripHtml = s => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+        const siteUrl = buildSiteUrl(req);
 
         const items = posts.map(post => {
             const desc = stripHtml(post.content).substring(0, 200);
-            const link = `${siteUrl}/post.html?id=${post._id}`;
+            const link = buildPostLink(post, siteUrl);
             return `
     <item>
       <title><![CDATA[${post.title}]]></title>
@@ -883,6 +914,52 @@ ${items}
     }
 });
 
+// E-mails transacionais (confirmação de inscrição + aviso de post novo) via Resend
+const CONFIRM_EMAIL = {
+    pt: { subject: '🐸 Inscrição confirmada — Floresta Criativa', greeting: 'Inscrição confirmada!', body: 'Você vai receber um aviso por aqui sempre que sair um post novo na Floresta Criativa. Obrigado por acompanhar 🐸' },
+    en: { subject: '🐸 Subscription confirmed — Floresta Criativa', greeting: 'Subscription confirmed!', body: "You'll get an email here whenever a new post goes live on Floresta Criativa. Thanks for following 🐸" }
+};
+
+const NEW_POST_EMAIL = {
+    pt: { subjectPrefix: '🌿 Novo post na Floresta Criativa: ', readMore: 'Ler o post completo', unsubscribe: 'Cancelar inscrição' },
+    en: { subjectPrefix: '🌿 New post on Floresta Criativa: ', readMore: 'Read the full post', unsubscribe: 'Unsubscribe' }
+};
+
+function postField(post, field, lang) {
+    if (lang === 'en') {
+        const enValue = post[`${field}_en`];
+        if (enValue) return enValue;
+    }
+    return post[field] || '';
+}
+
+async function notifySubscribersOfNewPost(post, req) {
+    const subscribers = await Subscriber.find({});
+    if (!subscribers.length) return;
+
+    const siteUrl = buildSiteUrl(req);
+    const link = buildPostLink(post, siteUrl);
+
+    const emails = subscribers.map(sub => {
+        const lang = sub.lang === 'en' ? 'en' : 'pt';
+        const msgs = NEW_POST_EMAIL[lang];
+        const title = postField(post, 'title', lang);
+        const excerpt = stripHtml(postField(post, 'content', lang)).substring(0, 200);
+        const unsubscribeLink = `${siteUrl}/api/unsubscribe?token=${sub.unsubscribeToken}`;
+        return {
+            from: RESEND_FROM,
+            to: sub.email,
+            subject: `${msgs.subjectPrefix}${title}`,
+            html: `<p><strong>${title}</strong></p><p>${excerpt}${excerpt ? '...' : ''}</p><p><a href="${link}">${msgs.readMore}</a></p><hr><p style="font-size:12px;color:#888"><a href="${unsubscribeLink}">${msgs.unsubscribe}</a></p>`
+        };
+    });
+
+    for (let i = 0; i < emails.length; i += 100) {
+        const batch = emails.slice(i, i + 100);
+        await resend.batch.send(batch);
+    }
+}
+
 // Inscrição por e-mail
 const SUBSCRIBE_MESSAGES = {
     pt: { email: 'E-mail inválido', already: 'Você já está inscrito(a)!', confirmed: 'Inscrição confirmada! Obrigado por acompanhar 🐸', saveError: 'Erro ao salvar inscrição' },
@@ -903,11 +980,44 @@ app.post('/subscribe', subscribeLimiter, [
         const email = req.body.email.trim().toLowerCase();
         const exists = await Subscriber.exists({ email });
         if (exists) return res.json({ success: true, message: msgs.already });
-        await Subscriber.create({ email });
+        await Subscriber.create({ email, lang });
         res.json({ success: true, message: msgs.confirmed });
+
+        const confirm = CONFIRM_EMAIL[lang];
+        resend.emails.send({
+            from: RESEND_FROM,
+            to: email,
+            subject: confirm.subject,
+            html: `<p><strong>${confirm.greeting}</strong></p><p>${confirm.body}</p>`
+        }).catch(err => console.error('Erro ao enviar e-mail de confirmação:', err));
     } catch (err) {
         res.status(500).json({ message: msgs.saveError });
     }
+});
+
+const UNSUBSCRIBE_PAGE = {
+    pt: { title: 'Inscrição cancelada', done: 'Você foi removido(a) da nossa lista. Sentiremos sua falta! 🐸', invalid: 'Link inválido ou já usado.', back: 'Voltar pro site' },
+    en: { title: 'Unsubscribed', done: "You've been removed from our list. We'll miss you! 🐸", invalid: 'Invalid or already used link.', back: 'Back to the site' }
+};
+
+function unsubscribePageHtml(lang, message, siteUrl) {
+    const t = UNSUBSCRIBE_PAGE[lang];
+    return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><title>${t.title}</title>
+<style>body{font-family:sans-serif;max-width:480px;margin:80px auto;text-align:center;color:#333}a{color:#4a7c59}</style>
+</head><body><p>${message}</p><p><a href="${siteUrl}">${t.back}</a></p></body></html>`;
+}
+
+// Descadastro (link enviado no rodapé dos e-mails de post novo)
+app.get('/unsubscribe', async (req, res) => {
+    const siteUrl = buildSiteUrl(req);
+    const token = req.query.token;
+    const sub = token ? await Subscriber.findOne({ unsubscribeToken: token }) : null;
+    if (!sub) {
+        return res.send(unsubscribePageHtml('pt', UNSUBSCRIBE_PAGE.pt.invalid, siteUrl));
+    }
+    const lang = sub.lang === 'en' ? 'en' : 'pt';
+    await Subscriber.deleteOne({ _id: sub._id });
+    res.send(unsubscribePageHtml(lang, UNSUBSCRIBE_PAGE[lang].done, siteUrl));
 });
 
 // Rota para carregar post no editor (sem incrementar views)
@@ -1330,6 +1440,280 @@ app.get('/spotify/now-playing', async (req, res) => {
         });
     } catch (err) {
         res.json({ connected: false });
+    }
+});
+
+// ── Animes: lista de assistidos / assistindo / quero ver ─────────────────
+
+const ANIME_STATUSES = ['assistindo', 'assistido', 'quero_ver', 'pausado', 'abandonado'];
+
+const Anime = mongoose.model('Anime', new mongoose.Schema({
+    title: { type: String, required: true, maxlength: 200 },
+    status: { type: String, enum: ANIME_STATUSES, default: 'quero_ver' },
+    rating: { type: Number, min: 0, max: 10, default: null },
+    episodesWatched: { type: Number, min: 0, default: 0 },
+    episodesTotal: { type: Number, min: 0, default: null },
+    cover: { type: String, default: '', maxlength: 500 },
+    link: { type: String, default: '', maxlength: 500 },
+    notes: { type: String, default: '', maxlength: 500 },
+    malId: { type: Number, default: null },
+    favorite: { type: Boolean, default: false },
+    startedAt: { type: Date, default: null },
+    finishedAt: { type: Date, default: null },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+}));
+
+const animeValidators = [
+    body('title').optional().trim().notEmpty().withMessage('O título é obrigatório').isLength({ max: 200 }),
+    body('status').optional().isIn(ANIME_STATUSES).withMessage('Status inválido'),
+    body('rating').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 10 }).withMessage('A nota vai de 0 a 10'),
+    body('episodesWatched').optional({ nullable: true, checkFalsy: true }).isInt({ min: 0 }),
+    body('episodesTotal').optional({ nullable: true, checkFalsy: true }).isInt({ min: 0 }),
+    body('cover').optional({ nullable: true, checkFalsy: true }).trim().isURL({ protocols: ['https'], require_protocol: true }).withMessage('A capa precisa ser um link https'),
+    body('link').optional({ nullable: true, checkFalsy: true }).trim().isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('O link precisa começar com https://'),
+    body('notes').optional({ nullable: true }).trim().isLength({ max: 500 }).withMessage('Comentário muito longo (máx. 500)'),
+    body('malId').optional({ nullable: true, checkFalsy: true }).isInt({ min: 1 }),
+    body('favorite').optional().isBoolean(),
+    body('startedAt').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+    body('finishedAt').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+];
+
+const ANIME_FIELDS = ['title', 'status', 'rating', 'episodesWatched', 'episodesTotal', 'cover', 'link', 'notes', 'malId', 'favorite', 'startedAt', 'finishedAt'];
+
+// Ao marcar como assistido, completa episódios e data de término se estiverem vazios
+function fillFinished(anime) {
+    if (anime.status !== 'assistido') return;
+    if (!anime.finishedAt) anime.finishedAt = new Date();
+    if (anime.episodesTotal && !anime.episodesWatched) anime.episodesWatched = anime.episodesTotal;
+}
+
+function pickAnimeFields(src) {
+    const out = {};
+    for (const key of ANIME_FIELDS) {
+        if (src[key] === undefined) continue;
+        out[key] = src[key] === '' && !['notes', 'cover', 'link'].includes(key) ? null : src[key];
+    }
+    return out;
+}
+
+// Capas vindas do MyAnimeList são copiadas para o Cloudinary ao salvar, para não
+// sumirem se o MAL mudar o endereço. Se a cópia falhar, fica o link original.
+function isMalImage(url) {
+    try { return /(^|\.)myanimelist\.net$/i.test(new URL(url).hostname); } catch (e) { return false; }
+}
+function isOurAnimeCover(url) {
+    return typeof url === 'string' && url.includes('res.cloudinary.com') && url.includes('/floresta-criativa/animes/');
+}
+async function mirrorAnimeCover(url) {
+    if (!url || !isMalImage(url)) return url;
+    try {
+        const result = await cloudinary.uploader.upload(url, { folder: 'floresta-criativa/animes' });
+        return result.secure_url || url;
+    } catch (err) {
+        console.error('Não consegui copiar a capa para o Cloudinary, mantendo o link do MAL:', err.message || err);
+        return url;
+    }
+}
+
+// Público: lista de animes, opcionalmente filtrada por status
+// GET /api/animes?status=assistindo
+app.get('/animes', async (req, res) => {
+    try {
+        const filter = {};
+        if (req.query.status) {
+            const statuses = String(req.query.status).split(',').filter(s => ANIME_STATUSES.includes(s));
+            if (statuses.length) filter.status = { $in: statuses };
+        }
+        if (req.query.favorite === 'true') filter.favorite = true;
+        const animes = await Anime.find(filter).sort({ favorite: -1, updatedAt: -1 }).lean();
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json(animes);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar animes' });
+    }
+});
+
+// Público: contagem por status (para as abas)
+app.get('/animes/stats', async (req, res) => {
+    try {
+        const rows = await Anime.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]);
+        const stats = Object.fromEntries(ANIME_STATUSES.map(s => [s, 0]));
+        rows.forEach(r => { stats[r._id] = r.count; });
+        res.json(stats);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao buscar estatísticas' });
+    }
+});
+
+// Admin: busca no MyAnimeList (via Jikan, sem chave) para preencher capa/episódios
+// GET /api/admin/animes/search?q=frieren
+app.get('/admin/animes/search', requireAuth, async (req, res) => {
+    const q = String(req.query.q || '').trim().slice(0, 100);
+    if (q.length < 2) return res.json([]);
+    try {
+        const url = `https://api.jikan.moe/v4/anime?limit=8&sfw=true&q=${encodeURIComponent(q)}`;
+        const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (!r.ok) return res.status(502).json({ message: 'A busca do MyAnimeList não respondeu, tente de novo' });
+        const { data = [] } = await r.json();
+        res.json(data.map(a => ({
+            malId: a.mal_id,
+            title: a.title,
+            titleEnglish: a.title_english || '',
+            episodesTotal: a.episodes || null,
+            cover: a.images?.webp?.image_url || a.images?.jpg?.image_url || '',
+            year: a.year || a.aired?.prop?.from?.year || null,
+            type: a.type || '',
+            link: a.url || ''
+        })));
+    } catch (err) {
+        res.status(502).json({ message: 'A busca do MyAnimeList não respondeu, tente de novo' });
+    }
+});
+
+app.post('/admin/animes', requireAuth, animeValidators, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!req.body.title || !String(req.body.title).trim()) {
+        return res.status(400).json({ message: 'O título é obrigatório' });
+    }
+    try {
+        const fields = pickAnimeFields(req.body);
+        if (fields.cover) fields.cover = await mirrorAnimeCover(fields.cover);
+        const anime = new Anime(fields);
+        fillFinished(anime);
+        await anime.save();
+        res.status(201).json(anime);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao salvar anime' });
+    }
+});
+
+app.put('/admin/animes/:id', requireAuth, animeValidators, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ message: 'Anime não encontrado' });
+    try {
+        const anime = await Anime.findById(req.params.id);
+        if (!anime) return res.status(404).json({ message: 'Anime não encontrado' });
+        const fields = pickAnimeFields(req.body);
+        const oldCover = anime.cover;
+        if (fields.cover && fields.cover !== oldCover) fields.cover = await mirrorAnimeCover(fields.cover);
+        anime.set({ ...fields, updatedAt: new Date() });
+        fillFinished(anime);
+        await anime.save();
+        // Capa trocada: apaga a cópia antiga do Cloudinary
+        if (fields.cover !== undefined && fields.cover !== oldCover && isOurAnimeCover(oldCover)) deleteFromCloudinary(oldCover);
+        res.json(anime);
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao atualizar anime' });
+    }
+});
+
+app.delete('/admin/animes/:id', requireAuth, async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ message: 'Anime não encontrado' });
+    try {
+        const anime = await Anime.findByIdAndDelete(req.params.id);
+        if (!anime) return res.status(404).json({ message: 'Anime não encontrado' });
+        if (isOurAnimeCover(anime.cover)) deleteFromCloudinary(anime.cover);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Erro ao excluir anime' });
+    }
+});
+
+// ── SEO: sitemap e prévia dos posts para buscadores/redes sociais ──────────
+// Endereço "oficial" do site, usado em canonical, sitemap e og:url (o domínio
+// floresta-criativa.vercel.app aponta pra cá como cópia).
+const CANONICAL_SITE = (process.env.SITE_URL || 'https://nayfts.dev').replace(/\/$/, '');
+const fs = require('fs');
+
+function escapeAttr(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// O conteúdo vem do CKEditor com entidades HTML (&nbsp;, &amp;...); decodifica antes de escapar de novo
+function decodeEntities(s) {
+    return String(s || '')
+        .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/&#0?39;/g, "'")
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ').trim();
+}
+
+function postImageUrl(post) {
+    if (!post.image_path) return `${CANONICAL_SITE}/imagens/og-image.jpg`;
+    return post.image_path.startsWith('http') ? post.image_path : `${CANONICAL_SITE}/imagens/uploads/${post.image_path}`;
+}
+
+// Recebe o HTML do post.html e devolve com título, descrição e tags og:/twitter:
+// já preenchidos — WhatsApp, Instagram e o Google leem isso sem rodar JavaScript.
+function renderPostMeta(html, post) {
+    const title = post.title || 'Floresta Criativa';
+    const desc = decodeEntities(stripHtml(post.content)).substring(0, 160);
+    const url = buildPostLink(post, CANONICAL_SITE);
+    const img = postImageUrl(post);
+    const set = (re, tag) => (re.test(html) ? (html = html.replace(re, tag)) : html);
+    set(/<title>[^<]*<\/title>/, `<title>${escapeAttr(title)} — Floresta Criativa</title>`);
+    set(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${escapeAttr(desc)}">`);
+    set(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${escapeAttr(title)}">`);
+    set(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${escapeAttr(desc)}">`);
+    set(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${escapeAttr(img)}">`);
+    const extra = `<link rel="canonical" href="${escapeAttr(url)}">` +
+        `<meta property="og:url" content="${escapeAttr(url)}">` +
+        `<meta property="og:locale" content="pt_BR">`;
+    return html.replace('</head>', `${extra}</head>`);
+}
+
+let postTemplateCache = null;
+function readPostTemplate() {
+    if (!postTemplateCache) {
+        postTemplateCache = fs.readFileSync(path.join(__dirname, '..', 'public', 'post.html'), 'utf8');
+    }
+    return postTemplateCache;
+}
+
+// GET /post.html?slug=... (roteado pelo vercel.json) — mesma página de sempre,
+// só que com as meta tags do post. Se algo der errado, serve a página sem mudança.
+app.get('/post.html', async (req, res) => {
+    let html;
+    try {
+        html = readPostTemplate();
+    } catch (err) {
+        console.error('post.html não encontrado para renderizar meta tags:', err);
+        return res.status(500).send('Erro ao carregar a página');
+    }
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400');
+    try {
+        const id = String(req.query.slug || req.query.id || '');
+        if (!id) return res.send(html);
+        const filter = (mongoose.Types.ObjectId.isValid(id) && id.length === 24) ? { _id: id } : { slug: id };
+        const post = await Post.findOne({ ...filter, status: { $ne: 'draft' } }).lean();
+        res.send(post ? renderPostMeta(html, post) : html);
+    } catch (err) {
+        console.error('Erro ao gerar meta tags do post:', err);
+        res.send(html);
+    }
+});
+
+// GET /sitemap.xml (roteado pelo vercel.json) — páginas fixas + todos os posts publicados
+const SITEMAP_PAGES = ['/', '/rascunhos-da-floresta.html', '/sapo-imaginario.html', '/verde-inspiracao.html', '/sobre-mim.html', '/livro-de-visitas.html'];
+app.get('/sitemap.xml', async (req, res) => {
+    try {
+        const posts = await Post.find({ status: { $ne: 'draft' } }, { slug: 1, publish_date: 1 }).sort({ publish_date: -1 }).lean();
+        const urls = SITEMAP_PAGES.map(p => `  <url><loc>${CANONICAL_SITE}${p}</loc></url>`)
+            .concat(posts.map(p => {
+                const lastmod = p.publish_date ? `<lastmod>${new Date(p.publish_date).toISOString().slice(0, 10)}</lastmod>` : '';
+                return `  <url><loc>${escapeAttr(buildPostLink(p, CANONICAL_SITE))}</loc>${lastmod}</url>`;
+            }));
+        res.set('Content-Type', 'application/xml; charset=utf-8');
+        res.set('Cache-Control', 'public, max-age=0, s-maxage=3600');
+        res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
+    } catch (err) {
+        console.error('Erro ao gerar sitemap:', err);
+        res.status(500).send('Erro ao gerar sitemap');
     }
 });
 
