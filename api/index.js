@@ -25,7 +25,10 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Sem RESEND_API_KEY o construtor do Resend lança erro, e como isso roda ao carregar o arquivo,
+// derrubava a API inteira (posts, comentários, tudo). Agora, sem chave, só os e-mails ficam desligados.
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+if (!resend) console.warn('RESEND_API_KEY não definida: e-mails de inscrição/post novo desativados.');
 const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
 function escapeRegex(string) {
@@ -934,6 +937,7 @@ function postField(post, field, lang) {
 }
 
 async function notifySubscribersOfNewPost(post, req) {
+    if (!resend) return;
     const subscribers = await Subscriber.find({});
     if (!subscribers.length) return;
 
@@ -983,6 +987,7 @@ app.post('/subscribe', subscribeLimiter, [
         await Subscriber.create({ email, lang });
         res.json({ success: true, message: msgs.confirmed });
 
+        if (!resend) return;
         const confirm = CONFIRM_EMAIL[lang];
         resend.emails.send({
             from: RESEND_FROM,
