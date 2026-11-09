@@ -305,7 +305,9 @@
 
   function api(path, options) {
       options = options || {};
-      return fetch(API_BASE + path, Object.assign({ credentials: 'include', headers: { 'Content-Type': 'application/json' } }, options))
+      // no-store: a lista pública /animes vem com cache de 60s no navegador; sem isso,
+      // depois de salvar a tabela recarregava a versão antiga e parecia que nada mudou
+      return fetch(API_BASE + path, Object.assign({ credentials: 'include', cache: 'no-store', headers: { 'Content-Type': 'application/json' } }, options))
           .then(function (r) {
               if (r.status === 401) { window.location.href = 'login.html'; throw new Error('Não autenticado'); }
               return r.json().catch(function () { return {}; }).then(function (data) {
